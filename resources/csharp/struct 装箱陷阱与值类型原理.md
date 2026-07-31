@@ -1,11 +1,11 @@
 ---
 title: "struct 装箱陷阱与值类型原理"
 type: resource
-tags: [csharp, unity, boxing, value-type]
+tags: [csharp, unity, boxing, value-type, memory, stack-vs-heap]
 created: "2026-07-28"
-updated: "2026-07-28"
+updated: "2026-07-30"
 status: active
-summary: "值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法"
+summary: "值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法、栈/堆内存布局与生命周期"
 ---
 
 # struct 装箱陷阱与值类型原理
@@ -155,6 +155,96 @@ arr[0].damage = 999;     // ✅ 直接修改原数组，无装箱
 - [ ] 枚举作为 `Dictionary` 的 Key → 实现 `IEquatable<TEnum>` 避免隐式装箱
 - [ ] 热路径上 struct → interface 转型 → 改用泛型方法
 - [ ] LINQ 操作 `Where`/`Select` 对 struct 集合 → 注意迭代器装箱
+
+## 值类型 vs 引用类型：栈/堆内存布局与生命周期
+
+### 核心记忆口诀
+
+> **struct 不一定在栈上，class 的引用在栈上，数据在堆上**
+
+### 分配规则
+
+| 场景 | struct | class |
+|:----|:------|:------|
+| 局部变量/参数 | **栈上**分配 | 引用变量在**栈上**，实例数据在**堆上** |
+| 类的字段成员 | 跟随类实例在**堆上** | 引用在类实例的堆布局中，指向另一个堆对象 |
+| 数组元素 | 数组自身在堆上，struct 元素作为数组的一部分连续存放 | 数组在堆上，每个元素是引用，指向分散在堆各处的对象 |
+
+### 图解：局部变量生命周期
+
+```csharp
+void SomeMethod()
+{
+    int a = 42;                         // a 在栈上
+    GameObject go = new GameObject();   // go 引用在栈上，对象在堆上
+    // ... 使用
+}   // ← 方法结束，栈帧弹出
+    //    a 和 go 引用 → 自动释放（栈操作，零开销）
+    //    GameObject 实例 → 堆上变成"垃圾"，等待 GC
+```
+
+```
+方法执行时栈帧：
+┌──────────── 栈（Stack）─────────────┐
+│  SomeMethod() 栈帧：                  │
+│  ┌──────────────────────────────┐    │
+│  │ int a = 42          (4 bytes) │    │
+│  │ GameObject go       (8 bytes) │────┼──→ 堆上 GameObject 实例
+│  │ (引用/指针)                    │    │    ┌──────────────────┐
+│  └──────────────────────────────┘    │    │ - m_Name: "Temp"  │
+│                                      │    │ - m_Transform     │
+│  方法结束后栈帧弹出 → a 和 go 自动释放 │    │ - ...             │
+│  无需 GC 介入 🎉                     │    └──────────────────┘
+└──────────────────────────────────────┘         ↑ 此对象由 GC 回收
+```
+
+### 释放时机对照表
+
+| 层 | 释放时机 | 释放方式 | 性能影响 |
+|:---|:--------|:--------|:--------|
+| **栈空间**（局部变量、参数、返回值） | 方法/作用域结束**立即释放** | 栈帧弹出，ESP 指针复位 | **零开销**，O(1) |
+| **堆空间**（class 实例、boxed struct） | 不确定，在下一次 GC 触发时回收 | 标记-清除或标记-压缩 | 每次 GC 有暂停 |
+
+### 常见误区
+
+```csharp
+void CreateTemp()
+{
+    var list = new List<string> { "a", "b" };
+} // ← list 引用被释放，但 List 对象还在堆上
+  //   GC 发现它不可达时才会回收
+```
+
+**误区**：以为方法结束 = 对象被销毁 ❌  
+**真相**：引用被释放 = 对象变为"垃圾" → 等待 GC 清扫
+
+### 为什么 Unity 项目要特别注意？
+
+```csharp
+void Update()
+{
+    List<Vector3> positions = new List<Vector3>();  // 每次 new 都在堆上分配
+    // ... 计算顶点
+} // 引用释放，但堆上的 List 等下轮 GC
+
+// ✅ 正确做法：拉到成员变量复用
+private List<Vector3> positions = new List<Vector3>();
+
+void Update()
+{
+    positions.Clear();   // 只清内容，不释放对象内存
+    // ... 复用同一个 List
+}
+```
+
+- 频繁在 Update 里 `new` 临时引用对象 = **堆上积累大量"垃圾"**
+- GC 触发 → 主线程暂停 → VR 项目尤其致命（帧率抖动）
+- **对象池** + **复用** + **struct 替代小 class** 是 Unity 性能三件套
+
+### 参考
+
+- [Value types - C# reference](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types)
+- [Memory allocation and garbage collection in Unity](https://docs.unity3d.com/Manual/performance-garbage-collector.html)
 
 ## 参考
 

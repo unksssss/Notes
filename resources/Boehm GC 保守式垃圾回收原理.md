@@ -74,6 +74,13 @@ Boehm GC 支持 Incremental 模式（开启后可分拆到多帧）：
 // ❌ 仍然是保守式，不能压缩
 ```
 
+### 面试易错点（Day 13 失分记录）
+
+1. **标记和清除都分片**，不是只分"清除"！
+2. **不能彻底消除 Stop-the-World**——分配压力大时仍可能触发完整 GC（full GC）
+3. **Mono 后端也支持**（Player Settings → Use Incremental GC），不是 IL2CPP 专属
+4. 记忆：增量 GC = 长暂停换小开销，治标不治本 → 代码里少产生垃圾才是王道（缓存、对象池、避免装箱）
+
 ## 与精确式 GC 对比（SGen / Unity 分代 GC）
 
 ```cs

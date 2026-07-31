@@ -1,11 +1,17 @@
 ---
-title: "Unity 渲染批处理体系"
+title: Unity 渲染批处理体系
 type: resource
-tags: [unity, rendering, batch, static-batching, gpu-instancing, srp-batcher]
-created: "2026-07-28"
-updated: "2026-07-28"
+tags:
+  - unity
+  - rendering
+  - batch
+  - static-batching
+  - gpu-instancing
+  - srp-batcher
+created: 2026-07-28
+updated: 2026-07-29
 status: active
-summary: "静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱"
+summary: 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱
 ---
 
 # Unity 渲染批处理体系
@@ -115,7 +121,7 @@ renderer.SetPropertyBlock(block);  // ← 这个操作让 SRP Batcher 对当前�
 ```
 
 **回退原因**：SRP Batcher 依赖 Material 的恒定数据在 GPU 端缓存，MPB 注入的是运行时可变的 Per-Renderer 数据，打破了缓存一致性假设。
-
+一旦调用MaterailPropertyBlock,引擎就会认为这个Render有私有属性覆盖,没法再和其他Render共享GPU常量缓冲区了，于是回退到传统DrawCall单独绘制.
 ### 陷阱
 
 1. **MPB 导致回退**：使用 `MaterialPropertyBlock` 后 SRP Batcher 对该渲染器失效（常见坑！）

@@ -38,6 +38,10 @@ updated: 2026-04-29
 - [[urp移动优化]] — URP 渲染管线在移动端的优化配置与技巧
 - [[协程原理与unitask]] — Unity 协程工作原理、局限性与 UniTask 替代方案
 - [[对象池实现]] — Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版）
+- [[ToggleGroup底层机制]] — ToggleGroup allowSwitchOff 行为与底层调用链
+- [[Addressables资源生命周期]] — Addressables 引用计数机制与资源生命周期
+- [[Obi Rope粒子约束体系]] — Obi Rope 粒子约束架构与初始爆炸根因
+- [[MonoBehaviour生命周期与SetActive的坑]] — 生命周期与初始 inactive 陷阱
 
 ### unity面试
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
@@ -58,6 +62,12 @@ updated: 2026-04-29
 ### 性能优化
 - [[profiler自定义采样]] — Unity Profiler 自定义采样标记定位性能瓶颈
 - [[对象池实现]] — Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版）
+- [[Addressables资源生命周期]] — Addressables 引用计数机制与资源生命周期
+
+### 算法
+- [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
+- [[DFS与BFS遍历算法]] — DFS/BFS 对比：最短路径、环检测，均 O(V+E)
+- [[链表反转]] — 三指针迭代与递归两种写法
 
 ### 数据驱动
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用

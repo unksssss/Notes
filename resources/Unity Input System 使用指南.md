@@ -1,13 +1,17 @@
 ---
-title: "Unity Input System 使用指南"
+title: Unity Input System 使用指南
 type: resource
-tags: [unity, Input System, 输入, XR]
-created: "2026-06-17"
-updated: "2026-06-17"
+tags:
+  - unity
+  - 输入
+  - XR
+created: 2026-06-17
+updated: 2026-06-17
 status: active
-summary: "Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。"
+summary: Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。
 source: ""
-related: [["XR Interaction Toolkit 配置指南"]]
+related:
+  - - XR Interaction Toolkit 配置指南
 ---
 
 # Unity Input System 使用指南
