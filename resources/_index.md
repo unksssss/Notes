@@ -25,5 +25,10 @@ updated: 2026-04-29
 | [[链表反转]] | 三指针迭代（O(n)/O(1)）与递归（O(n)/O(n)）两种写法 |
 | [[Obi Rope粒子约束体系]] | Obi Rope 粒子约束架构、初始爆炸根因与解决方向 |
 | [[MonoBehaviour生命周期与SetActive的坑]] | 初始 inactive 不触发 Awake、协程与 SetActive 关系 |
+| [[排序算法-快排归并堆排]] | 快排/归并/堆排复杂度对比：稳定性、最坏退化、空间占用 |
+| [[KMP字符串匹配]] | 主串指针不回退、next 前缀表、O(n+m)、面试高频追问 |
+| [[Animator参数与性能优化]] | 参数四类型、Trigger vs Bool、StringToHash 预计算 int、HasParameter |
+| [[XR射线交互与World Space Canvas]] | TrackedDeviceGraphicRaycaster + Event Camera + XRRayInteractor 三件套 |
+| [[UGUI事件接口与EventTrigger]] | IPointerMoveHandler 不生效四大原因、Raycast Target、验证技巧 |
 | [[dots详解]] | DOTS详解 |
 | [[unity知识点-2026-04-28]] | Unity知识点 2026-04-28 |
