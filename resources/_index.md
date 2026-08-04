@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-04-29
+updated: 2026-08-04
 ---
 
 # Resources
@@ -23,12 +23,17 @@ updated: 2026-04-29
 | [[DFS与BFS遍历算法]] | DFS/BFS 对比：最短路径（BFS）、环检测（DFS），均 O(V+E) |
 | [[Addressables资源生命周期]] | Addressables 引用计数：Load/Release 成对、只 Load 不 Release = 泄漏 |
 | [[链表反转]] | 三指针迭代（O(n)/O(1)）与递归（O(n)/O(n)）两种写法 |
-| [[Obi Rope粒子约束体系]] | Obi Rope 粒子约束架构、初始爆炸根因与解决方向 |
+| [[Obi Rope粒子约束体系]] | Obi Rope 粒子约束架构、初始爆炸根因、Blueprint 局部坐标系与整体平移 |
 | [[MonoBehaviour生命周期与SetActive的坑]] | 初始 inactive 不触发 Awake、协程与 SetActive 关系 |
 | [[排序算法-快排归并堆排]] | 快排/归并/堆排复杂度对比：稳定性、最坏退化、空间占用 |
 | [[KMP字符串匹配]] | 主串指针不回退、next 前缀表、O(n+m)、面试高频追问 |
 | [[Animator参数与性能优化]] | 参数四类型、Trigger vs Bool、StringToHash 预计算 int、HasParameter |
 | [[XR射线交互与World Space Canvas]] | TrackedDeviceGraphicRaycaster + Event Camera + XRRayInteractor 三件套 |
 | [[UGUI事件接口与EventTrigger]] | IPointerMoveHandler 不生效四大原因、Raycast Target、验证技巧 |
+| [[递归与迭代转换]] | 尾递归转循环、一般递归用栈/队列显式保存状态、二叉树前序迭代模板 |
+| [[动态规划入门]] | 最优子结构/重叠子问题、三板斧套路、爬楼梯变体转移方程 |
+| [[DOTween与协程选型]] | 协程管流程、DOTween 管补间；可中断/可控是选 DOTween 的核心理由 |
+| [[Update-FixedUpdate-LateUpdate执行时机]] | FixedUpdate 固定步长跑物理、Update 跑逻辑、LateUpdate 相机跟随；两套时钟解耦 |
+| [[UGUI布局系统与强制刷新]] | LayoutGroup 动态加子项不刷新的解法：ForceRebuildLayoutImmediate/ForceUpdateCanvases、GetWorldCorners |
 | [[dots详解]] | DOTS详解 |
 | [[unity知识点-2026-04-28]] | Unity知识点 2026-04-28 |

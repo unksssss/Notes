@@ -3,9 +3,9 @@ title: "Obi Rope 粒子约束体系"
 type: resource
 tags: [unity, obi, 物理, 项目实战]
 created: "2026-07-31"
-updated: "2026-07-31"
+updated: "2026-08-04"
 status: active
-summary: "Obi Rope 粒子 + 约束架构：Distance/Bend/Pin/Attachment 约束、初始爆炸根因（粒子堆叠自碰撞 + Pin 高空拉回）"
+summary: "Obi Rope 粒子 + 约束架构：Distance/Bend/Pin/Attachment 约束、初始爆炸根因（粒子堆叠自碰撞 + Pin 高空拉回）、Blueprint 局部坐标系与整体平移"
 ---
 
 # Obi Rope 粒子约束体系
@@ -42,6 +42,7 @@ Obi 把绳索拆成**一串粒子（ObiParticle）**，由**全局唯一的 Obi 
   - Transform 在场景原点 + CP0=(0,0,0) → 绳索起点 = 世界原点
   - 正确做法：Transform 放在锚点端，CP0=(0,0,0) 对应锚点世界坐标，绳索才能从锚点"长"出来
 - 一句话记忆：Blueprint 决定"形状"，Transform 决定"在哪"
+- **整体平移（Day 15 巩固）**：移动绳索 GameObject 的 Transform（锚点/附件跟着挪）即可，**Blueprint 完全不用重建**——局部坐标天然解耦。⚠️ 但不要只拖端点：ObiParticleAttachment（Static 模式）会跟随锚点，只改端点会把绳索"拉伸"而不是"平移"，形状会变
 
 ## 生成要点速记（项目积累）
 
