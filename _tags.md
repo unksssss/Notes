@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-08-04
+updated: 2026-08-06
 ---
 
 # Tags Index
@@ -53,6 +53,8 @@ updated: 2026-08-04
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
 - [[UGUI布局系统与强制刷新]] — LayoutGroup 动态加子项不刷新的解法
 - [[DOTween与协程选型]] — 协程管流程、DOTween 管补间、可中断可控
+- [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
+- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 
 ### unity面试
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
@@ -75,6 +77,8 @@ updated: 2026-08-04
 - [[profiler自定义采样]] — Unity Profiler 自定义采样标记定位性能瓶颈
 - [[对象池实现]] — Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版）
 - [[Addressables资源生命周期]] — Addressables 引用计数机制与资源生命周期
+- [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
+- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 
 ### 算法
 - [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
@@ -84,6 +88,8 @@ updated: 2026-08-04
 - [[KMP字符串匹配]] — 主串指针不回退、next 前缀表、O(n+m)
 - [[递归与迭代转换]] — 尾递归转循环、一般递归用栈/队列显式保存状态
 - [[动态规划入门]] — 最优子结构/重叠子问题、三板斧套路、爬楼梯变体
+- [[二分查找]] — 原理、比较次数推导、O(log n)、C# BinarySearch
+- [[贪心算法入门]] — 局部最优、找零钱翻车案例、贪心 vs DP 分界
 
 ### 数据结构
 - [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
@@ -91,6 +97,11 @@ updated: 2026-08-04
 - [[排序算法-快排归并堆排]] — 快排/归并/堆排复杂度对比
 - [[递归与迭代转换]] — 尾递归转循环、一般递归用栈/队列显式保存状态
 - [[动态规划入门]] — 最优子结构/重叠子问题、三板斧套路
+- [[二分查找]] — 原理、比较次数推导、O(log n)
+- [[贪心算法入门]] — 局部最优、找零钱翻车案例
+
+### 物理
+- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 
 ### 数据驱动
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用
@@ -118,16 +129,17 @@ updated: 2026-08-04
 ### UGUI
 - [[UGUI事件接口与EventTrigger]] — IPointerMoveHandler 不生效四大原因
 - [[UGUI布局系统与强制刷新]] — LayoutGroup 动态加子项不刷新的解法
+- [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
-| unity | 24 |
-| 算法 | 7 |
-| 性能优化 | 3 |
+| unity | 26 |
+| 算法 | 9 |
+| 性能优化 | 5 |
 | unity面试 | 3 |
-| 数据结构 | 5 |
+| 数据结构 | 7 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
@@ -145,5 +157,6 @@ updated: 2026-08-04
 | 对象池 | 1 |
 | 动画 | 1 |
 | 生命周期 | 2 |
-| UGUI | 2 |
+| UGUI | 3 |
+| 物理 | 1 |
 | daily | 1 |

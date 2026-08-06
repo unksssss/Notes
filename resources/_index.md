@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-08-04
+updated: 2026-08-06
 ---
 
 # Resources
@@ -35,5 +35,10 @@ updated: 2026-08-04
 | [[DOTween与协程选型]] | 协程管流程、DOTween 管补间；可中断/可控是选 DOTween 的核心理由 |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | FixedUpdate 固定步长跑物理、Update 跑逻辑、LateUpdate 相机跟随；两套时钟解耦 |
 | [[UGUI布局系统与强制刷新]] | LayoutGroup 动态加子项不刷新的解法：ForceRebuildLayoutImmediate/ForceUpdateCanvases、GetWorldCorners |
+| [[UGUI布局系统与强制刷新]] | LayoutGroup 动态加子项不刷新的解法：ForceRebuildLayoutImmediate/ForceUpdateCanvases、GetWorldCorners；ScrollRect 三种 MovementType |
+| [[TMP Text 零分配更新]] | TMP SetText 格式化重载/SetCharArray 零分配更新文本，避开 string 拼接 GC |
+| [[二分查找]] | 二分查找原理、最少/最多比较次数（⌈log₂n⌉）、O(log n)、C# BinarySearch |
+| [[Physics Raycast 与 NonAlloc]] | Raycast 性能：LayerMask 过滤、同步返回；NonAlloc 预分配数组零分配（VR 首选） |
+| [[贪心算法入门]] | 贪心=局部最优、找零钱翻车案例、贪心选择性质、与 DP 的分界 |
 | [[dots详解]] | DOTS详解 |
 | [[unity知识点-2026-04-28]] | Unity知识点 2026-04-28 |
