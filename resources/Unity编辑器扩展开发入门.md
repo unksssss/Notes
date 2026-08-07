@@ -83,6 +83,43 @@ private InspectorExample Target { get { return target as InspectorExample; } }
 
 **教训**：自定义 Editor 里**不要声明与基类同名成员**（target / serializedObject 等），同名必炸。
 
+### ✅ 批量给选中物体添加组件（实战 2026-08-07）
+**4 条铁律**：
+1. **`Undo.AddComponent<T>(go)` 而非 `go.AddComponent<T>()`**——编辑器一切操作可撤销，AddComponent 撤不回来
+2. **先查重**：`GetComponent<T>() == null` 才添加，防组件叠罗汉
+3. **过滤 Project 资产**：`Selection.objects` 含预制体资产，用 `if (!(o is GameObject go) || !go.scene.IsValid()) continue;` 只处理场景对象
+4. **VR 抓取前提**：XRGrabInteractable 需要 Collider，没有就补一个
+
+```csharp
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class SetGoInteractable
+{
+    [MenuItem("Tools/SetGoInteractable", true)]
+    static bool CheckGo() => Selection.activeGameObject != null;
+
+    [MenuItem("Tools/SetGoInteractable", false)]
+    static void SetGo()
+    {
+        int count = 0;
+        foreach (var o in Selection.objects)
+        {
+            if (!(o is GameObject go) || !go.scene.IsValid()) continue;
+            if (go.GetComponent<Collider>() == null)
+                Undo.AddComponent<BoxCollider>(go);
+            if (go.GetComponent<XRGrabInteractable>() == null)
+                Undo.AddComponent<XRGrabInteractable>(go);
+            count++;
+        }
+        Debug.Log($"✅ 已为 {count} 个物体配置可抓取");
+    }
+}
+```
+- `[MenuItem]` 静态方法**不需要继承 Editor**，普通类即可
+- 进阶：想"选任意组件批量加"，用 `MonoScript.GetClass()` + `Undo.AddComponent(go, type)` 做成窗口
+
 ## 四、项目实战思路（配电房）
 
 - **场景体检工具**：扫描所有 HookRope 检查 ropeStart/ropeEnd 是否配置（曾发现 SM_消防栓箱 ropeEnd=NULL）
