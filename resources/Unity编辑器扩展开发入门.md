@@ -90,6 +90,12 @@ private InspectorExample Target { get { return target as InspectorExample; } }
 3. **过滤 Project 资产**：`Selection.objects` 含预制体资产，用 `if (!(o is GameObject go) || !go.scene.IsValid()) continue;` 只处理场景对象
 4. **VR 抓取前提**：XRGrabInteractable 需要 Collider，没有就补一个
 
+**为什么不能对 prefab 资产 AddComponent**：
+- `AddComponent` 是"改 GameObject 组件列表"的操作，只作用于场景/运行时实例（内存里的活对象）
+- prefab 资产是磁盘上的 `.prefab` 序列化文件，没有组件数组 → `Can't add component ... because it is a prefab asset`
+- **但资产可以加组件，只是要"曲线救国"**：实例化 → 实例上加（可 Undo）→ `PrefabUtility.SaveAsPrefabAsset` 覆盖保存 → `DestroyImmediate` 临时实例
+- 旧 API `AssetDatabase.AddObjectToAsset` 能塞但引用难处理，不推荐
+
 ```csharp
 using UnityEditor;
 using UnityEngine;
