@@ -45,3 +45,4 @@ updated: 2026-08-06
 | [[UGUI多级UI性能优化与Canvas重建]] | 多级UI性能优化：Canvas Rebuild 根因、动静分离拆 Canvas、浅平化层级、四层优化框架 |
 | [[Unity编辑器扩展开发入门]] | 编辑器扩展知识体系地图+入门核心：文件夹规范/菜单入口四兄弟/Selection，配电房实战思路 |
 | [[Unity编辑器相关特性]] | 特性四分类+序列化三兄弟易混点+PropertyDrawer 三步套路（系列第2篇） |
+| [[Unity创建编辑器窗体EditorWindow]] | EditorWindow 生命周期/OnGUI 立即模式/刷新三兄弟/EditorPrefs 持久化+场景体检窗口示例 |
