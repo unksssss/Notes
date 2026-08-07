@@ -146,7 +146,7 @@ public class SavePrefabWizard : ScriptableWizard
         if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(parent, "SavePrefab");
 
         string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{target.name}.prefab");
-        PrefabUtility.SaveAsPrefabAsset(target, path);
+        PrefabUtility.SaveAsPrefabAssetAndConnect(target, path, InteractionMode.UserAction); // 保存+连接
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
@@ -157,6 +157,14 @@ public class SavePrefabWizard : ScriptableWizard
 - **坑**：`AssetDatabase.CreateFolder(parent, name)` 父目录不存在会返回 -1 静默失败
 - `GenerateUniqueAssetPath` 同名自动加 (1)(2)，想覆盖需先 LoadAssetAtPath 检查 + 确认弹窗
 - 进阶：保存目录做成 public 字段 + 目录选择器，配置化
+
+### 保存关联 vs 快照（SaveAsPrefabAsset vs SaveAsPrefabAssetAndConnect）
+- `SaveAsPrefabAsset(go, path)`：只导出**快照**，场景 go 仍是独立对象，不与 prefab 关联
+- `SaveAsPrefabAssetAndConnect(go, path, InteractionMode.UserAction)`：保存 + **把场景 go 变成该 prefab 实例**（建立 Prefab Connection）
+  - 连接后：Inspector 顶部出现 Prefab 头（Open/Select/Overrides）；改资产同步实例；实例改动标记 override 不污染资产
+  - `InteractionMode.UserAction` = 可 Ctrl+Z 撤销；`AutomatedAction` = 静默
+  - ⚠️ 若 go 原本是别的 prefab 实例，会断开旧连接重连到新 prefab
+- 体验加分：`Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(path)` 自动选中新资产
 
 ## 相关笔记
 - [[Unity编辑器扩展开发入门]]
