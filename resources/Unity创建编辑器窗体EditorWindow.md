@@ -81,17 +81,31 @@ public class SceneHealthWindow : EditorWindow
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         foreach (var rope in FindObjectsOfType<HookRope>())
         {
-            if (!string.IsNullOrEmpty(filter) && !rope.name.Contains(filter)) continue;
-            EditorGUILayout.BeginHorizontal();
+            bool match = string.IsNullOrEmpty(filter) || rope.name.Contains(filter);
+            EditorGUILayout.BeginHorizontal();          // 无条件成对，不 continue
+            GUI.enabled = match;                        // 过滤用灰显，不删控件
             EditorGUILayout.ObjectField(rope, typeof(HookRope), true);
-            if (rope.ropeStart == null || rope.ropeEnd == null)
-                EditorGUILayout.LabelField("⚠ 未配置端点", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField(rope.ropeStart == null || rope.ropeEnd == null ? "⚠ 未配置端点" : "");
+            GUI.enabled = true;
             EditorGUILayout.EndHorizontal();
         }
         EditorGUILayout.EndScrollView();
     }
 }
 ```
+
+## 七、常见坑：Invalid GUILayout state（实战踩坑 2026-08-07）
+
+**现象**：`GUI Error: Invalid GUILayout state ... Verify that all layout Begin/End calls match`
+
+**根因**：OnGUI 一帧内跑多个事件（Layout 算尺寸 → Repaint 绘制 → 鼠标事件），GUILayout 要求**每个事件绘制完全相同的 Begin/End 序列**。一旦控件数量依赖"可变数据"（用户在 TextField 输入改 filter、`FindObjectsOfType` 动态结果、循环里 continue），事件间数量不一致 → 状态机崩。
+
+**黄金法则**：**控件数量只能由事件间不变的数据决定**
+1. 列表缓存：`FindObjectsOfType` 移出 OnGUI，用 `EditorApplication.hierarchyChanged += Refresh` 驱动刷新
+2. 分支恒等：Begin/End 无条件成对，**绝不 continue/return 跳过**
+3. 过滤用灰显：`GUI.enabled = match` 而非删行
+4. 事件要解绑：`OnDisable` 里 `-= Refresh`，防泄漏
+5. 顺带：`EditorPrefs.SetString` 别放 OnGUI 裸调（每帧写注册表），用 `EditorGUI.BeginChangeCheck/EndChangeCheck` 包住
 
 ## 相关笔记
 - [[Unity编辑器扩展开发入门]]
