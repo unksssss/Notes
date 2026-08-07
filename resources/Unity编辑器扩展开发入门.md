@@ -63,7 +63,27 @@ private static void MyToolDelete()
 - 编辑器无缓存区：**必须 DestroyImmediate() 而非 Destroy()**
 - 最佳实践：`Undo.DestroyObjectImmediate()` / `Undo.RecordObject()` 记录撤销
 
-## 三、项目实战思路（配电房）
+## 三、自定义 Editor 常见坑（实战踩坑 2026-08-07）
+
+### ❌ target 遮蔽导致的 StackOverflowException
+**现象**：自定义 Editor（继承 `Editor`）里声明了名为 `target` 的属性，getter 无限递归 → `StackOverflowException: get_target ()` 刷屏。
+
+```csharp
+// ❌ 错误：target 遮蔽基类 Editor.target，getter 里 return target 递归调用自己
+private InspectorExample target { get { return target as InspectorExample; } }
+```
+
+**原因**：C# 成员解析"当前类优先于基类"（名称遮蔽）。属性名 `target` 把基类 `Editor.target`（当前选中的组件实例）藏住了，getter 体内 `target` 引用的是属性自身。
+
+**修复**：属性改名即可：
+```csharp
+// ✅ 正确：Target 的 getter 里 target 才解析到基类 Editor.target
+private InspectorExample Target { get { return target as InspectorExample; } }
+```
+
+**教训**：自定义 Editor 里**不要声明与基类同名成员**（target / serializedObject 等），同名必炸。
+
+## 四、项目实战思路（配电房）
 
 - **场景体检工具**：扫描所有 HookRope 检查 ropeStart/ropeEnd 是否配置（曾发现 SM_消防栓箱 ropeEnd=NULL）
 - 批量检查缺失引用、一键摆位、批量生成 Obi Rope 配置
