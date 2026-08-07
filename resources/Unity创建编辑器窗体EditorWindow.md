@@ -107,6 +107,22 @@ public class SceneHealthWindow : EditorWindow
 4. 事件要解绑：`OnDisable` 里 `-= Refresh`，防泄漏
 5. 顺带：`EditorPrefs.SetString` 别放 OnGUI 裸调（每帧写注册表），用 `EditorGUI.BeginChangeCheck/EndChangeCheck` 包住
 
+## 八、ScriptableWizard vs EditorWindow（2026-08-07）
+
+**一句话**：EditorWindow = 常驻工作台；ScriptableWizard = 一次性向导弹窗
+
+| 维度 | EditorWindow | ScriptableWizard |
+|------|-------------|-----------------|
+| 形态 | 可停靠常驻窗口 | 模态对话框（锁焦点） |
+| 打开 | `GetWindow<T>()` 单例 | `DisplayWizard<T>(标题, 确认, 取消)` |
+| 按钮 | 自己画 | 自带 Create/Cancel，确认自动关窗回调 |
+| 状态 | 自己写提示 | `helpString` / `errorString` / `isValid`（控制按钮灰显） |
+| public 字段 | 不自动显示 | **自动显示在窗体上**，零 GUI 代码 |
+| 回调 | OnGUI | `OnWizardUpdate()`（输入变化）+ `OnWizardCreate()`（确认主逻辑） |
+| 适用 | 长期工具面板 | 输入参数→确认→执行的向导流程 |
+
+**选型**：需要常驻反复操作 → EditorWindow；一次性创建/批量流程（如"保存 prefab 向导"）→ ScriptableWizard
+
 ## 相关笔记
 - [[Unity编辑器扩展开发入门]]
 - [[Unity编辑器相关特性]]
