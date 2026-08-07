@@ -123,6 +123,41 @@ public class SceneHealthWindow : EditorWindow
 
 **选型**：需要常驻反复操作 → EditorWindow；一次性创建/批量流程（如"保存 prefab 向导"）→ ScriptableWizard
 
+### Wizard 实战范例：保存 prefab 向导（灯皇独立完成 2026-08-07）
+```csharp
+public class SavePrefabWizard : ScriptableWizard
+{
+    public GameObject target;   // public 字段自动显示
+
+    [MenuItem("MyTools/保存为Prefab")]
+    static void Open() => DisplayWizard<SavePrefabWizard>("保存向导", "保存", "取消");
+
+    void OnWizardUpdate()
+    {
+        isValid = target != null;
+        helpString = target ? $"将保存:{target.name}.prefab" : "请拖入要保存的物体";
+    }
+
+    void OnWizardCreate()
+    {
+        // ⚠️ CreateFolder 要求父目录已存在！Resources 目录可能不存在，要逐级建
+        string parent = "Assets/Resources", folder = parent + "/SavePrefab";
+        if (!AssetDatabase.IsValidFolder(parent)) AssetDatabase.CreateFolder("Assets", "Resources");
+        if (!AssetDatabase.IsValidFolder(folder)) AssetDatabase.CreateFolder(parent, "SavePrefab");
+
+        string path = AssetDatabase.GenerateUniqueAssetPath($"{folder}/{target.name}.prefab");
+        PrefabUtility.SaveAsPrefabAsset(target, path);
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Selection.activeObject = AssetDatabase.LoadAssetAtPath<GameObject>(path); // 加分：自动选中
+    }
+}
+```
+- **坑**：`AssetDatabase.CreateFolder(parent, name)` 父目录不存在会返回 -1 静默失败
+- `GenerateUniqueAssetPath` 同名自动加 (1)(2)，想覆盖需先 LoadAssetAtPath 检查 + 确认弹窗
+- 进阶：保存目录做成 public 字段 + 目录选择器，配置化
+
 ## 相关笔记
 - [[Unity编辑器扩展开发入门]]
 - [[Unity编辑器相关特性]]
