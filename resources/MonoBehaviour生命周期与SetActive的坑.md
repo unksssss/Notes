@@ -3,7 +3,7 @@ title: "MonoBehaviour 生命周期与 SetActive 的坑"
 type: resource
 tags: [unity, 生命周期, 面试]
 created: "2026-07-31"
-updated: "2026-08-06"
+updated: "2026-08-10"
 status: active
 summary: "Awake/OnEnable/Start 生命周期；初始 inactive 对象不触发 Awake（首次激活才触发）；协程与 SetActive 的关系；OnDisable vs OnDestroy 触发时机对比"
 ---
@@ -51,6 +51,19 @@ OnDestroy（销毁时执行）
 - 协程：GameObject 被 `SetActive(false)` 或销毁时，协程**会停止**；组件 `enabled = false` **不会**停止协程
 - `Start` 在对象激活后的第一帧 Update 前执行；初始 inactive 则从激活后开始计时
 - 对象池场景：状态重置必须写在 `OnEnable`（每次激活都触发）而不是 `Start`（只执行一次）
+
+## OnApplicationFocus vs OnApplicationPause（Day 19，VR/移动端切后台）
+
+| 回调 | 触发时机 | 频率 |
+|---|---|---|
+| `OnApplicationPause(bool)` | 仅在**暂停状态改变**时（true=切后台，false=切回） | 低频，状态真正改变才触发 |
+| `OnApplicationFocus(bool)` | **每次焦点变化**都触发（弹窗/来电/摘头显） | 高频，比 Pause 频繁 |
+
+**调用顺序（口诀：切出 Focus 先、切回 Pause 先）**：
+- 切后台：`OnApplicationFocus(false)` → `OnApplicationPause(true)`
+- 切回前台：`OnApplicationPause(false)` → `OnApplicationFocus(true)`
+
+**实战**：暂停音频/存档等逻辑放 `OnApplicationPause`（状态真正改变才调用一次，不会重复执行）；UI 焦点类响应放 `OnApplicationFocus`。
 
 ## 相关
 
