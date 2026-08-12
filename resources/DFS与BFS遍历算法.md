@@ -95,6 +95,33 @@ void DFS(Graph g, int v, bool[] visited)
 
 **记忆口诀**：「前中后」说的是**根**的位置（根前/根中/根后），左子树永远在右子树前面。前三种递归或栈（DFS），层序用队列（BFS）。
 
+## ⚠️ 高频失分点：前序迭代实现 = 栈，不是队列！（Day 20 又滑铁卢）
+
+**错解**："访问到节点就把左右孩子加入队列" ❌ —— 那是**层序（BFS）**的思路！
+
+**正解**：前/中/后序的迭代实现（DFS）用 **栈**；只有层序（BFS）用队列。
+
+> 口诀：**层序（BFS）= 队列；深度优先（前/中/后序迭代）= 栈**。队列先进先出横向铺开，栈后进先出纵向深入。
+
+前序迭代模板：
+
+```csharp
+Stack<TreeNode> stack = new Stack<TreeNode>();
+stack.Push(root);
+while (stack.Count > 0)
+{
+    TreeNode node = stack.Pop();
+    visit(node);                                  // 先访问根
+    if (node.right != null) stack.Push(node.right); // 先压右
+    if (node.left  != null) stack.Push(node.left);  // 再压左 → 左先弹出
+}
+```
+
+**关键在压栈顺序**：栈是后进先出，要保证"左孩子先被访问"，就得**先压右、再压左**——后压的左孩子先弹出，顺序变成 根→左→右。
+
+复杂度：时间 O(n)（每个节点进出栈一次），空间 O(h)（h 为树高，最坏退化为链时 O(n)）。
+
 ## 相关
 
 - [[哈希表冲突解决与Dictionary底层]]
+- [[递归与迭代转换]]
