@@ -17,7 +17,7 @@ updated: 2026-08-12
 | [[对象池实现]]                             | 对象池实现                                                                                                              |
 | [[IL2CPP 编译原理与陷阱]]                    | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制                                                                                        |
 | [[Unity 渲染批处理体系]]                     | 静态批处理 vs GPU Instancing vs SRP Batcher                                                                             |
-| [[csharp/struct 装箱陷阱与值类型原理]]          | 值类型装箱拆箱机制、GC 压力、避免方法                                                                                               |
+| [[struct 装箱陷阱与值类型原理]]          | 值类型装箱拆箱机制、GC 压力、避免方法                                                                                               |
 | [[ToggleGroup底层机制]]                   | ToggleGroup allowSwitchOff 行为与底层调用链（早退拦截 + NotifyToggleOn）                                                         |
 | [[哈希表冲突解决与Dictionary底层]]              | 链地址法/开放地址法、墓碑标记、C# Dictionary 扩容机制                                                                                 |
 | [[DFS与BFS遍历算法]]                       | DFS/BFS 对比：最短路径（BFS）、环检测（DFS），均 O(V+E)；二叉树前序迭代用栈、层序用队列                                              |
@@ -48,3 +48,4 @@ updated: 2026-08-12
 | [[Unity创建编辑器窗体EditorWindow]]          | EditorWindow 生命周期/OnGUI 立即模式/刷新三兄弟/EditorPrefs 持久化+场景体检窗口示例                                                        |
 | [[C# foreach 与枚举器零分配]]                 | 数组 for 展开零分配、List<T> struct 枚举器不走接口零分配、接口接收即装箱、yield 状态机分配                                                    |
 | [[UnityEngine.Object 判空与销毁机制]]          | 托管壳+native 芯、Destroy 只销毁 native、== 重载销毁即空、MissingReferenceException、假空对象                                                |
+| [[VR物理冲击力 — AddExplosionForce vs 自定义定向力]] | AddExplosionForce 三坑（方向不可控/必须全挂 RB/质心不可预测）与自定义定向力（dir+衰减+Impulse），VR 冲击波首选自定义                                  |

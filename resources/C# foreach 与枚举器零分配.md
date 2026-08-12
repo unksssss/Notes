@@ -50,6 +50,6 @@ Update 里每帧 `foreach (var item in list)` 遍历 `List<T>` 本身零分配�
 
 ## 相关
 
-- [[csharp/struct 装箱陷阱与值类型原理]]
+- [[struct 装箱陷阱与值类型原理]]
 - [[Boehm GC 保守式垃圾回收原理]]
 - [[TMP Text 零分配更新]]

@@ -44,7 +44,7 @@ updated: 2026-08-06
 - [[MonoBehaviour生命周期与SetActive的坑]] — 生命周期与初始 inactive 陷阱
 - [[IL2CPP 编译原理与陷阱]] — IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制
 - [[Unity 渲染批处理体系]] — 静态批处理 vs GPU Instancing vs SRP Batcher
-- [[csharp/struct 装箱陷阱与值类型原理]] — 值类型装箱拆箱机制与 GC 压力
+- [[struct 装箱陷阱与值类型原理]] — 值类型装箱拆箱机制与 GC 压力
 - [[Boehm GC 保守式垃圾回收原理]] — 保守式 GC 标记-清除、增量 GC
 - [[对象池 OnEnable OnDisable 最佳实践]] — 对象池激活/回收钩子最佳实践
 - [[Animator参数与性能优化]] — 参数四类型、Trigger vs Bool、StringToHash
