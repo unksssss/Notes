@@ -19,7 +19,7 @@ updated: 2026-08-12
 | [[Unity 渲染批处理体系]]                     | 静态批处理 vs GPU Instancing vs SRP Batcher                                                                             |
 | [[struct 装箱陷阱与值类型原理]]          | 值类型装箱拆箱机制、GC 压力、避免方法                                                                                               |
 | [[ToggleGroup底层机制]]                   | ToggleGroup allowSwitchOff 行为与底层调用链（早退拦截 + NotifyToggleOn）                                                         |
-| [[哈希表冲突解决与Dictionary底层]]              | 链地址法/开放地址法、墓碑标记、C# Dictionary 扩容机制                                                                                 |
+| [[哈希表冲突解决与Dictionary底层]]              | 链地址法/开放地址法（信箱 vs 停车场比喻）、墓碑标记、C# Dictionary 扩容机制                                                                           |
 | [[DFS与BFS遍历算法]]                       | DFS/BFS 对比：最短路径（BFS）、环检测（DFS），均 O(V+E)；二叉树前序迭代用栈、层序用队列                                              |
 | [[Addressables资源生命周期]]                | Addressables 引用计数：Load/Release 成对、只 Load 不 Release = 泄漏                                                            |
 | [[链表反转]]                              | 三指针迭代（O(n)/O(1)）与递归（O(n)/O(n)）两种写法；快慢指针 Floyd 判圈 + 找环入口                                                  |
