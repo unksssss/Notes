@@ -3,7 +3,7 @@ title: "Boehm GC 保守式垃圾回收原理"
 type: resource
 tags: [unity, gc, memory, csharp]
 created: "2026-07-21"
-updated: "2026-07-21"
+updated: "2026-08-13"
 status: active
 summary: "Unity Mono 使用的 Boehm GC 是保守式(Conservative)GC，不精确追踪引用，而是扫描堆栈内存判断指针"
 ---
@@ -139,6 +139,21 @@ GC.Collect();
 // ↑ 主线程在此暂停，整堆扫描标记-清除
 // ↓ 可能导致几十毫秒甚至上百毫秒卡顿
 ```
+
+### 4. `List.Clear()` 只是"断引用"，回收要等 GC（Day 22）
+
+```cs
+List<GameObject> objs = new(...); // 存了一堆引用
+objs.Clear();
+// ↑ 只是把列表里的引用置空（Count=0）
+// ↓ 对象本身不会立即释放！
+// ↓ 要等下次 GC 标记-清除扫描到"无任何引用指向"才回收
+// 且 Clear() 后内部数组容量（Capacity）保留，供后续复用
+```
+
+- 频繁 Clear + 大量重新添加 → 堆上对象"悬空"累积，等 GC 触发时才释放，容易造成偶发卡顿
+- 对策：对象池复用（Clear 前先回收对象池）、或 `Capacity=0` 的 `TrimExcess()` 显式释放数组（谨慎用）
+- 与引用类型 GC 的经典面试组合：值类型 List 存 struct 无堆分配；引用类型 List 存 class 清空后仍等 GC
 
 ## 何时升级到分代 GC
 
