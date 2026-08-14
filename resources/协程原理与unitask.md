@@ -3,7 +3,7 @@ title: "协程原理与UniTask"
 type: resource
 tags: [unity, 协程, 异步, UniTask, async]
 created: "2026-04-28"
-updated: "2026-05-20"
+updated: "2026-08-14"
 status: active
 summary: "Unity 协程工作原理、IL 层状态机、局限性、UniTask 零 GC 异步方案深度解析"
 source: ""
@@ -119,6 +119,48 @@ IEnumerator Inner()
 ```
 
 嵌套实现原理：Unity 把 `StartCoroutine(Inner)` 返回的 Coroutine 当作一个特殊的 yield instruction，内部维护父子链表——`Inner` 完成时恢复 `Outer`。
+
+### 1.4 协程的生命周期与终止（Day 23 失分点）
+
+**yield break vs yield return null（最易混淆）**
+
+| 写法 | 作用 |
+|---|---|
+| `yield return null` | 挂起**一帧**，下一帧 Update 后恢复 |
+| `yield break` | **终止协程**，后面代码不再执行（相当于协程里的 `return`） |
+
+```csharp
+IEnumerator Demo()
+{
+    Debug.Log("A");
+    yield return null;      // 暂停一帧
+    Debug.Log("B");
+    yield break;            // ← 到这里协程结束
+    Debug.Log("C");         // 永远不执行
+}
+```
+
+**`SetActive(false)` 不会停协程！**
+
+```csharp
+IEnumerator Loop()
+{
+    while (true)
+    {
+        Debug.Log("还在跑");
+        yield return null;
+    }
+}
+// gameObject.SetActive(false) → 协程照样每帧执行！⚠️
+// 物体只是隐藏了，MonoBehaviour 仍是激活状态（Day 3/6 老坑）
+```
+
+- 想停 → `StopCoroutine(c)`（需持有 Coroutine 引用）/ `StopAllCoroutines()`
+- 或协程内主动检查 `!gameObject.activeSelf` 自行退出
+
+**`Destroy` 后协程立即停止**：GameObject 销毁 → MonoBehaviour 走 `OnDestroy` → 协程随之终止，后续 yield 后的代码不再执行。
+
+**一句话总结**：`yield return null` = 暂停一帧；`yield break` = 永久结束；`SetActive(false)` = 不停；`Destroy` = 必停。
 
 ---
 
