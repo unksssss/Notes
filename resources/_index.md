@@ -49,3 +49,4 @@ updated: 2026-08-12
 | [[C# foreach 与枚举器零分配]]                 | 数组 for 展开零分配、List<T> struct 枚举器不走接口零分配、接口接收即装箱、yield 状态机分配                                                    |
 | [[UnityEngine.Object 判空与销毁机制]]          | 托管壳+native 芯、Destroy 只销毁 native、== 重载销毁即空、MissingReferenceException、假空对象                                                |
 | [[VR物理冲击力 — AddExplosionForce vs 自定义定向力]] | AddExplosionForce 三坑（方向不可控/必须全挂 RB/质心不可预测）与自定义定向力（dir+衰减+Impulse），VR 冲击波首选自定义                                  |
+| [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力+CollisionFlags）vs SimpleMove（速度/秒+自动重力+bool 着地），斜坡 Slope Limit 与法线投影，选型建议                    |
