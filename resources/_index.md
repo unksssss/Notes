@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-08-12
+updated: 2026-08-18
 ---
 
 # Resources
@@ -21,7 +21,7 @@ updated: 2026-08-12
 | [[ToggleGroup底层机制]]                   | ToggleGroup allowSwitchOff 行为与底层调用链（早退拦截 + NotifyToggleOn）                                                         |
 | [[哈希表冲突解决与Dictionary底层]]              | 链地址法/开放地址法（信箱 vs 停车场比喻）、墓碑标记、C# Dictionary 扩容机制                                                                           |
 | [[DFS与BFS遍历算法]]                       | DFS/BFS 对比：最短路径（BFS）、环检测（DFS），均 O(V+E)；二叉树前序迭代用栈、层序用队列                                              |
-| [[Addressables资源生命周期]]                | Addressables 引用计数：Load/Release 成对、只 Load 不 Release = 泄漏                                                            |
+| [[Addressables资源生命周期]]                | Addressables 引用计数：Load/Release 成对、LoadAssetAsync/InstantiateAsync 配对规则与错误后果（计数不归零=泄漏）                              |
 | [[链表反转]]                              | 三指针迭代（O(n)/O(1)）与递归（O(n)/O(n)）两种写法；快慢指针 Floyd 判圈 + 找环入口                                                  |
 | [[Obi Rope粒子约束体系]]                    | Obi Rope 粒子约束架构、初始爆炸根因、Blueprint 局部坐标系与整体平移                                                                        |
 | [[MonoBehaviour生命周期与SetActive的坑]]     | 初始 inactive 不触发 Awake、协程与 SetActive 关系                                                                             |
@@ -30,7 +30,7 @@ updated: 2026-08-12
 | [[Animator参数与性能优化]]                   | 参数四类型、Trigger vs Bool、StringToHash 预计算 int、HasParameter                                                            |
 | [[XR射线交互与World Space Canvas]]         | TrackedDeviceGraphicRaycaster + Event Camera + XRRayInteractor 三件套                                                 |
 | [[UGUI事件接口与EventTrigger]]             | IPointerMoveHandler 不生效四大原因、Raycast Target、验证技巧                                                                    |
-| [[递归与迭代转换]]                           | 尾递归转循环、一般递归用栈/队列显式保存状态、二叉树前序迭代模板                                                                                   |
+| [[递归与迭代转换]]                           | 尾递归转循环+TCO（C# 默认不做）、一般递归用栈/队列显式保存状态、二叉树前序迭代模板                                                               |
 | [[动态规划入门]]                            | 最优子结构/重叠子问题、三板斧套路、爬楼梯变体转移方程；方法数（+）vs 最少步数（min+1）易混点                                                 |
 | [[DOTween与协程选型]]                      | 协程管流程、DOTween 管补间；可中断/可控是选 DOTween 的核心理由                                                                           |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | FixedUpdate 固定步长跑物理、Update 跑逻辑、LateUpdate 相机跟随；两套时钟解耦                                                              |
@@ -50,3 +50,4 @@ updated: 2026-08-12
 | [[UnityEngine.Object 判空与销毁机制]]          | 托管壳+native 芯、Destroy 只销毁 native、== 重载销毁即空、MissingReferenceException、假空对象                                                |
 | [[VR物理冲击力 — AddExplosionForce vs 自定义定向力]] | AddExplosionForce 三坑（方向不可控/必须全挂 RB/质心不可预测）与自定义定向力（dir+衰减+Impulse），VR 冲击波首选自定义                                  |
 | [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力+CollisionFlags）vs SimpleMove（速度/秒+自动重力+bool 着地），斜坡 Slope Limit 与法线投影，选型建议                    |
+| [[Resources.Load 加载与 as 转型]]          | 泛型 vs 非泛型+as：引用类型 downcast 无装箱、加载失败返回 null 不抛异常、判空习惯、卸载时机                                                    |

@@ -3,9 +3,9 @@ title: "协程原理与UniTask"
 type: resource
 tags: [unity, 协程, 异步, UniTask, async]
 created: "2026-04-28"
-updated: "2026-08-14"
+updated: "2026-08-18"
 status: active
-summary: "Unity 协程工作原理、IL 层状态机、局限性、UniTask 零 GC 异步方案深度解析"
+summary: "Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析"
 source: ""
 related: ["[[unity知识点-2026-04-28]]", "[[unity知识点-2026-04-29]]", "[[DOTS详解]]", "[[Profiler自定义采样]]"]
 ---
@@ -74,7 +74,7 @@ Unity 引擎内部有一个 `CoroutineManager`（C++ 实现），分**时间驱�
 | yield 指令 | 恢复时机 | 调度器类型 |
 |---|---|---|
 | `null` / `0` | 下一帧的 Update 之后 | 帧尾统一处理 |
-| `WaitForEndOfFrame` | 渲染完成后，摄像机和 GUI 渲染之前 | WaitForEndOfFrame 回调 |
+| `WaitForEndOfFrame` | 所有相机 + GUI 渲染完成后、画面显示到屏幕前（帧末） | WaitForEndOfFrame 回调 |
 | `WaitForFixedUpdate` | 固定时间步物理更新后 | FixedUpdate 回调 |
 | `WaitForSeconds` | 指定时间后（Time.time 累计） | 计时器列表，每帧检查到期 |
 | `WaitUntil` / `WaitWhile` | 每帧检查谓词 | 帧尾遍历等待队列 |
@@ -161,6 +161,30 @@ IEnumerator Loop()
 **`Destroy` 后协程立即停止**：GameObject 销毁 → MonoBehaviour 走 `OnDestroy` → 协程随之终止，后续 yield 后的代码不再执行。
 
 **一句话总结**：`yield return null` = 暂停一帧；`yield break` = 永久结束；`SetActive(false)` = 不停；`Destroy` = 必停。
+
+### 1.5 WaitForEndOfFrame 的时机与用途（Day 25）
+
+**恢复时机**：所有相机渲染完成后、画面显示到屏幕之前——后面的代码**仍然算本帧**（帧末执行）。
+
+**vs `yield return null` 的区别**（Day 25 灯皇答对的点）：
+
+| 写法 | 恢复时机 | 后续代码属于 |
+|---|---|---|
+| `yield return null` | 下一帧 Update 前 | **下一帧** |
+| `yield return new WaitForEndOfFrame()` | 本帧渲染完成后 | **本帧**（帧末） |
+
+**主要用途：截屏**！读屏幕像素（`ReadPixels`/`CaptureScreenshot`）必须等本帧渲染完成，否则抓到的是上一帧画面：
+
+```csharp
+IEnumerator TakeScreenshot()
+{
+    yield return new WaitForEndOfFrame();   // 先等本帧渲染完
+    Texture2D tex = ScreenCapture.CaptureScreenshotAsTexture();
+    // 或 new Texture2D(...) + ReadPixels(...)
+}
+```
+
+也常用于帧末 UI 后处理、需要整帧画面数据的操作。
 
 ---
 
