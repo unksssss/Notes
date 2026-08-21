@@ -241,6 +241,20 @@ void Update()
 - GC 触发 → 主线程暂停 → VR 项目尤其致命（帧率抖动）
 - **对象池** + **复用** + **struct 替代小 class** 是 Unity 性能三件套
 
+### 泛型集合 vs 非泛型集合：零装箱 vs 每次装箱（Day 28）
+
+```csharp
+var listInt  = new List<int>();      // ✅ 内部是 int[]（T[]），存 int 零装箱
+var arrList  = new ArrayList();      // ❌ 内部是 object[]，每个 int 塞进去都装箱
+listInt.Add(42);                     // 42 直接写进 int[]，栈到堆零拷贝零分配
+arrList.Add(42);                     // 42 先装箱成堆上 object，再存进 object[]
+```
+
+- `List<T>`（泛型）：内部数组就是 `T[]`，值类型元素全程以原始形态存储，**零装箱、零 GC 压力**
+- `ArrayList`（非泛型）：内部是 `object[]`，值类型元素**每次存入都装箱**（堆分配 + 拷贝），取出再拆箱
+- 实战结论：**永远用泛型集合**（`List<int>`、`Dictionary<string,int>`），Unity 高频路径（每帧循环）用非泛型集合装箱会积累大量 GC 垃圾
+- 注意区分：**值类型→object/接口 的转换才会装箱**；引用类型之间的转型（父子类 downcast/upcast）只是地址重解释，**永不装箱**（Day 25 的 `as` 误区正解）
+
 ### 参考
 
 - [Value types - C# reference](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types)
