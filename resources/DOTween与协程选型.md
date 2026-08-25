@@ -39,6 +39,25 @@ summary: "协程（状态机/流程控制）vs DOTween（时间轴补间/可中�
 - DOTween 的 `.OnComplete()` 回调里启动协程
 - 注意：`transform.DOKill()` 清理残留 Tween，防止目标被"幽灵 Tween"锁定
 
+## Kill vs Complete（Day 30 先讲后答 ⚠️）
+
+| | Kill() | Complete() |
+|---|---|---|
+| 行为 | **立即终止**补间 | **立即快进到终点** |
+| 当前值 | 停在中断那一刻 | 直接设为最终值 |
+| OnComplete | ❌ 不触发（触发 onKill） | ✅ 触发 |
+| 适用场景 | 中途取消动画 | 确保到达终态并收尾 |
+
+**实战坑**：UI 面板淡出中途被 Kill → 卡在 alpha=0.5 半透明；"关闭动画必须到终态"的场景用 `Complete()` 才能保证终值 + 执行收尾逻辑（SetActive(false)/回收）。
+
+**OnComplete 不触发的场景**：
+1. Kill() 打断（最常见）
+2. 场景切换 / GameObject 销毁（默认 SetAutoKill(true) 跟随回收）
+3. 同一对象上重播同类型 tween，旧的被覆盖回收
+4. 补间还在 delay 期就被 Kill
+
+补充：`Kill(bool complete)` 传 true 等价"先 Complete 再 Kill"，会触发 OnComplete；Kill 后可 `tween.IsActive()` 判断存活。
+
 ## 相关
 
 - [[协程原理与unitask]]

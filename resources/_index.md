@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-08-18
+updated: 2026-08-25
 ---
 
 # Resources
@@ -14,7 +14,7 @@ updated: 2026-08-18
 | [[unity知识点-2026-04-29]]               | Unity知识点 2026-04-29                                                                                                |
 | [[profiler自定义采样]]                     | Profiler自定义采样                                                                                                      |
 | [[urp移动优化]]                           | URP移动优化                                                                                                            |
-| [[对象池实现]]                             | 对象池实现                                                                                                              |
+| [[对象池实现]]                             | 对象池 IObjectPool 实现；面试三连问：池空 Get=Instantiate 兜底（取不到现造）/池满 Release=Destroy 截断/初始化放 OnEnable                                    |
 | [[IL2CPP 编译原理与陷阱]]                    | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制                                                                                        |
 | [[Unity 渲染批处理体系]]                     | 静态批处理 vs GPU Instancing vs SRP Batcher                                                                             |
 | [[struct 装箱陷阱与值类型原理]]          | 值类型装箱拆箱机制、GC 压力、避免方法                                                                                               |
@@ -32,7 +32,7 @@ updated: 2026-08-18
 | [[UGUI事件接口与EventTrigger]]             | IPointerMoveHandler 不生效四大原因、Raycast Target、验证技巧                                                                    |
 | [[递归与迭代转换]]                           | 尾递归转循环+TCO（C# 默认不做）、一般递归用栈/队列显式保存状态、二叉树前序迭代模板                                                               |
 | [[动态规划入门]]                            | 最优子结构/重叠子问题、三板斧套路、爬楼梯变体转移方程；方法数（+）vs 最少步数（min+1）易混点                                                 |
-| [[DOTween与协程选型]]                      | 协程管流程、DOTween 管补间；可中断/可控是选 DOTween 的核心理由                                                                           |
+| [[DOTween与协程选型]]                      | 协程管流程、DOTween 管补间；可中断/可控是选 DOTween 的核心理由；Kill（停原地不触发 OnComplete）vs Complete（跳终点触发）                                    |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | FixedUpdate 固定步长跑物理、Update 跑逻辑、LateUpdate 相机跟随；两套时钟解耦                                                              |
 | [[UGUI布局系统与强制刷新]]                     | LayoutGroup 动态加子项不刷新的解法：ForceRebuildLayoutImmediate/ForceUpdateCanvases、GetWorldCorners                            |
 | [[UGUI布局系统与强制刷新]]                     | LayoutGroup 动态加子项不刷新的解法：ForceRebuildLayoutImmediate/ForceUpdateCanvases、GetWorldCorners；ScrollRect 三种 MovementType |

@@ -164,6 +164,32 @@ Game 视图 Stats 面板：
 - **Batches**：实际提交的 DrawCall 数
 - **SetPass calls**：切换 Shader Pass 的次数（SRP Batcher 主要优化这个）
 
+---
+
+## Frame Debugger 排查合批失败（Day 30 先讲后答 ⚠️）
+
+### 用法
+
+**Window → Analysis → Frame Debugger** → 点 Enable → 左侧逐 DrawCall 浏览当前帧 → 点击某条看右侧详情，**合批失败时会直接给出 Break cause（断开原因）**。
+
+### 常见 Break cause 速查表
+
+| Break Cause | 含义 | 解决 |
+|---|---|---|
+| Different Mesh | Mesh 不同 | 静态批处理要求**相同 Mesh + 相同材质** |
+| Different Material Instance | 材质被运行时实例化 | 代码里 `renderer.material`（自动克隆）→ 改 `sharedMaterial` 或 MPB |
+| Different Shader / SRP Batcher 不兼容 | Shader 不兼容 | URP 下用了 Built-in shader，或自定义 shader 无 CBUFFER(UnityPerMaterial) |
+| Dynamic batching 限制 | 顶点 >900 / 缩放不一致 / 不同材质 | 换静态批处理或 GPU Instancing |
+| Lightmap / 阴影设置不同 | 光照通道不同 | 统一光照设置 |
+
+### 核心记忆点：同材质 ≠ 同材质实例
+
+Inspector 显示同一材质球，但只要代码写过 `GetComponent<Renderer>().material.xxx = ...`，Unity 就会**悄悄克隆材质** → 两个物体各用各的实例 → 合批作废！
+
+- 改**共享属性** → `renderer.sharedMaterial`（不克隆）
+- 改**个体差异** → `MaterialPropertyBlock`（不破坏合批）
+- ⚠️ 千万别在 Update 里每帧改 `.material`（每秒克隆 N 次，DrawCall 爆炸）
+
 ## 参考
 
 - [Static Batching - Unity Manual](https://docs.unity3d.com/Manual/StaticBatching.html)
