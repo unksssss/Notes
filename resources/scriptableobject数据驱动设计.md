@@ -136,6 +136,34 @@ public class WeaponDatabase : ScriptableObject
 
 策划可以在这个列表里增删改武器，程序员写读取逻辑即可。
 
+### ⚠️ 创建方式：CreateInstance vs new（Day 31 考点，面试高频坑）
+
+**正确姿势**：运行时创建 SO 实例必须用 `ScriptableObject.CreateInstance<T>()`，直接 `new` 是坑：
+
+```csharp
+// ❌ 错误：只造了 C# 壳，引擎报警告 "Can't create ScriptableObject directly"
+var bad = new WeaponData();
+
+// ✅ 正确：走引擎构造路径，完成原生侧初始化
+var good = ScriptableObject.CreateInstance<WeaponData>();
+good.damage = 42;
+```
+
+**为什么不能 new——"双面对象"结构**：Unity 里所有能被引擎管理的对象（GameObject / MonoBehaviour / ScriptableObject / Texture…）都是 `UnityEngine.Object` 的子类，有双面结构：
+
+| | 托管侧（C# 壳） | 原生侧（native 对象） |
+|---|---|---|
+| 是什么 | 代码里能碰到的引用 | 引擎内部 C++ 对象（生命周期/序列化/内存管理） |
+| 谁创建 | `new` 只能造出壳 | 只有引擎构造路径能创建 |
+
+直接 `new` = 造了个**没登记的壳**，原生侧不存在 → 不参与引擎对象系统、字段进不了序列化、没有 name/hideFlags 等原生能力。
+
+**类比 🏠**：Unity 像户籍系统——`CreateInstance` = 正式登记户口（引擎认识）；`new` = 偷盖的违章房（引擎路过不认识，出了事不管）。
+
+**资产 vs 运行时实例**：`.asset` 文件 = SO 在编辑器里的持久化形态（`AssetDatabase.CreateAsset` 生成）；`CreateInstance` = 纯内存实例（用完即弃）。运行时 CreateInstance 常用于：GameEvent 事件系统、运行时配置对象、数据容器。
+
+> 同理：`MonoBehaviour` 也不许 `new`，必须 `AddComponent` 或 `Instantiate`，道理完全相同。
+
 ### ScriptableObject 里写函数
 
 很多人以为 ScriptableObject 只能存数据，其实它和普通 C# 类一样，**函数、属性、事件都能写**。

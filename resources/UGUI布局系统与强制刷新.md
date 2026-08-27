@@ -53,6 +53,12 @@ viewport.GetWorldCorners(corners);       // 2. 世界坐标 corners 兜底（比
 - 无限轮播（滚出视野就换数据 + 瞬移回绕）必须 **Unrestricted**——Clamped 滚到边界直接卡死，循环断裂；Elastic 回弹会和代码回绕的位置计算打架
 - 自写槽位轮转（如 VerticalBackPack）不用 ScrollRect，是同一思路的另一实现
 
+**⚠️ 复发警示（Day 31 又滑铁卢 ❌）**：题目"横向无限循环轮播该用哪种 MovementType"再答 Clamped！Day 14/17 失分 → Day 18 攻破 → Day 31 复发。核心记忆点：
+- **Clamped = 锁死边界**（位置出不去，"回绕"无从谈起）
+- **Elastic = 抢着回弹**（每帧回绕计算被回弹打断）
+- **Unrestricted = 位置控制权完全交给你**，配合模运算回绕实现无缝循环
+- 口诀：**"要循环，选 Unrestricted；要卡边，选 Clamped；要手感，选 Elastic"**
+
 ## 相关
 
 - [[UGUI事件接口与EventTrigger]]
