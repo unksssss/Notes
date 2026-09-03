@@ -3,9 +3,9 @@ title: "ScriptableObject数据驱动设计"
 type: resource
 tags: [unity, ScriptableObject, 数据驱动]
 created: "2026-04-29"
-updated: "2026-04-29"
+updated: "2026-09-03"
 status: active
-summary: "从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用"
+summary: "从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy"
 source: ""
 related: ["[[unity-inputsystem详解]]", "[[unity网络同步方案-状态同步vs帧同步]]"]
 ---
@@ -161,6 +161,30 @@ good.damage = 42;
 **类比 🏠**：Unity 像户籍系统——`CreateInstance` = 正式登记户口（引擎认识）；`new` = 偷盖的违章房（引擎路过不认识，出了事不管）。
 
 **资产 vs 运行时实例**：`.asset` 文件 = SO 在编辑器里的持久化形态（`AssetDatabase.CreateAsset` 生成）；`CreateInstance` = 纯内存实例（用完即弃）。运行时 CreateInstance 常用于：GameEvent 事件系统、运行时配置对象、数据容器。
+
+### ⚠️ 运行时 CreateInstance 的生命周期：不随场景、不随 GC，自己 Destroy（Day 34 失分点）
+
+`CreateInstance<MySO>()` 出来的对象**既不是场景物体，也不是 .asset 资源**——它是游荡在内存里的"野" UnityEngine.Object。常见误解（Day 34 灯皇踩的坑）：「没有引用就被 GC 回收」→ **错**！
+
+**为什么 .NET GC 管不了它**：ScriptableObject 继承 `UnityEngine.Object`，是**托管壳 + native 芯**结构。C# 侧壳的"假析构"由 Unity 的 native 引用计数接管（不是 .NET 的 GC 可达性分析）。所以：
+
+- ❌ **不会**因为没有 C# 引用就被 GC 立刻回收（壳可能被收，native 芯的清理不保证）
+- ❌ **不会**随场景切换自动卸载（它不属于任何场景）
+- ✅ **必须手动 `Destroy(so)`**，尤其反复创建（任务数据容器、事件系统实例）时——否则内存只增不减 = 泄漏
+
+```csharp
+// ❌ 每次开任务都 new 一个容器，用完不管 → SO 越积越多
+var data = ScriptableObject.CreateInstance<TaskData>();
+// ...用完后没销毁
+
+// ✅ 用完即毁；对象池/复用场景同理
+var data = ScriptableObject.CreateInstance<TaskData>();
+try { /* ...用... */ }
+finally { Destroy(data); }
+```
+
+> 对照记忆：**普通 C# 对象 = GC 管；`.asset` 资源 = 引擎按引用加载/卸载；运行时 CreateInstance = 亲生的自己养（手动 Destroy）**。
+> 顺带：`Instantiate(asset)`（复制资产为运行实例）也同理需要手动 Destroy，它同样脱离资源管理。
 
 > 同理：`MonoBehaviour` 也不许 `new`，必须 `AddComponent` 或 `Instantiate`，道理完全相同。
 

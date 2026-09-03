@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-08-27
+updated: 2026-09-03
 ---
 
 # Resources
@@ -10,7 +10,7 @@ updated: 2026-08-27
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | [[unity网络同步方案-状态同步vs帧同步]]             | Unity网络同步方案_状态同步vs帧同步                                                                                              |
 | [[unity-inputsystem详解]]               | Unity InputSystem详解                                                                                                |
-| [[scriptableobject数据驱动设计]]            | ScriptableObject数据驱动设计；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）                                                  |
+| [[scriptableobject数据驱动设计]]            | ScriptableObject数据驱动设计；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
 | [[unity知识点-2026-04-29]]               | Unity知识点 2026-04-29                                                                                                |
 | [[profiler自定义采样]]                     | Profiler自定义采样                                                                                                      |
 | [[urp移动优化]]                           | URP移动优化                                                                                                            |
@@ -51,3 +51,4 @@ updated: 2026-08-27
 | [[VR物理冲击力 — AddExplosionForce vs 自定义定向力]] | AddExplosionForce 三坑（方向不可控/必须全挂 RB/质心不可预测）与自定义定向力（dir+衰减+Impulse），VR 冲击波首选自定义                                  |
 | [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力+CollisionFlags）vs SimpleMove（速度/秒+自动重力+bool 着地），斜坡 Slope Limit 与法线投影，选型建议                    |
 | [[Resources.Load 加载与 as 转型]]          | 泛型 vs 非泛型+as：引用类型 downcast 无装箱、加载失败返回 null 不抛异常、判空习惯、卸载时机                                                    |
+| [[栈与队列的相互实现]]                      | 两栈实现队列（出队栈空才倒腾、摊还 O(1)）vs 单队列实现栈（push 转 size-1 圈拱新元素到队头、O(n)）；易错：push 前反转整队列方向反了           |
