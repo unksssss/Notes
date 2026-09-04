@@ -1,7 +1,7 @@
 ---
 title: Unity编辑器相关特性
 type: resource
-tags: [Unity, 编辑器扩展, Attribute, 特性, PropertyDrawer]
+tags: [unity, 编辑器扩展, Attribute, 特性, PropertyDrawer]
 created: 2026-08-07
 updated: 2026-08-07
 status: 学习中

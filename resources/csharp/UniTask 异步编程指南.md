@@ -1,4 +1,6 @@
 ---
+title: UniTask 异步编程指南
+type: resource
 tags:
   - unity
   - csharp
@@ -6,6 +8,8 @@ tags:
   - unitask
   - 异步编程
 created: 2026-05-21
+updated: 2026-09-04
+summary: UniTask 零 GC 异步编程指南：以 struct 替代 class 实现零分配，Unity 官方 Task 与协程的最佳替代方案，配套异步模式与生命周期管理
 source:
   - https://www.cnblogs.com/clnchanpin/p/19685090
   - https://www.cnblogs.com/Firepad-magic/p/18229337

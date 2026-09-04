@@ -1,7 +1,7 @@
 ---
 title: Unity编辑器扩展开发入门
 type: resource
-tags: [Unity, 编辑器扩展, Editor, MenuItem, EditorWindow]
+tags: [unity, 编辑器扩展, Editor, MenuItem, EditorWindow]
 created: 2026-08-07
 updated: 2026-08-07
 status: 学习中

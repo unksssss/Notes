@@ -1,7 +1,7 @@
 ---
 title: Unity创建编辑器窗体EditorWindow
 type: resource
-tags: [Unity, 编辑器扩展, EditorWindow, 工具窗口]
+tags: [unity, 编辑器扩展, EditorWindow, 工具窗口]
 created: 2026-08-07
 updated: 2026-08-07
 status: 学习中

@@ -1,3 +1,12 @@
+---
+title: Ignite-灭火机制分析
+type: resource
+tags: [unity, 火焰, 灭火机制, 消防, 项目分析]
+created: 2026-06-30
+updated: 2026-09-04
+summary: Firefighting Simulator Ignite 灭火机制拆解：火灾分类（Class A/B/C）与对应灭火介质、配电房/厨房等场景的 VR 消防机制借鉴
+---
+
 # Firefighting Simulator: Ignite — 灭火机制拆解
 
 ## 火灾分类 + 对应灭火介质

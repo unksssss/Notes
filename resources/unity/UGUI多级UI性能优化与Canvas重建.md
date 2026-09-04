@@ -1,7 +1,7 @@
 ---
 title: UGUI多级UI性能优化与Canvas重建
 type: resource
-tags: [Unity, UGUI, Canvas, 性能优化, 面试]
+tags: [unity, UGUI, Canvas, 性能优化, 面试]
 created: 2026-08-07
 updated: 2026-08-07
 status: 持续完善

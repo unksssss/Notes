@@ -1,3 +1,12 @@
+---
+title: AI-Agent-提示词-日记问答同步
+type: resource
+tags: [agent, 提示词, 自动化, meta]
+created: 2026-07-14
+updated: 2026-09-04
+summary: AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代
+---
+
 # Unity 技术笔记 + 知识问答 + GitHub 同步 — AI Agent 提示词
 
 将此提示词配置为每日定时任务（建议 17:00 和 17:30 两个时间点），由 AI Agent 自动执行。
