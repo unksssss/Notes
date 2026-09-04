@@ -55,6 +55,10 @@ updated: 2026-08-06
 - [[DOTween与协程选型]] — 协程管流程、DOTween 管补间、可中断可控
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
+- [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
+
+### 线程安全
+- [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
 
 ### unity面试
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
@@ -135,7 +139,7 @@ updated: 2026-08-06
 
 | Tag | Count |
 |-----|-------|
-| unity | 26 |
+| unity | 27 |
 | 算法 | 9 |
 | 性能优化 | 5 |
 | unity面试 | 3 |
@@ -160,3 +164,4 @@ updated: 2026-08-06
 | UGUI | 3 |
 | 物理 | 1 |
 | daily | 1 |
+| 线程安全 | 1 |

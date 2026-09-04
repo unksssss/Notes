@@ -22,7 +22,7 @@ updated: 2026-09-04
 
 | File | Summary |
 | --- | --- |
-| [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解 |
+| [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
 | [[对象池 OnEnable OnDisable 最佳实践]] | 利用 OnEnable/OnDisable 配合对象池实现自动重置，避免手动重置状态的耦合问题 |
 | [[对象池实现]] | Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版），含面试三连问：池空 Get=Instantiate 兜底 / 池满 Release=Destroy 截断 / 初始化放 OnEnable 原因 |
@@ -75,9 +75,9 @@ updated: 2026-09-04
 | --- | --- |
 | [[ParticleSystem详解]] | Unity ParticleSystem 全部模块属性详解，按开发频率排序，附常见参数调优方案。 |
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀 |
-| [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧 |
+| [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（5）
+### scripting（6）
 
 | File | Summary |
 | --- | --- |
@@ -86,6 +86,7 @@ updated: 2026-09-04
 | [[UnityEngine.Object 判空与销毁机制]] | Unity 对象双层结构：托管壳 + native 芯；Destroy 只销毁 native；== 重载使销毁即空；MissingReferenceException；假空对象；为什么分两侧（历史/性能/生命周期主权） |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | 三 Update 分工：FixedUpdate 固定步长跑物理、Update 帧率相关跑逻辑、LateUpdate 相机跟随；物理与渲染是解耦的两套时钟 |
 | [[协程原理与unitask]] | Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析 |
+| [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 
 ### ui（5）
 
@@ -117,7 +118,7 @@ updated: 2026-09-04
 | [[动态规划入门]] | DP 两大核心（最优子结构、重叠子问题）+ 三板斧（定义状态、转移方程、初始值）+ 爬楼梯变体例题 |
 | [[哈希表冲突解决与Dictionary底层]] | 链地址法/开放地址法对比（信箱 vs 停车场比喻）、开放地址删除需墓碑标记、C# Dictionary 分离链接结构与其扩容机制 |
 | [[排序算法-快排归并堆排]] | 三大排序对比：快速排序（平均之王/不稳定/最坏 O(n²)）、归并排序（稳定/费内存）、堆排序（省内存/常数大），复杂度与记忆口诀 |
-| [[栈与队列的相互实现]] | 两栈实现队列 vs 单队列实现栈的对称思路与复杂度；核心是牺牲一次 O(n) 转圈调序；易错点：单队列 push 转圈方向、双队列 push O(1) 版本 |
+| [[栈与队列的相互实现]] | 两栈实现队列 vs 单队列实现栈的对称思路与复杂度；核心是牺牲一次 O(n) 转圈调序；易错点：单队列 push 转圈方向、双队列 push O(1) 版本；栈的应用延伸：括号匹配（平分法误区） |
 | [[贪心算法入门]] | 贪心=每步局部最优；找零钱翻车案例证明贪心不是万能；适用条件（贪心选择性质+最优子结构）；与动态规划的边界 |
 | [[递归与迭代转换]] | 递归的栈溢出与性能开销、尾递归与 TCO（C# 默认不做）、一般递归用栈/队列显式保存状态（DFS 用栈、BFS 用队列）、二叉树前序迭代模板；账本比喻：不欠账→循环，欠账要回溯→显式栈 |
 | [[链表反转]] | 链表反转两种写法：三指针迭代法（O(n)/O(1)）与递归法（O(n)/O(n)），先保存 next 防断链 |
@@ -143,4 +144,4 @@ updated: 2026-09-04
 | [[AI-Agent-提示词-日记问答同步]] | AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代 |
 | [[Unity主程学习路线]] | Unity程序从一年经验到主程的完整学习路线，分五个阶段：基础→引擎深入→架构→专项突破→主程能力。 |
 
-共 58 篇资源笔记。
+共 59 篇资源笔记。
