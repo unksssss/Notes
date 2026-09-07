@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-09-04
+updated: 2026-09-07
 ---
 
 # Resources
@@ -14,7 +14,7 @@ updated: 2026-09-04
 
 | File | Summary |
 | --- | --- |
-| [[Animator参数与性能优化]] | Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效 |
+| [[Animator参数与性能优化]] | Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效；状态机过渡期间状态归属 + Has Exit Time（Day 36 面经） |
 | [[DOTween与协程选型]] | 协程（状态机/流程控制）vs DOTween（时间轴补间/可中断可控），选择口诀：'动'用 DOTween、'流程'用协程，可混用 |
 | [[dotween详解]] | Unity DOTween 动画补间库完整指南：基本用法、回调系统、Sequence序列、生命週期控制、常用模式与性能注意事项 |
 
@@ -25,14 +25,15 @@ updated: 2026-09-04
 | [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
 | [[对象池 OnEnable OnDisable 最佳实践]] | 利用 OnEnable/OnDisable 配合对象池实现自动重置，避免手动重置状态的耦合问题 |
-| [[对象池实现]] | Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版），含面试三连问：池空 Get=Instantiate 兜底 / 池满 Release=Destroy 截断 / 初始化放 OnEnable 原因 |
+| [[对象池实现]] | Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版），含面试三连问：池空 Get=Instantiate 兜底 / 池满 Release=Destroy 截断 / 初始化放 OnEnable 原因；池化反面判据 + 粒子池同构（maxParticles/Prewarm，Day 36 拔高） |
 
-### assets（2）
+### assets（3）
 
 | File | Summary |
 | --- | --- |
 | [[Addressables资源生命周期]] | Addressables 引用计数机制：Load/Release 成对、计数累加、只 Load 不 Release = 内存泄漏；LoadAssetAsync/Release 与 InstantiateAsync/ReleaseInstance 配对规则与错误后果；与 Resources 对比 |
 | [[Resources.Load 加载与 as 转型]] | Resources.Load<T> 泛型 vs 非泛型+as 的机制、引用类型 as 无装箱误解、加载失败返回 null 不抛异常、判空习惯、卸载时机 |
+| [[AssetBundle 生命周期与卸载语义]] | Unload(false) 卸包头保实例 vs Unload(true) 连资源全销毁 → 粉红 Missing；依赖加载先父后子、卸载先子后父；Addressables 引用计数 = 底层 AB 的人肉记账自动化（Day 36 面经） |
 
 ### digest（2）
 
@@ -62,31 +63,33 @@ updated: 2026-09-04
 | --- | --- |
 | [[profiler自定义采样]] | Unity Profiler 自定义采样标记定位性能瓶颈 |
 
-### physics（2）
+### physics（3）
 
 | File | Summary |
 | --- | --- |
 | [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力）vs SimpleMove（速度/秒+自动重力）对比、斜坡 Slope Limit 与法线投影处理、选型建议 |
 | [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选） |
+| [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
 
 ### rendering（3）
 
 | File | Summary |
 | --- | --- |
 | [[ParticleSystem详解]] | Unity ParticleSystem 全部模块属性详解，按开发频率排序，附常见参数调优方案。 |
-| [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀 |
+| [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（6）
+### scripting（7）
 
 | File | Summary |
 | --- | --- |
-| [[IL2CPP 编译原理与陷阱]] | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比 |
+| [[IL2CPP 编译原理与陷阱]] | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比；2026 官方路线 Mono → CoreCLR 四阶段（6.5~6.8） |
 | [[MonoBehaviour生命周期与SetActive的坑]] | Awake/OnEnable/Start 生命周期；初始 inactive 对象不触发 Awake（首次激活才触发）；协程与 SetActive 的关系；OnDisable vs OnDestroy 触发时机对比 |
 | [[UnityEngine.Object 判空与销毁机制]] | Unity 对象双层结构：托管壳 + native 芯；Destroy 只销毁 native；== 重载使销毁即空；MissingReferenceException；假空对象；为什么分两侧（历史/性能/生命周期主权） |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | 三 Update 分工：FixedUpdate 固定步长跑物理、Update 帧率相关跑逻辑、LateUpdate 相机跟随；物理与渲染是解耦的两套时钟 |
 | [[协程原理与unitask]] | Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析 |
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
+| [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 
 ### ui（5）
 
@@ -104,8 +107,9 @@ updated: 2026-09-04
 | --- | --- |
 | [[Boehm GC 保守式垃圾回收原理]] | Unity Mono 使用的 Boehm GC 是保守式(Conservative)GC，不精确追踪引用，而是扫描堆栈内存判断指针；内存碎片危害与缓解（分代/对象池/LOH） |
 | [[C# foreach 与枚举器零分配]] | foreach 的 GC 真相：数组 for 展开零分配、List<T> struct 枚举器不走接口零分配、接口接收枚举器即装箱、yield 状态机分配 |
+| [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | 闭包=编译器为捕获变量的匿名方法生成隐藏类（c__DisplayClassX），捕获变量搬字段、存活期=委托引用存活期 → 静态/事件订阅拴住 this=泄漏；每帧 new 捕获型 lambda=持续 GC Alloc（Day 36 面经） |
 | [[UniTask 异步编程指南]] | UniTask 零 GC 异步编程指南：以 struct 替代 class 实现零分配，Unity 官方 Task 与协程的最佳替代方案，配套异步模式与生命周期管理 |
-| [[struct 装箱陷阱与值类型原理]] | 值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法、栈/堆内存布局与生命周期、继承与内存布局分离、装箱内存布局 |
+| [[struct 装箱陷阱与值类型原理]] | 值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法、栈/堆内存布局与生命周期、继承与内存布局分离、装箱内存布局；参数传递 ref/out 与值拷贝（Day 36） |
 | [[内存管理方案对比]] | 各大语言内存管理策略对比：完全手动 → 编译期静态分析 → ARC → 追踪式 GC → 引用计数+GC |
 
 ## 算法与数据结构
@@ -116,9 +120,9 @@ updated: 2026-09-04
 | [[KMP字符串匹配]] | KMP 核心思想：主串指针不回退，利用 next 数组（最长相等前后缀）计算模式串滑动距离，复杂度从 O(n×m) 降到 O(n+m) |
 | [[二分查找]] | 二分查找原理、最少/最多比较次数推导（⌈log₂n⌉）、O(log n) 时间复杂度、C# 内置 BinarySearch |
 | [[动态规划入门]] | DP 两大核心（最优子结构、重叠子问题）+ 三板斧（定义状态、转移方程、初始值）+ 爬楼梯变体例题 |
-| [[哈希表冲突解决与Dictionary底层]] | 链地址法/开放地址法对比（信箱 vs 停车场比喻）、开放地址删除需墓碑标记、C# Dictionary 分离链接结构与其扩容机制 |
+| [[哈希表冲突解决与Dictionary底层]] | 链地址法/开放地址法对比（信箱 vs 停车场比喻）、开放地址删除需墓碑标记、C# Dictionary 分离链接结构与其扩容机制；哈希应用两数之和 O(n)（Day 36） |
 | [[排序算法-快排归并堆排]] | 三大排序对比：快速排序（平均之王/不稳定/最坏 O(n²)）、归并排序（稳定/费内存）、堆排序（省内存/常数大），复杂度与记忆口诀 |
-| [[栈与队列的相互实现]] | 两栈实现队列 vs 单队列实现栈的对称思路与复杂度；核心是牺牲一次 O(n) 转圈调序；易错点：单队列 push 转圈方向、双队列 push O(1) 版本；栈的应用延伸：括号匹配（平分法误区） |
+| [[栈与队列的相互实现]] | 两栈实现队列 vs 单队列实现栈的对称思路与复杂度；核心是牺牲一次 O(n) 转圈调序；易错点：单队列 push 转圈方向、双队列 push O(1) 版本；栈的应用延伸：括号匹配（平分法误区、三条件+两边界） |
 | [[贪心算法入门]] | 贪心=每步局部最优；找零钱翻车案例证明贪心不是万能；适用条件（贪心选择性质+最优子结构）；与动态规划的边界 |
 | [[递归与迭代转换]] | 递归的栈溢出与性能开销、尾递归与 TCO（C# 默认不做）、一般递归用栈/队列显式保存状态（DFS 用栈、BFS 用队列）、二叉树前序迭代模板；账本比喻：不欠账→循环，欠账要回溯→显式栈 |
 | [[链表反转]] | 链表反转两种写法：三指针迭代法（O(n)/O(1)）与递归法（O(n)/O(n)），先保存 next 防断链 |
@@ -144,4 +148,4 @@ updated: 2026-09-04
 | [[AI-Agent-提示词-日记问答同步]] | AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代 |
 | [[Unity主程学习路线]] | Unity程序从一年经验到主程的完整学习路线，分五个阶段：基础→引擎深入→架构→专项突破→主程能力。 |
 
-共 59 篇资源笔记。
+共 63 篇资源笔记。

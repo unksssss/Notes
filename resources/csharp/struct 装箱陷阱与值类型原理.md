@@ -311,6 +311,14 @@ arrList.Add(42);                     // 42 先装箱成堆上 object，再存进
 - [Value types - C# reference](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types)
 - [Memory allocation and garbage collection in Unity](https://docs.unity3d.com/Manual/performance-garbage-collector.html)
 
+## 参数传递：值拷贝 vs ref/out（Day 36 经典）
+
+- **普通传参（值类型）**：传**副本**，方法内改不影响调用方；引用类型传"引用副本"，可改对象内容但重赋值不影响调用方；
+- **ref**：传**变量的引用（地址）**——实参**必须先初始化**（方法可能读它），方法内可读写，改动同步回调用方；**无装箱**（地址直传，不在堆上打包 object）；
+- **out**：也是传引用，但**实参无需先初始化**（方法负责写），**方法返回前必须给 out 赋值**（义务），否则编译错误；
+- 适用：ref 通用于值/引用类型（`ref GameObject` 合法）；out 适合"方法要产出多个结果"（TryParse 模式）。
+- 速记："ref = 实参先有值，方法随便改；out = 实参可空手，方法必须填"。⚠️ ref/out 不装箱——装箱只发生在值类型赋给 object/接口时（与"按引用传递"是两码事）。
+
 ## 参考
 
 - [Boxing and Unboxing - Microsoft Docs](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing)

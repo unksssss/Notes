@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-08-06
+updated: 2026-09-07
 ---
 
 # Tags Index
@@ -106,6 +106,7 @@ updated: 2026-08-06
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
+- [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
 
 ### 数据驱动
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用
@@ -135,6 +136,15 @@ updated: 2026-08-06
 - [[UGUI布局系统与强制刷新]] — LayoutGroup 动态加子项不刷新的解法
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 
+### 资源管理
+- [[AssetBundle 生命周期与卸载语义]] — Unload(false/true)、依赖顺序、粉红材质排查
+
+### 热更新
+- [[热更新 HybridCLR — AOT 泛型元数据补全]] — 程序集剥离、清单 MD5 下发、AOT 泛型元数据补全
+
+### 闭包
+- [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] — 隐藏类搬变量、存活期=委托引用、闭包泄漏
+
 ## Stats
 
 | Tag | Count |
@@ -162,6 +172,9 @@ updated: 2026-08-06
 | 动画 | 1 |
 | 生命周期 | 2 |
 | UGUI | 3 |
-| 物理 | 1 |
+| 物理 | 2 |
 | daily | 1 |
 | 线程安全 | 1 |
+| 资源管理 | 1 |
+| 热更新 | 1 |
+| 闭包 | 1 |

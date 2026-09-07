@@ -198,6 +198,15 @@ Inspector 显示同一材质球，但只要代码写过 `GetComponent<Renderer>(
 - 改**个体差异** → `MaterialPropertyBlock`（不破坏合批）
 - ⚠️ 千万别在 Update 里每帧改 `.material`（每秒克隆 N 次，DrawCall 爆炸）
 
+## SRP Batcher 底层：CBUFFER 常量缓冲复用（Day 36 拔高）
+
+- **省的是什么**：CPU 侧每个物体的 **SetPass（shader 状态绑定）** 调用——不是"GPU 干活变少"，GPU 数据照收，省的是 CPU 反复走完整状态设置流程。
+- **合批单位**：**shader 变体 × 兼容性**。不要求同 mesh、不合并顶点（区别于静态批处理/GPU Instancing）。
+- **为什么必须 CBUFFER**：兼容 shader 把材质属性统一塞进**同一布局的 CBUFFER（常量缓冲）** → 驱动可一次绑定缓冲结构、连续画属性不同的物体，切物体只更新缓冲内容、不重铺整套状态。属性不走 CBUFFER = 盘子规格不统一 = 回退老路径。
+- 📖 类比：普通管线=每桌客人重新铺桌摆盘；SRP Batcher=餐具统一的快餐店，换菜不换桌。
+- **破坏三条件**：① shader 不兼容（属性没进 CBUFFER/不支持特性）；② **MaterialPropertyBlock**——MPB 每实例属性走 Instancing 通道不在统一 CBUFFER → 该物体被踢出 SRP Batcher（**MPB 帮 GPU Instancing、砸 SRP Batcher**，易混点）；③ 每帧改材质属性/材质实例化。
+- **与 GPU Instancing 的关系**：**两条互斥渲染路径**，共存 ≠ 同一物体同时享受两者。兼容 shader 走 SRP Batcher 批次；同 mesh+同材质开 Instancing 走实例批次。一个 draw 不会既是 SRP Batcher 又是 Instancing——MPB 把物体"推向"Instancing 并踢出 SRP Batcher，本质路径二选一。
+
 ## 参考
 
 - [Static Batching - Unity Manual](https://docs.unity3d.com/Manual/StaticBatching.html)

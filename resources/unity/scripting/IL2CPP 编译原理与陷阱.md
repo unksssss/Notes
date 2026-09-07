@@ -148,6 +148,19 @@ class PreserveAttribute : System.Attribute { }
 6. **IL2CPP 的 `System.Reflection.Emit` 不可用**，需要动态代码生成用 Emit 的请考虑替代方案
 7. **代码裁剪从 Low 开始**，逐步提高到 Medium 和 High，每次 Build 测试
 
+## 2026 官方路线：脚本运行时 Mono → CoreCLR（Day 36 官方新特性）
+
+Unity 把脚本运行时从自研 Mono 逐步迁移到 .NET 官方 **CoreCLR**，分四阶段（2026 路线图）：
+
+| 版本 | 里程碑 |
+|---|---|
+| 6.5（2026-06） | 生命周期 API 落地 |
+| 6.6（2026-08-31 发布） | **Fast Enter Play Mode 设为默认** |
+| 6.7 | 桌面端 CoreCLR Player 实验性开放 |
+| 6.8 | 生态就绪 |
+
+要点：CoreCLR 与 IL2CPP **不是替代关系**——IL2CPP 仍是移动端/主机发布后端；CoreCLR 是与标准 .NET 同源的新运行时，吃 .NET 生态与持续性能优化。易错：6.6 只是默认 Fast Enter Play Mode，桌面 Player 要 6.7；迁移最终会落到打包产物（运行时更换），不是编辑器专属。
+
 ## 参考
 
 - [IL2CPP Overview - Unity Manual](https://docs.unity3d.com/Manual/IL2CPP.html)
