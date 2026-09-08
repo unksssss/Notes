@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-09-07
+updated: 2026-09-08
 ---
 
 # Tags Index
@@ -29,6 +29,9 @@ updated: 2026-09-07
 
 ### unity
 - [[dots详解]] — Unity DOTS (ECS + Jobs + Burst) 完整讲解
+- [[Unity 序列化机制]] — Unity 序列化器范围/限制、6.6 原生 Dictionary 序列化
+- [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事
+- [[UI-逻辑-数据分层与事件驱动]] — UI/逻辑/数据三层 + 事件驱动（TaskStateManager 范式）
 - [[profiler自定义采样]] — Unity Profiler 自定义采样标记定位性能瓶颈
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用
 - [[unity-inputsystem详解]] — 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用
@@ -83,6 +86,7 @@ updated: 2026-09-07
 - [[Addressables资源生命周期]] — Addressables 引用计数机制与资源生命周期
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
+- [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
 
 ### 算法
 - [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
@@ -94,6 +98,17 @@ updated: 2026-09-07
 - [[动态规划入门]] — 最优子结构/重叠子问题、三板斧套路、爬楼梯变体
 - [[二分查找]] — 原理、比较次数推导、O(log n)、C# BinarySearch
 - [[贪心算法入门]] — 局部最优、找零钱翻车案例、贪心 vs DP 分界
+- [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
+
+### 寻路
+- [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
+
+### 设计模式
+- [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事
+- [[UI-逻辑-数据分层与事件驱动]] — UI/逻辑/数据三层 + 事件驱动（TaskStateManager 范式）
+
+### 序列化
+- [[Unity 序列化机制]] — Unity 序列化器范围/限制、6.6 原生 Dictionary 序列化
 
 ### 数据结构
 - [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
@@ -117,6 +132,7 @@ updated: 2026-09-07
 
 ### 渲染
 - [[urp移动优化]] — URP 渲染管线在移动端的优化配置与技巧
+- [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
 
 ### 网络同步
 - [[unity网络同步方案-状态同步vs帧同步]] — 工业数字孪生场景中两种网络同步方案的对比与选型
@@ -135,6 +151,7 @@ updated: 2026-09-07
 - [[UGUI事件接口与EventTrigger]] — IPointerMoveHandler 不生效四大原因
 - [[UGUI布局系统与强制刷新]] — LayoutGroup 动态加子项不刷新的解法
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
+- [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
 
 ### 资源管理
 - [[AssetBundle 生命周期与卸载语义]] — Unload(false/true)、依赖顺序、粉红材质排查
@@ -149,9 +166,9 @@ updated: 2026-09-07
 
 | Tag | Count |
 |-----|-------|
-| unity | 27 |
-| 算法 | 9 |
-| 性能优化 | 5 |
+| unity | 30 |
+| 算法 | 10 |
+| 性能优化 | 6 |
 | unity面试 | 3 |
 | 数据结构 | 7 |
 | 每日学习 | 2 |
@@ -165,16 +182,19 @@ updated: 2026-09-07
 | 网络同步 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
-| 渲染 | 1 |
+| 渲染 | 2 |
 | 协程 | 1 |
 | 异步 | 1 |
 | 对象池 | 1 |
 | 动画 | 1 |
 | 生命周期 | 2 |
-| UGUI | 3 |
+| UGUI | 4 |
 | 物理 | 2 |
 | daily | 1 |
 | 线程安全 | 1 |
 | 资源管理 | 1 |
 | 热更新 | 1 |
 | 闭包 | 1 |
+| 寻路 | 1 |
+| 序列化 | 1 |
+| 设计模式 | 2 |

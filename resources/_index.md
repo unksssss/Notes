@@ -18,7 +18,7 @@ updated: 2026-09-07
 | [[DOTween与协程选型]] | 协程（状态机/流程控制）vs DOTween（时间轴补间/可中断可控），选择口诀：'动'用 DOTween、'流程'用协程，可混用 |
 | [[dotween详解]] | Unity DOTween 动画补间库完整指南：基本用法、回调系统、Sequence序列、生命週期控制、常用模式与性能注意事项 |
 
-### architecture（4）
+### architecture（6）
 
 | File | Summary |
 | --- | --- |
@@ -26,6 +26,8 @@ updated: 2026-09-07
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
 | [[对象池 OnEnable OnDisable 最佳实践]] | 利用 OnEnable/OnDisable 配合对象池实现自动重置，避免手动重置状态的耦合问题 |
 | [[对象池实现]] | Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版），含面试三连问：池空 Get=Instantiate 兜底 / 池满 Release=Destroy 截断 / 初始化放 OnEnable 原因；池化反面判据 + 粒子池同构（maxParticles/Prewarm，Day 36 拔高） |
+| [[单例模式与静态类选型]] | 单例 vs 静态类：要对象用单例、只要函数用静态类；静态类做不到四件事（继承接口/当参数/生命周期/序列化）；单例四缺点（Day 37 面经） |
+| [[UI-逻辑-数据分层与事件驱动]] | UI/逻辑/数据三层职责 + 事件驱动（TaskStateManager 范式）：状态变更走事件 UI 订阅；优点（解耦/可单测）+ 缺点（事件流难追踪/过度设计）（Day 37 面经） |
 
 ### assets（3）
 
@@ -79,11 +81,12 @@ updated: 2026-09-07
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（7）
+### scripting（8）
 
 | File | Summary |
 | --- | --- |
 | [[IL2CPP 编译原理与陷阱]] | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比；2026 官方路线 Mono → CoreCLR 四阶段（6.5~6.8） |
+| [[Unity 序列化机制]] | Unity 序列化器范围与限制、Dictionary 三绕路；Unity 6.6 官方新特性：Inspector 原生 Dictionary 序列化（两列 key-value + 编译期校验）（Day 37 官方新特性） |
 | [[MonoBehaviour生命周期与SetActive的坑]] | Awake/OnEnable/Start 生命周期；初始 inactive 对象不触发 Awake（首次激活才触发）；协程与 SetActive 的关系；OnDisable vs OnDestroy 触发时机对比 |
 | [[UnityEngine.Object 判空与销毁机制]] | Unity 对象双层结构：托管壳 + native 芯；Destroy 只销毁 native；== 重载使销毁即空；MissingReferenceException；假空对象；为什么分两侧（历史/性能/生命周期主权） |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | 三 Update 分工：FixedUpdate 固定步长跑物理、Update 帧率相关跑逻辑、LateUpdate 相机跟随；物理与渲染是解耦的两套时钟 |
@@ -91,11 +94,12 @@ updated: 2026-09-07
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 
-### ui（5）
+### ui（6）
 
 | File | Summary |
 | --- | --- |
 | [[TMP Text 零分配更新]] | TextMeshPro 零 GC 分配更新文本：SetText 格式化重载直接写入内部字符缓冲、SetCharArray；避开 string 拼接与 Format 的堆分配 |
+| [[UGUI 图集原理与合批]] | 图集共享纹理免切换→合批；代价：尺寸上限/整张常驻内存/按界面分组；Mask(模板缓冲打断合批) vs RectMask2D(shader 裁剪)；动静分离三档分层（Day 37 面经） |
 | [[ToggleGroup底层机制]] | ToggleGroup allowSwitchOff 行为与底层调用链：Toggle.Set() 入口早退拦截 + NotifyToggleOn → SetAllTogglesOff |
 | [[UGUI事件接口与EventTrigger]] | UGUI 事件两种写法（接口 vs EventTrigger）、IPointerMoveHandler 不生效的四大原因、验证技巧；C# event vs UnityEvent（序列化与 Inspector 配置、性能差异） |
 | [[UGUI多级UI性能优化与Canvas重建]] | 多级 UI 性能优化：Canvas Rebuild 根因、动静分离拆 Canvas、浅平化层级、图集合批、代码层优化、面试回答框架 |
@@ -125,6 +129,7 @@ updated: 2026-09-07
 | [[排序算法-快排归并堆排]] | 三大排序对比：快速排序（平均之王/不稳定/最坏 O(n²)）、归并排序（稳定/费内存）、堆排序（省内存/常数大），复杂度与记忆口诀 |
 | [[栈与队列的相互实现]] | 两栈实现队列 vs 单队列实现栈的对称思路与复杂度；核心是牺牲一次 O(n) 转圈调序；易错点：单队列 push 转圈方向、双队列 push O(1) 版本；栈的应用延伸：括号匹配（平分法误区、三条件+两边界） |
 | [[贪心算法入门]] | 贪心=每步局部最优；找零钱翻车案例证明贪心不是万能；适用条件（贪心选择性质+最优子结构）；与动态规划的边界 |
+| [[A星寻路算法]] | A* = Dijkstra + 启发式 f(n)=g(n)+h(n)；h 可采纳性保证最优、高估错过最优解；h=0 退化为 Dijkstra；网格启发函数选择；NavMesh 底层思想（Day 37 面经） |
 | [[递归与迭代转换]] | 递归的栈溢出与性能开销、尾递归与 TCO（C# 默认不做）、一般递归用栈/队列显式保存状态（DFS 用栈、BFS 用队列）、二叉树前序迭代模板；账本比喻：不欠账→循环，欠账要回溯→显式栈 |
 | [[链表反转]] | 链表反转两种写法：三指针迭代法（O(n)/O(1)）与递归法（O(n)/O(n)），先保存 next 防断链 |
 
@@ -149,4 +154,4 @@ updated: 2026-09-07
 | [[AI-Agent-提示词-日记问答同步]] | AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代 |
 | [[Unity主程学习路线]] | Unity程序从一年经验到主程的完整学习路线，分五个阶段：基础→引擎深入→架构→专项突破→主程能力。 |
 
-共 64 篇资源笔记。
+共 69 篇资源笔记。
