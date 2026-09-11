@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-09-07
+updated: 2026-09-11
 ---
 
 # Resources
@@ -81,11 +81,12 @@ updated: 2026-09-07
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（8）
+### scripting（9）
 
 | File | Summary |
 | --- | --- |
 | [[IL2CPP 编译原理与陷阱]] | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比；2026 官方路线 Mono → CoreCLR 四阶段（6.5~6.8） |
+| [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] | System.Object → UnityEngine.Object 四大分支；Component 两条腿（走 Behaviour 的 MonoBehaviour/StateMachineBehaviour/Collider2D/Rigidbody2D vs 直接继承的 Transform/Renderer/Collider3D/Rigidbody）；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别；3D 与 2D 不对称；12 道面试追问 |
 | [[Unity 序列化机制]] | Unity 序列化器范围与限制、Dictionary 三绕路；Unity 6.6 官方新特性：Inspector 原生 Dictionary 序列化（两列 key-value + 编译期校验）（Day 37 官方新特性） |
 | [[MonoBehaviour生命周期与SetActive的坑]] | Awake/OnEnable/Start 生命周期；初始 inactive 对象不触发 Awake（首次激活才触发）；协程与 SetActive 的关系；OnDisable vs OnDestroy 触发时机对比 |
 | [[UnityEngine.Object 判空与销毁机制]] | Unity 对象双层结构：托管壳 + native 芯；Destroy 只销毁 native；== 重载使销毁即空；MissingReferenceException；假空对象；为什么分两侧（历史/性能/生命周期主权） |

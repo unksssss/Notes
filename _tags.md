@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-09-08
+updated: 2026-09-11
 ---
 
 # Tags Index
@@ -59,6 +59,7 @@ updated: 2026-09-08
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
+- [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — System.Object → UnityEngine.Object 四大分支；Component 两条腿（Behaviour vs 直接继承）；12 道面试追问
 
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
@@ -146,6 +147,7 @@ updated: 2026-09-08
 ### 生命周期
 - [[MonoBehaviour生命周期与SetActive的坑]] — 初始 inactive 不触发 Awake
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
+- [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — Object→Component→Behaviour/MonoBehaviour 全景；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别
 
 ### UGUI
 - [[UGUI事件接口与EventTrigger]] — IPointerMoveHandler 不生效四大原因
@@ -162,11 +164,24 @@ updated: 2026-09-08
 ### 闭包
 - [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] — 隐藏类搬变量、存活期=委托引用、闭包泄漏
 
+### 架构
+- [[UI-逻辑-数据分层与事件驱动]] — UI/逻辑/数据三层 + 事件驱动（TaskStateManager 范式）
+- [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — Object→Component→Behaviour/MonoBehaviour 体系全景；Component 两条腿（Behaviour vs 直接继承）；3D 与 2D 物理设计不对称
+
+### 类层级
+- [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — UnityEngine.Object 四大分支 + Component 两条腿（走 Behaviour 与直接继承）完整体系；12 道面试追问
+
+### scripting
+- [[IL2CPP 编译原理与陷阱]] — IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比
+- [[协程原理与unitask]] — Unity 协程工作原理、IL 层状态机、yield 指令恢复时机、UniTask 替代
+- [[Unity 序列化机制]] — 序列化器范围与限制、Dictionary 三绕路、6.6 原生 Dictionary
+- [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — 类继承体系全景、BehaviourManager 派发、Component 两条腿
+
 ## Stats
 
 | Tag | Count |
 |-----|-------|
-| unity | 30 |
+| unity | 31 |
 | 算法 | 10 |
 | 性能优化 | 6 |
 | unity面试 | 3 |
@@ -187,7 +202,7 @@ updated: 2026-09-08
 | 异步 | 1 |
 | 对象池 | 1 |
 | 动画 | 1 |
-| 生命周期 | 2 |
+| 生命周期 | 3 |
 | UGUI | 4 |
 | 物理 | 2 |
 | daily | 1 |
@@ -198,3 +213,6 @@ updated: 2026-09-08
 | 寻路 | 1 |
 | 序列化 | 1 |
 | 设计模式 | 2 |
+| 架构 | 2 |
+| 类层级 | 1 |
+| scripting | 4 |
