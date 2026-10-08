@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-09-11
+updated: 2026-10-08
 ---
 
 # Resources
@@ -95,7 +95,7 @@ updated: 2026-09-11
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 
-### ui（6）
+### ui（10）
 
 | File | Summary |
 | --- | --- |
@@ -105,6 +105,10 @@ updated: 2026-09-11
 | [[UGUI事件接口与EventTrigger]] | UGUI 事件两种写法（接口 vs EventTrigger）、IPointerMoveHandler 不生效的四大原因、验证技巧；C# event vs UnityEvent（序列化与 Inspector 配置、性能差异） |
 | [[UGUI多级UI性能优化与Canvas重建]] | 多级 UI 性能优化：Canvas Rebuild 根因、动静分离拆 Canvas、浅平化层级、图集合批、代码层优化、面试回答框架 |
 | [[UGUI布局系统与强制刷新]] | LayoutGroup + ContentSizeFitter 动态加子项尺寸不刷新的解法：LayoutRebuilder.ForceRebuildLayoutImmediate / Canvas.ForceUpdateCanvases；Start 时机读 UI 尺寸用 GetWorldCorners；ScrollRect 三种 MovementType |
+| [[UGUI Canvas 渲染模式与屏幕适配]] | Canvas 三模式（Overlay / Screen Space-Camera / World Space）渲染时机与遮挡差异、Event Camera 坑；Canvas Scaler 三模式与 Match 公式；刘海屏 SafeArea 适配完整代码与五条坑 |
+| [[UGUI 事件系统与射线检测链路]] | UI 事件完整链路（EventSystem→InputModule→Raycaster→ExecuteEvents 冒泡）、GraphicRaycaster 源码级射线流程、点击双条件、OnDrop 时序；Raycast Target 过多的真实代价 + 「不影响 DrawCall」辟谣 + 七条优化 |
+| [[UGUI 拖拽实现与拖放检测]] | 背包拖拽四接口完整骨架（幽灵 CanvasGroup / 坐标转换三兄弟 / RaycastNonAlloc 探测）；落点判定三方案；「拖拽中碰撞检测失效」八条根因（UI 无 Collider / Kinematic vs Static / ghost 挡射线 / blockingObjects） |
+| [[UGUI DrawCall 与性能优化]] | UGUI DrawCall 生成机制与合批五条件、破批十大元凶、DrawCall vs Overdraw、Frame Debugger/Profiler 诊断链路、四层优化清单与面试框架 |
 
 ## C# / .NET / 语言机制
 

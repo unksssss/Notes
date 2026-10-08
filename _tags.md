@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-09-11
+updated: 2026-10-08
 ---
 
 # Tags Index
@@ -68,6 +68,10 @@ updated: 2026-09-11
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
 - [[unity知识点-2026-04-29]] — 今日知识点：工业仿真网络同步方案 — 状态同步 vs 帧同步
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
+- [[UGUI Canvas 渲染模式与屏幕适配]] — Canvas 三模式 + Canvas Scaler + 刘海屏 SafeArea（面试八问 Q1/Q4/Q5）
+- [[UGUI 事件系统与射线检测链路]] — 事件触发链路 + GraphicRaycaster 源码流程 + Raycast Target 代价（面试八问 Q2/Q3）
+- [[UGUI 拖拽实现与拖放检测]] — 背包拖拽骨架 + 拖拽中碰撞检测失效八条根因（面试八问 Q6/Q7）
+- [[UGUI DrawCall 与性能优化]] — 合批五条件 + 破批十大元凶 + Overdraw + 诊断工具链（面试八问 Q8）
 
 ### 协程
 - [[协程原理与unitask]] — Unity 协程工作原理、局限性与 UniTask 替代方案
@@ -88,6 +92,9 @@ updated: 2026-09-11
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 - [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
+- [[UGUI多级UI性能优化与Canvas重建]] — Canvas Rebuild 根因、动静分离、浅平化、面试框架
+- [[UGUI 事件系统与射线检测链路]] — Raycast Target 过多的真实代价与七条优化
+- [[UGUI DrawCall 与性能优化]] — 合批五条件、破批十大元凶、DrawCall vs Overdraw、诊断工具链
 
 ### 算法
 - [[哈希表冲突解决与Dictionary底层]] — 链地址法/开放地址法、C# Dictionary 扩容机制
@@ -134,6 +141,8 @@ updated: 2026-09-11
 ### 渲染
 - [[urp移动优化]] — URP 渲染管线在移动端的优化配置与技巧
 - [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
+- [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件、破批十大元凶、Overdraw 与诊断
+- [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing / 静态动态合批
 
 ### 网络同步
 - [[unity网络同步方案-状态同步vs帧同步]] — 工业数字孪生场景中两种网络同步方案的对比与选型
@@ -150,10 +159,41 @@ updated: 2026-09-11
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — Object→Component→Behaviour/MonoBehaviour 全景；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别
 
 ### UGUI
+- [[UGUI Canvas 渲染模式与屏幕适配]] — Canvas 三渲染模式 + Canvas Scaler 三模式 + 刘海屏 SafeArea
+- [[UGUI 事件系统与射线检测链路]] — 事件触发链路、GraphicRaycaster 射线流程、Raycast Target 代价
+- [[UGUI 拖拽实现与拖放检测]] — 拖拽四接口骨架、落点判定三方案、碰撞检测失效八条根因
+- [[UGUI DrawCall 与性能优化]] — 合批五条件、破批十大元凶、Overdraw、诊断工具链
+- [[UGUI多级UI性能优化与Canvas重建]] — Canvas Rebuild 根因与四层优化
 - [[UGUI事件接口与EventTrigger]] — IPointerMoveHandler 不生效四大原因
 - [[UGUI布局系统与强制刷新]] — LayoutGroup 动态加子项不刷新的解法
 - [[TMP Text 零分配更新]] — TMP SetText 零分配更新文本
 - [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
+
+### Canvas
+- [[UGUI Canvas 渲染模式与屏幕适配]] — Overlay / Screen Space-Camera / World Space 渲染时机与 Event Camera 坑
+- [[UGUI多级UI性能优化与Canvas重建]] — Canvas Rebuild 机制与动静分离拆 Canvas
+
+### 屏幕适配
+- [[UGUI Canvas 渲染模式与屏幕适配]] — Canvas Scaler 三模式、Match 公式、刘海屏 SafeArea 适配
+
+### 事件系统
+- [[UGUI 事件系统与射线检测链路]] — EventSystem / InputModule / Raycaster 三角色与 ExecuteEvents 冒泡
+- [[UGUI 拖拽实现与拖放检测]] — 拖拽四接口与释放帧 OnDrop→OnEndDrag 时序
+
+### 射线检测
+- [[UGUI 事件系统与射线检测链路]] — GraphicRaycaster 源码级过滤流程与排序规则
+- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
+
+### 拖拽
+- [[UGUI 拖拽实现与拖放检测]] — 背包拖拽四接口骨架与拖放探测三方案
+
+### 物理检测
+- [[UGUI 拖拽实现与拖放检测]] — UI 拖拽无 Collider、Kinematic vs Static 不触发、手动 Query 兜底
+- [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
+
+### DrawCall
+- [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件与破批十大元凶
+- [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing / 静态动态合批（3D 侧）
 
 ### 资源管理
 - [[AssetBundle 生命周期与卸载语义]] — Unload(false/true)、依赖顺序、粉红材质排查
@@ -181,10 +221,10 @@ updated: 2026-09-11
 
 | Tag | Count |
 |-----|-------|
-| unity | 31 |
+| unity | 35 |
 | 算法 | 10 |
-| 性能优化 | 6 |
-| unity面试 | 3 |
+| 性能优化 | 9 |
+| unity面试 | 7 |
 | 数据结构 | 7 |
 | 每日学习 | 2 |
 | DOTS | 1 |
@@ -197,13 +237,13 @@ updated: 2026-09-11
 | 网络同步 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
-| 渲染 | 2 |
+| 渲染 | 4 |
 | 协程 | 1 |
 | 异步 | 1 |
 | 对象池 | 1 |
 | 动画 | 1 |
 | 生命周期 | 3 |
-| UGUI | 4 |
+| UGUI | 9 |
 | 物理 | 2 |
 | daily | 1 |
 | 线程安全 | 1 |
@@ -216,3 +256,10 @@ updated: 2026-09-11
 | 架构 | 2 |
 | 类层级 | 1 |
 | scripting | 4 |
+| Canvas | 2 |
+| 屏幕适配 | 1 |
+| 事件系统 | 2 |
+| 射线检测 | 2 |
+| 拖拽 | 1 |
+| 物理检测 | 2 |
+| DrawCall | 2 |
