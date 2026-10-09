@@ -3,10 +3,11 @@ title: "热更新 HybridCLR — AOT 泛型元数据补全"
 type: resource
 tags: [unity, 热更新, HybridCLR, IL2CPP, AOT, 真实面经]
 created: "2026-09-07"
-updated: "2026-09-07"
+updated: "2026-10-09"
 status: active
-summary: "HybridCLR + AssetBundle 热更整体流程：程序集剥离（AOT 主包 vs HotUpdate.dll）→ 清单 MD5 版本比对下发 → AOT 泛型裁剪根因（泛型=按需实例化，主包没见过的组合机器码里没有）→ DHE 元数据补全；附 AOT vs JIT 精讲"
+summary: "HybridCLR + AssetBundle 热更整体流程：程序集剥离（AOT 主包 vs HotUpdate.dll）→ 清单 MD5 版本比对下发 → AOT 泛型裁剪根因（泛型=按需实例化，主包没见过的组合机器码里没有）→ DHE 元数据补全；附 AOT vs JIT 精讲；实战落地见 [[YooAssets 热更新流程 — HybridCLR 实战]]"
 related:
+  - "[[YooAssets 热更新流程 — HybridCLR 实战]]"
   - "[[IL2CPP 编译原理与陷阱]]"
   - "[[Addressables资源生命周期]]"
 ---
@@ -14,6 +15,8 @@ related:
 # 热更新 HybridCLR — AOT 泛型元数据补全
 
 来源：CSDN 面经《unity几道面试题》原题"hybrid+assetbundle 热更整体流程讲一下"。
+
+> 🚀 **实战落地**：本笔记讲的是**原理**；具体代码链路（YooAssets 资源更新 + DLL 加载 + 反射调用）见 📎 [[YooAssets 热更新流程 — HybridCLR 实战]]（学习项目 `E:\unityproject\HybirdCLR`）。
 
 ## 热更的意义
 

@@ -81,7 +81,7 @@ updated: 2026-10-09
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（9）
+### scripting（10）
 
 | File | Summary |
 | --- | --- |
@@ -94,6 +94,7 @@ updated: 2026-10-09
 | [[协程原理与unitask]] | Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析 |
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
+| [[YooAssets 热更新流程 — HybridCLR 实战]] | **学习项目实战**（`E:\unityproject\HybirdCLR`）：YooAssets 多包设计 + 三档运行模式（EditorSimulate/OfflinePlay/HostPlay）+ 八步链路（Initialize → CreatePackage → 文件系统与下载参数 → 请求版本 → 加载清单 → 差异下载 → LoadAssetAsync<TextAsset> → Assembly.Load + 反射调用 → Release）；DLL 为何改名 `.bytes`；自定义 IRemoteService 的多 CDN 容灾 |
 
 ### ui（11）
 
@@ -165,4 +166,4 @@ updated: 2026-10-09
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 78 篇资源笔记（unity 46 / csharp 8 / algorithm 13 / archive 9 / meta 2）。
+共 79 篇资源笔记（unity 47 / csharp 8 / algorithm 13 / archive 9 / meta 2）。
