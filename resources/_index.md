@@ -168,4 +168,4 @@ updated: 2026-10-09
 | [[AI-Agent-提示词-日记问答同步]] | AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代 |
 | [[Unity主程学习路线]] | Unity程序从一年经验到主程的完整学习路线，分五个阶段：基础→引擎深入→架构→专项突破→主程能力。 |
 
-共 70 篇资源笔记。
+共 75 篇资源笔记（unity 45 / csharp 7 / algorithm 11 / archive 9 / interview 1 / meta 2）。
