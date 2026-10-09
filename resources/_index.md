@@ -6,7 +6,7 @@ updated: 2026-10-09
 
 # Resources
 
-按知识域分目录归档（Unity / C# / 算法 / 归档 / 面试题库 / meta），Unity 内再按主题细分。双链按文件名解析，跨目录跳转不受影响。
+按知识域分目录归档（Unity / C# / 算法 / 归档 / meta），Unity 内再按主题细分。双链按文件名解析，跨目录跳转不受影响。
 
 ## Unity / 引擎技术
 
@@ -152,15 +152,6 @@ updated: 2026-10-09
 | [[unity网络同步方案-状态同步vs帧同步]] | 工业数字孪生场景中两种网络同步方案的对比与选型 |
 | [[单圆柱多折点水带实现解析]] | 双 Mesh 多折点水带方案：BakedHoseMesh 固定段低频重建 + ActiveHoseMesh 末端实时段每帧重建；对应 SingleCylinderHoseFromFireTruck / MultiPointBentCylinder 脚本 |
 
-## 每日面试题库（interview）
-
-每天问答出的 15 题（面试题 + 算法题）**开题即落盘**到此处，一篇一天：`每日面试题-YYYY-MM-DD.md`。
-含题干、选项、参考答案、解析、来源标签（真实面经 / 库外新题 / 官方新特性 / 拔高 / 算法）、作答记录回填位、关联知识笔记双链。**与主题笔记的分工**：这里是「题目与答案」，主题笔记是「知识讲解」，两者互链。
-
-| File | Summary |
-| --- | --- |
-| [[每日面试题-2026-10-09]] | Day 41 完整 15 题（5 选择 + 10 简答）：CPU 剔除加速结构（BVH/四叉/八叉树）、Unity 6.7 SCGI 实时 GI、AB 依赖提前卸载→洋红、共享依赖 `Unload(true)` 连带卸载、拓扑排序判环；协程执行顺序、TMP 汉字 SDF、静态·动态图集、延迟渲染 G-Buffer 与 MSAA 不兼容、Addressables 引用计数、SRP Batcher CBUFFER、对象池进阶、静态事件泄漏、TCP vs UDP、最小栈 |
-
 ## 学习路线 / Agent 协作
 
 | File | Summary |
@@ -168,4 +159,6 @@ updated: 2026-10-09
 | [[AI-Agent-提示词-日记问答同步]] | AI Agent 每日任务（知识问答 + 技术笔记 + GitHub 同步）的早期提示词存档，已被 automation 内部 prompt 取代 |
 | [[Unity主程学习路线]] | Unity程序从一年经验到主程的完整学习路线，分五个阶段：基础→引擎深入→架构→专项突破→主程能力。 |
 
-共 75 篇资源笔记（unity 45 / csharp 7 / algorithm 11 / archive 9 / interview 1 / meta 2）。
+> **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
+
+共 74 篇资源笔记（unity 45 / csharp 7 / algorithm 11 / archive 9 / meta 2）。

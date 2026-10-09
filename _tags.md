@@ -65,7 +65,6 @@ updated: 2026-10-08
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
 
 ### unity面试
-- [[每日面试题-2026-10-09]] — Day 41 完整 15 题（题干+选项+参考答案+解析）：剔除加速结构、SCGI 实时 GI、AB 依赖卸载、拓扑排序判环、协程顺序、TMP SDF、图集、延迟渲染 G-Buffer/MSAA、Addressables、SRP Batcher、对象池、静态事件、TCP/UDP、最小栈
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
 - [[unity知识点-2026-04-29]] — 今日知识点：工业仿真网络同步方案 — 状态同步 vs 帧同步
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
@@ -225,7 +224,7 @@ updated: 2026-10-08
 | unity | 35 |
 | 算法 | 10 |
 | 性能优化 | 9 |
-| unity面试 | 8 |
+| unity面试 | 7 |
 | 数据结构 | 7 |
 | 每日学习 | 2 |
 | DOTS | 1 |
