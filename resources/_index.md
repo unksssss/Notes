@@ -35,7 +35,7 @@ updated: 2026-10-09
 | --- | --- |
 | [[Addressables资源生命周期]] | Addressables 引用计数机制：Load/Release 成对、计数累加、只 Load 不 Release = 内存泄漏；LoadAssetAsync/Release 与 InstantiateAsync/ReleaseInstance 配对规则与错误后果；与 Resources 对比 |
 | [[Resources.Load 加载与 as 转型]] | Resources.Load<T> 泛型 vs 非泛型+as 的机制、引用类型 as 无装箱误解、加载失败返回 null 不抛异常、判空习惯、卸载时机 |
-| [[AssetBundle 生命周期与卸载语义]] | Unload(false) 卸包头保实例 vs Unload(true) 连资源全销毁 → 粉红 Missing；依赖加载先父后子、卸载先子后父；Addressables 引用计数 = 底层 AB 的人肉记账自动化（Day 36 面经） |
+| [[AssetBundle 生命周期与卸载语义]] | **AB 包全流程**（标记 → 打包生成 Manifest → 依赖 → 下发 → 加载 → 依赖加载 → 实例化 → 卸载）+ 打包粒度两原则「共享的抽出来、同生命周期的放一起」；Unload(false) 卸包头保实例 vs Unload(true) 连资源全销毁 → 粉红 Missing；依赖加载先父后子、卸载先子后父；Addressables 引用计数 = 底层 AB 的人肉记账自动化（Day 36 面经 + 2026-10-09 补全流程） |
 
 ### digest（2）
 
@@ -95,7 +95,7 @@ updated: 2026-10-09
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 
-### ui（10）
+### ui（11）
 
 | File | Summary |
 | --- | --- |
@@ -109,6 +109,7 @@ updated: 2026-10-09
 | [[UGUI 事件系统与射线检测链路]] | UI 事件完整链路（EventSystem→InputModule→Raycaster→ExecuteEvents 冒泡）、GraphicRaycaster 源码级射线流程、点击双条件、OnDrop 时序；Raycast Target 过多的真实代价 + 「不影响 DrawCall」辟谣 + 七条优化 |
 | [[UGUI 拖拽实现与拖放检测]] | 背包拖拽四接口完整骨架（幽灵 CanvasGroup / 坐标转换三兄弟 / RaycastNonAlloc 探测）；落点判定三方案；「拖拽中碰撞检测失效」八条根因（UI 无 Collider / Kinematic vs Static / ghost 挡射线 / blockingObjects） |
 | [[UGUI DrawCall 与性能优化]] | UGUI DrawCall 生成机制与合批五条件、破批十大元凶、DrawCall vs Overdraw、Frame Debugger/Profiler 诊断链路、四层优化清单与面试框架 |
+| [[字体与文本合批]] | 「字体能合批吗」：**字体不决定合批**，仍看同材质同贴图 + 深度连续；Legacy Text 同 Font 共一张动态图集可合批（扩容会打断）；TMP 同 FontAsset 共享材质可合批，**fallback 会拆 submesh 产生额外 DC**；最常见破批其实是「文本与 Image 交错」（材质不同）+ 六条优化 |
 
 ## C# / .NET / 语言机制
 
@@ -121,6 +122,7 @@ updated: 2026-10-09
 | [[struct 装箱陷阱与值类型原理]] | 值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法、栈/堆内存布局与生命周期、继承与内存布局分离、装箱内存布局；参数传递 ref/out 与值拷贝（Day 36） |
 | [[内存管理方案对比]] | 各大语言内存管理策略对比：完全手动 → 编译期静态分析 → ARC → 追踪式 GC → 引用计数+GC |
 | [[C# IL 中间语言与编译执行模型]] | IL/CIL = .NET 通用中间语言：两段论（csc 编译一次、JIT/AOT 各自翻译）；栈机模型（ldarg 压栈/add 弹栈/ret）；box/newobj/隐藏类指令 ↔ 装箱/闭包/协程状态机；Unity 四条消费路线 Mono/IL2CPP/CoreCLR/HybridCLR |
+| [[委托与事件]] | delegate = 类型安全的函数指针 + target（实例方法隐式持 `this`）→ 多播委托链按序执行、异常截断、`-=` 只移除一个；**event = 编译器对 delegate 字段的封装**（私有字段 + add/remove 访问器，外部只能 `+=`/`-=`，不能赋 null 覆盖、不能 Invoke）→ 为什么需要它；与 UnityEvent 取舍；订阅不取消 = GC 泄漏，静态事件最危险 |
 
 ## 算法与数据结构
 
@@ -136,7 +138,9 @@ updated: 2026-10-09
 | [[贪心算法入门]] | 贪心=每步局部最优；找零钱翻车案例证明贪心不是万能；适用条件（贪心选择性质+最优子结构）；与动态规划的边界 |
 | [[A星寻路算法]] | A* = Dijkstra + 启发式 f(n)=g(n)+h(n)；h 可采纳性保证最优、高估错过最优解；h=0 退化为 Dijkstra；网格启发函数选择；NavMesh 底层思想（Day 37 面经） |
 | [[递归与迭代转换]] | 递归的栈溢出与性能开销、尾递归与 TCO（C# 默认不做）、一般递归用栈/队列显式保存状态（DFS 用栈、BFS 用队列）、二叉树前序迭代模板；账本比喻：不欠账→循环，欠账要回溯→显式栈 |
-| [[链表反转]] | 链表反转两种写法：三指针迭代法（O(n)/O(1)）与递归法（O(n)/O(n)），先保存 next 防断链 |
+| [[链表反转]] | 链表反转两种写法：三指针迭代法（O(n)/O(1)）与递归法（O(n)/O(n)），先保存 next 防断链；附快慢指针 Floyd 判环 |
+| [[两个链表的第一个公共结点]] | 单链表相交必为 **Y 形**（共用尾部，不可能 X 形）；三种解法：长度差对齐法 / 双指针「走完自己走对方」（路程都是 m+n，代码最短，面试首选）/ 哈希表；易错点：比引用不比值、无交点返 null（剑指 Offer 52 / LC160） |
+| [[链表中环的入口结点]] | 快慢指针找相遇点 → fast 重置 head、两指针同速再走，再遇即入口；核心推导 `a = (n-1)L + c`，即「头→入口 = 相遇点→入口（+整数圈）」；易错：第二步必须改回 1 步、不能直接返回相遇点（剑指 Offer 23 / LC142） |
 
 ## 项目归档（消防仿真 / XR-VR，已停出题）
 
@@ -161,4 +165,4 @@ updated: 2026-10-09
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 74 篇资源笔记（unity 45 / csharp 7 / algorithm 11 / archive 9 / meta 2）。
+共 78 篇资源笔记（unity 46 / csharp 8 / algorithm 13 / archive 9 / meta 2）。
