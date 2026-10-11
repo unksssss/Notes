@@ -3,7 +3,7 @@ title: "YooAssets 热更新流程 — HybridCLR 实战"
 type: resource
 tags: [unity, 热更新, HybridCLR, YooAssets, AssetBundle, 学习项目]
 created: "2026-10-09"
-updated: "2026-10-09"
+updated: "2026-10-11"
 status: active
 summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类"
 related:
@@ -198,7 +198,86 @@ public class RemoteService : IRemoteService
 - `AOTGenericReferences.cs` **目前是空的**（`PatchedAOTAssemblyList` 与泛型类型列表都没有内容）→ 说明还没执行过 HybridCLR 的「生成 AOT 泛型引用」菜单，或热更代码里暂时没有用到主包没见过的泛型。**一旦热更代码 new 了新泛型，必须先跑生成并让 DLL 随包携带**，否则运行时崩溃。详见 📎 [[热更新 HybridCLR — AOT 泛型元数据补全]]
 - `Bridge` 代码目前是「加载 → 反射调用静态方法」的最小闭环，下一步通常会演进为：加载完成后调用 `Hello` 的入口方法去启动整个热更业务（而不是散落反射）。
 
-## 五、面试答题框架
+## 五、2026-10-11 实战推进：从「加载即调用」到「常驻驱动」+ 首次打包
+
+### 5.1 职责拆分：加载归 Bridge，调用归常驻 MonoBehaviour
+
+`LoadDllScripts.cs` 里那段反射调用被**注释掉、移交给 `GameManager`**：
+
+```diff
+  HotUpdateDll = Assembly.Load(dllText.bytes);
+- Type helloType = hotupdateAss.GetType("Hello");
+- MethodInfo helloMethod = helloType.GetMethod("Run");
+- helloMethod.Invoke(null, null);
+  dllHandle.Release();
++ yield return new WaitForSeconds(3);
++ SceneManager.LoadScene("GameScene");
+```
+
+```csharp
+public class GameManager : MonoBehaviour
+{
+    void Update()
+    {
+        Type helloType = LoadDllScripts.Instance.HotUpdateDll.GetType("Hello");
+        MethodInfo helloMethod = helloType.GetMethod("Run");
+        helloMethod.Invoke(null, null);
+    }
+}
+```
+
+**拆分的理由**：`LoadDllScripts` 收敛为「**把 DLL 加载进内存**」（加载完即 `Release()` 释放资源句柄、切场景），「**调用热更代码**」是持续行为，交给常驻对象。这样 Assembly 的持有生命周期与业务驱动解耦。
+
+配套两点：
+
+- `LoadDllScripts.Start()` 里 `Instance = this; DontDestroyOnLoad(gameObject);` —— **必须跨场景常驻**，否则 `LoadScene` 一执行，Assembly 的持有者就随场景卸载没了；
+- `public Assembly HotUpdateDll { get; private set; }` —— 把 Assembly 暴露给 AOT 侧其它脚本（这是 AOT ↔ 热更的唯一"接口面"）。
+
+### 5.2 每帧反射是热路径反模式
+
+`Update` 里每帧 `GetType` + `GetMethod` + `Invoke` = **每帧 3 次反射**（`Invoke` 含装箱 + 参数数组 + 反射栈帧，`GetMethod` 还要字符串匹配）。优化按性价比排序：
+
+| 档位 | 做法 | 说明 |
+| --- | --- | --- |
+| ① 缓存元数据 | `Start()` 里把 `Type` / `MethodInfo` 存字段 | 改动最小，干掉 2/3 反射 |
+| ② 转委托 | `MethodInfo.CreateDelegate<Action>()` | 调用开销接近直接调用（**推荐**） |
+| ③ 改架构 | 热更 DLL 暴露统一入口（如 `IHotUpdateEntry.Start()`），AOT 侧只调一次 | 从根上避免"每帧过反射" |
+
+📎 反射 / IL / 委托的底层开销见 [[C# IL 中间语言与编译执行模型]]
+
+### 5.3 热更侧同样别做「每帧查找」
+
+```csharp
+// 反面写法：每帧两次 GameObject.Find（全场景层级遍历 O(n)）
+public static void Run() {
+    var g1 = GameObject.Find("Square (1)");
+    g1.transform.Rotate(0, 0.1f, 0.1f);
+}
+```
+
+正确姿势是热更入口初始化时缓存引用，`Run` 里只做 `Rotate`。**「每帧做查找」一律改成「一次查找 + 缓存引用」** —— 这条在 AOT 侧（反射）和热更侧（Find）是同一条原则。
+
+### 5.4 打包产物分层（包版本 v1.1.5）
+
+```
+Bundles/StandaloneWindows64/HotUpdateDlls/v1.1.5/     ← 要上传 CDN 的那份
+├── 97e2d83ce3cf8abe85e5c929a3916f85.bundle          ← 实际资源包（Hash 命名）
+├── HotUpdateDlls_v1.1.5.bytes                       ← 远端清单
+├── HotUpdateDlls_v1.1.5.hash                        ← 清单 Hash（比对是否需要更新）
+├── HotUpdateDlls.version                            ← 版本文件（指向最新清单名）
+├── HotUpdateDlls_v1.1.5.report                      ← 打包报告（查资源归属）
+└── link.xml                                         ← 裁剪保护
+
+Assets/StreamingAssets/yoo/HotUpdateDlls/             ← 随包发布的内置清单（兜底）
+├── BuiltinCatalog.json / .bytes                     ← 对应 CopyBuiltinPackageManifest 参数
+├── HotUpdateDlls.version
+└── HotUpdateDlls_v1.1.5.bytes / .hash
+```
+
+- `OutputCache/`（`buildInfo.log` / `buildlogtep.json`）是**打包中间缓存，不进包**；
+- **两层版本概念别混淆**：代码里 `defaultVersion = "v1.0"` 是**远端 URL 的一级目录**（`http://127.0.0.1:8080/CDN/PC/v1.0/`），构建产出的 `v1.1.5` 是 **YooAssets 包版本**。CDN 目录按哪个组织必须和 `RemoteService` 拼出的 URL 对齐，否则 `RequestPackageVersionAsync` 取不到版本文件 —— 这是热更"首跑失败"的高频原因。
+
+## 六、面试答题框架
 
 ① 一句话定性：**YooAssets 管资源、HybridCLR 管代码，两条链路各自做差异更新** → ② 资源侧八步：Initialize → CreatePackage → 选运行模式（Editor/Offline/Host）+ 文件系统 → 请求版本 → 加载清单 → 差异下载（`TotalDownloadCount` 即差异数）→ 加载 → Release → ③ 代码侧：DLL 改名 `.bytes` 打进 AB → `LoadAssetAsync<TextAsset>` → `Assembly.Load(bytes)` → 反射调用 → ④ 补上 AOT 泛型元数据这个最大的坑。
 
