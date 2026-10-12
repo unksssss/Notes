@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-09
+updated: 2026-10-12
 ---
 
 # Resources
@@ -35,7 +35,7 @@ updated: 2026-10-09
 | --- | --- |
 | [[Addressables资源生命周期]] | Addressables 引用计数机制：Load/Release 成对、计数累加、只 Load 不 Release = 内存泄漏；LoadAssetAsync/Release 与 InstantiateAsync/ReleaseInstance 配对规则与错误后果；与 Resources 对比 |
 | [[Resources.Load 加载与 as 转型]] | Resources.Load<T> 泛型 vs 非泛型+as 的机制、引用类型 as 无装箱误解、加载失败返回 null 不抛异常、判空习惯、卸载时机 |
-| [[AssetBundle 生命周期与卸载语义]] | **AB 包全流程**（标记 → 打包生成 Manifest → 依赖 → 下发 → 加载 → 依赖加载 → 实例化 → 卸载）+ 打包粒度两原则「共享的抽出来、同生命周期的放一起」；Unload(false) 卸包头保实例 vs Unload(true) 连资源全销毁 → 粉红 Missing；依赖加载先父后子、卸载先子后父；Addressables 引用计数 = 底层 AB 的人肉记账自动化（Day 36 面经 + 2026-10-09 补全流程） |
+| [[AssetBundle 生命周期与卸载语义]] | **AB 包全流程**（标记 → 打包生成 Manifest → 依赖 → 下发 → 加载 → 依赖加载 → 实例化 → 卸载）+ 打包粒度两原则「共享的抽出来、同生命周期的放一起」；Unload(false) 卸包头保实例 vs Unload(true) 连资源全销毁 → 粉红 Missing；依赖加载先父后子、卸载先子后父；**裸 AB 打包-加载最小闭环**（Editor 打包脚本四要点 / 产物四件套与 manifest 字段解读 / LoadFromFile 路径与资产名语义 / Resources 双份包体坑 / 压缩格式三选 LZMA·LZ4·Uncompressed / 加载 API 选型 / 与 YooAssets 对照）；Addressables 引用计数 = 底层 AB 的人肉记账自动化（Day 36 面经 + 2026-10-09 补全流程 + 2026-10-12 实战） |
 
 ### digest（2）
 
