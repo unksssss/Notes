@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-12
+updated: 2026-10-13
 ---
 
 # Resources
@@ -58,6 +58,12 @@ updated: 2026-10-12
 | --- | --- |
 | [[Unity Input System 使用指南]] | Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。 |
 | [[unity-inputsystem详解]] | 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用 |
+
+### network（1）
+
+| File | Summary |
+| --- | --- |
+| [[TCP 与 UDP 的区别与游戏选型]] | TCP vs UDP 十维度对比表；**队头阻塞**是实时游戏弃用 TCP 的核心原因（位置数据有时效性，宁可丢包也不等重传）；Nagle 算法坑与 `NoDelay`；业界方案 UDP + 自研可靠（KCP/ENet/UTP，关键消息可靠、状态同步允许丢包）；**粘包是 TCP 独有问题**（字节流无边界 vs 数据报有边界） |
 
 ### performance（1）
 
@@ -166,4 +172,4 @@ updated: 2026-10-12
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 79 篇资源笔记（unity 47 / csharp 8 / algorithm 13 / archive 9 / meta 2）。
+共 80 篇资源笔记（unity 48 / csharp 8 / algorithm 13 / archive 9 / meta 2）。

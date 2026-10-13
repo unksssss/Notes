@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-08
+updated: 2026-10-13
 ---
 
 # Knowledge Graph
@@ -45,6 +45,7 @@ updated: 2026-10-08
 | [[UGUI DrawCall 与性能优化]] | [[Unity 渲染批处理体系]] | related |
 | [[UGUI DrawCall 与性能优化]] | [[TMP Text 零分配更新]] | related |
 | [[UGUI DrawCall 与性能优化]] | [[对象池实现]] | related |
+| [[TCP 与 UDP 的区别与游戏选型]] | [[unity网络同步方案-状态同步vs帧同步]] | related |
 
 ## Suggested Links
 

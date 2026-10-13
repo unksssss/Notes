@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-08
+updated: 2026-10-13
 ---
 
 # Tags Index
@@ -60,6 +60,7 @@ updated: 2026-10-08
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — System.Object → UnityEngine.Object 四大分支；Component 两条腿（Behaviour vs 直接继承）；12 道面试追问
+- [[TCP 与 UDP 的区别与游戏选型]] — TCP vs UDP 十维度对比、队头阻塞、粘包归属、自研可靠 UDP
 
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
@@ -77,6 +78,7 @@ updated: 2026-10-08
 - [[UGUI 事件系统与射线检测链路]] — 事件触发链路 + GraphicRaycaster 源码流程 + Raycast Target 代价（面试八问 Q2/Q3）
 - [[UGUI 拖拽实现与拖放检测]] — 背包拖拽骨架 + 拖拽中碰撞检测失效八条根因（面试八问 Q6/Q7）
 - [[UGUI DrawCall 与性能优化]] — 合批五条件 + 破批十大元凶 + Overdraw + 诊断工具链（面试八问 Q8）
+- [[TCP 与 UDP 的区别与游戏选型]] — 队头阻塞为何让游戏弃用 TCP；粘包是 TCP 独有问题
 
 ### 协程
 - [[协程原理与unitask]] — Unity 协程工作原理、局限性与 UniTask 替代方案
@@ -153,6 +155,9 @@ updated: 2026-10-08
 - [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
 - [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件、破批十大元凶、Overdraw 与诊断
 - [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing / 静态动态合批
+
+### 网络
+- [[TCP 与 UDP 的区别与游戏选型]] — 面向连接/可靠/字节流 vs 无连接/不可靠/数据报；游戏选型与自研可靠 UDP
 
 ### 网络同步
 - [[unity网络同步方案-状态同步vs帧同步]] — 工业数字孪生场景中两种网络同步方案的对比与选型
@@ -235,10 +240,10 @@ updated: 2026-10-08
 
 | Tag | Count |
 |-----|-------|
-| unity | 35 |
+| unity | 36 |
 | 算法 | 12 |
 | 性能优化 | 10 |
-| unity面试 | 12 |
+| unity面试 | 13 |
 | 数据结构 | 9 |
 | 每日学习 | 2 |
 | DOTS | 1 |
@@ -248,6 +253,7 @@ updated: 2026-10-08
 | 数据驱动 | 1 |
 | InputSystem | 1 |
 | 输入系统 | 1 |
+| 网络 | 1 |
 | 网络同步 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
