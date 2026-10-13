@@ -3,9 +3,9 @@ title: "YooAssets 热更新流程 — HybridCLR 实战"
 type: resource
 tags: [unity, 热更新, HybridCLR, YooAssets, AssetBundle, 学习项目]
 created: "2026-10-09"
-updated: "2026-10-11"
+updated: "2026-10-13"
 status: active
-summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类"
+summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类；附 YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证与打包配置项语义、补丁 FSM 八节点"
 related:
   - "[[热更新 HybridCLR — AOT 泛型元数据补全]]"
   - "[[AssetBundle 生命周期与卸载语义]]"
@@ -280,6 +280,113 @@ Assets/StreamingAssets/yoo/HotUpdateDlls/             ← 随包发布的内置�
 ## 六、面试答题框架
 
 ① 一句话定性：**YooAssets 管资源、HybridCLR 管代码，两条链路各自做差异更新** → ② 资源侧八步：Initialize → CreatePackage → 选运行模式（Editor/Offline/Host）+ 文件系统 → 请求版本 → 加载清单 → 差异下载（`TotalDownloadCount` 即差异数）→ 加载 → Release → ③ 代码侧：DLL 改名 `.bytes` 打进 AB → `LoadAssetAsync<TextAsset>` → `Assembly.Load(bytes)` → 反射调用 → ④ 补上 AOT 泛型元数据这个最大的坑。
+
+## 七、2026-10-13 实战推进：YooAsset 3.0.6 官方示例首次打包 + 打包配置项语义
+
+**第二个学习项目**：`E:\unityproject\YooAssets_HybirdCLR`（导入 YooAsset 3.0.6 官方 **Space Shooter** 示例），10-13 16:04 跑通**首次 YooAssets 打包**，包版本 `2026-10-13-962`。示例的 `PatchLogic/` 就是上面八步链路的**官方参考实现**，且比手写版本更完整。
+
+### 7.1 打包产物三份，用途各不相同
+
+```
+Bundles/StandaloneWindows64/DefaultPackage/
+├── 2026-10-13-962/     ← 上传 CDN 的那份（22 个 .bundle + 清单四件套）
+├── OutputCache/        ← 打包中间缓存（buildInfo.log / buildlogtep.json / link.xml），不进包
+└── Simulate/           ← EditorSimulateMode 用的虚拟清单（DefaultPackage_Simulate.bytes）
+
+Assets/StreamingAssets/yoo/DefaultPackage/   ← 随包发布的内置清单（兜底）
+├── DefaultPackage.version = 2026-10-13-962
+├── DefaultPackage_2026-10-13-962.bytes / .hash / .report
+└── link.xml
+```
+
+### 7.2 `.report` = 一份可审计的构建快照（打包配置项语义）
+
+`DefaultPackage_<版本>.report` 的 `Summary` 段会把**收集器全部配置原样落盘**，是回答「这个配置项决定什么」最硬的证据来源：
+
+| 字段 | 值 | 语义 |
+| --- | --- | --- |
+| `BuildPipeline` | `ScriptableBuildPipeline` | 走 SBP：支持增量/缓存，可拿构建耗时 trace |
+| `BuildBundleType` | 2 | `RawAssetBundle`（真实 AB，区别于虚拟包） |
+| `CompressOption` | 2 | **LZ4 分块压缩**（128KB 块）—— 兼顾包体与加载速度，热更资源默认优选 |
+| `EnableAddressable` | true | 资源可用**可寻址地址**（如 `music_background`）加载，不必写全路径 |
+| `SupportExtensionless` | true | 地址可省略扩展名 |
+| `UniqueBundleName` | false | 包名不加包前缀 → **多包工程遇同名资源会冲突，须改 true** |
+| `EnableSharePackRule` | true | **共享资源（被 ≥2 处引用）自动抽成独立包** |
+| `SingleReferencedPackAlone` | true | **仅被单个资源引用的资源单独成包**（避免连带下载） |
+| `FileNameStyle` | 0 | Bundle 文件名用 **Hash 命名**（`ae0ced….bundle`），天然支持 CDN 强缓存 |
+| `AutoCollectShaders` | true | 自动收集 Shader 到 `unityshaders.bundle`（由 `BuiltinShadersBundleName` 指定） |
+| `WriteLinkXML` | true | 输出 `link.xml` 裁剪保护清单 |
+| `ClearBuildCacheFiles` / `UseAssetDependencyDB` | false | 未清缓存 / 未启用依赖数据库 |
+| `EncryptionServicesClassName` | `EncryptionNone` | 未加密（加密包数 0） |
+
+**规模**：`AssetFileTotalCount: 95` / `MainAssetTotalCount: 25` / `AllBundleTotalCount: 43` / `AllBundleTotalSize: 7 555 909 B`（≈7.2 MB）。
+
+**`IndependentAssets` 段**（单引用独立存放）：`vehicle_enemyShip_red_dff.tif`（Texture2D, 721 KB）、`UIFont/LICENSE.txt`（TextAsset, 11 KB）—— 印证 `SingleReferencedPackAlone` 的作用。
+
+**`BundleInfos` 段**：43 个包，每包含 `FileHash` / `FileCrc` / `FileSize` / `DependBundles` / `ReferenceBundles` / `BundleContents`。**包名 = 资源物理路径转下划线**（`assets_samples_yooasset_3_0_6_space_shooter_gameres_…`），只有 `unityshaders.bundle` 是引擎自动收集的特殊包（`ReferenceBundles` 被多个特效包引用 = 共享包典型）。
+
+### 7.3 两条「正常但有用」的打包警告
+
+```
+[WARN] [ErrorCode201] Found unreferenced asset and removed it: '…vehicle_enemyShip_red_dff.tif'
+[WARN] [ErrorCode601] Found stray bundle. Bundle ID: 42, bundle name: 'unityshaders.bundle'
+```
+
+- **ErrorCode201**：资源进了清单但**无人引用** → 打包器主动剔除（与 `IndependentAssets` 是同一批文件，说明「独立成包」和「未被引用」是两件事）；
+- **ErrorCode601**：`unityshaders.bundle` 由引擎自动生成、**不在收集器配置里** → 报 stray 属正常，不必修。
+
+### 7.4 构建耗时拆解（`buildlogtep.json`，Chrome Trace 格式）
+
+| 阶段 | 耗时 |
+| --- | --- |
+| `BuildPlayerScripts` | **8.79 s**（占大头 = 脚本编译/程序集重编译） |
+| `WriteSerializedFiles` | 3.59 s |
+| `Process Entries` | 3.52 s |
+| `Writing SceneBundleWriteOperation` | 1.91 s |
+| `CalculateAssetDependencyData` | 1.70 s |
+| `ArchiveAndCompressBundles` | 1.20 s |
+
+`buildInfo.log` 里 `TaskBuilding` 共 **15 s**、`BuildSeconds: 16` → **首次打包的瓶颈是脚本编译，不是资源归档压缩**。`buildlogtep.json` 可直接拖进 `chrome://tracing` 看构建瀑布图。
+
+### 7.5 补丁流程 FSM 八节点（官方实现）
+
+```
+FsmInitializePackage → FsmRequestPackageVersion → FsmUpdatePackageManifest
+→ FsmCreateDownloader → FsmDownloadPackageFiles → FsmDownloadPackageOver
+→ FsmClearCacheBundle → FsmStartGame
+```
+
+`PatchManager` = **静态状态机 + 事件驱动**：`Create(packageName, playMode)` 建节点 → `Start()` 从首节点跑 → `Update()` 由 `Boot.Update()` 每帧驱动；下载确认/重试这类「等用户、等结果」的环节靠 `UserTryXxxEvent` 事件在 `OnHandleEventMessage` 里 `ChangeState` 切回状态机，**而不是阻塞死等**。
+
+| 节点 | 关键 API / 参数 | 要点 |
+| --- | --- | --- |
+| `FsmInitializePackage` | `YooAssets.TryGetPackage` / `CreatePackage` → `package.InitializePackageAsync(options)` | 按 `EPlayMode` 分四套 Options |
+| `FsmRequestPackageVersion` | `RequestPackageVersionAsync()` → `operation.PackageVersion` | 版本号写回黑板给下一步用 |
+| `FsmUpdatePackageManifest` | `new LoadPackageManifestOptions(version, 60)` + `LoadPackageManifestAsync` | 第二参数 = 超时秒数 |
+| `FsmCreateDownloader` | `new ResourceDownloaderOptions(10, 3)` + `CreateResourceDownloader` | `TotalDownloadCount == 0` → **直接跳 `FsmStartGame`** |
+| `FsmDownloadPackageFiles` | 下载器进度/完成事件 | 由 `UserBeginDownloadWebFilesEvent` 进入 |
+| `FsmDownloadPackageOver` | — | 下载完成收尾 |
+| `FsmClearCacheBundle` | `new ClearCacheOptions(ClearCacheMethods.ClearUnusedBundleFiles)` + `ClearCacheAsync` | 清的是「**未使用**」缓存，不是清全部 |
+| `FsmStartGame` | `GameManager.SetGamePackage(YooAssets.GetPackage("DefaultPackage"))` → 切场景 | 资源系统就绪后才启动业务 |
+
+**四档 `EPlayMode` 的初始化参数差异**（选型题标准素材）：
+
+| PlayMode | Options | 文件系统 |
+| --- | --- | --- |
+| `EditorSimulateMode` | `EditorSimulateModeOptions` | `EditorSimulateBuildInvoker.Build(packageName, (int)EBundleType.VirtualAssetBundle)` 产虚拟包根目录 + `CreateDefaultEditorFileSystemParameters`，并注入 `VirtualDownloadMode / VirtualDownloadSpeed(1024*1000) / AsyncSimulateMinFrame(5) / AsyncSimulateMaxFrame(10)` —— **在编辑器里模拟异步时序与假下载速度**，可提前暴露掉帧/时序竞争 |
+| `OfflinePlayMode` | `OfflinePlayModeOptions` | `CreateDefaultBuiltinFileSystemParameters()`（只读 StreamingAssets） |
+| `HostPlayMode` | `HostPlayModeOptions` | Builtin（+`CopyBuiltinPackageManifest=true`）+ `CreateDefaultSandboxFileSystemParameters(remoteService)`（+`DownloadMaxConcurrency=5` / `DownloadMaxRequestPerFrame=1` / `DownloadWatchdogTimeout=10`） |
+| `WebPlayMode` | `WebPlayModeOptions` | WebGL 用 `CreateDefaultWebServerFileSystemParameters`；微信小游戏用 `WechatFileSystemCreater` + `WX.env.USER_DATA_PATH`（`#if UNITY_WEBGL && WEIXINMINIGAME`） |
+
+> 💡 `Boot.cs` 默认 `EPlayMode.EditorSimulateMode`；`Awake` 只做 `targetFrameRate=60 / runInBackground=true / DontDestroyOnLoad`，`Start` 里 `YooAssets.Initialize()`（**全局只调一次**）→ `PatchManager.Create("DefaultPackage", PlayMode)` → `Start()`。
+
+### 7.6 「包版本号」≠「远端 URL 版本目录」（易混点）
+
+- 10-11 `HotUpdateDlls` 包版本 = `v1.1.5`（自定义命名）；
+- 10-13 `DefaultPackage` 包版本 = `2026-10-13-962`（**日期 + 自增序号**，YooAsset 默认按打包日期生成）；
+- `FsmInitializePackage.GetHostServerURL()` 拼的是 `http://127.0.0.1/CDN/PC/v1.0` —— 这个 `v1.0` 是**代码里硬编码的 URL 一级目录**，与包版本无关。
+
+→ 上传 CDN 时必须让 **URL 目录组织** 与 **`RemoteService` 拼出的路径** 对齐，否则 `RequestPackageVersionAsync` 取不到 `.version` 文件。**这是热更「首跑失败」的高频原因。**
 
 ## 相关
 

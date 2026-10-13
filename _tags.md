@@ -217,7 +217,7 @@ updated: 2026-10-13
 
 ### 热更新
 - [[热更新 HybridCLR — AOT 泛型元数据补全]] — 程序集剥离、清单 MD5 下发、AOT 泛型元数据补全
-- [[YooAssets 热更新流程 — HybridCLR 实战]] — YooAssets 三档运行模式 + 八步热更链路 + Assembly.Load 动态加载
+- [[YooAssets 热更新流程 — HybridCLR 实战]] — YooAssets 三档运行模式 + 八步热更链路 + Assembly.Load 动态加载 + YooAsset 3.0.6 官方示例首次打包实证（打包配置项语义 / 补丁 FSM 八节点）
 
 ### 闭包
 - [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] — 隐藏类搬变量、存活期=委托引用、闭包泄漏
