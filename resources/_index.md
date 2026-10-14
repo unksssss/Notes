@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 
 # Resources
@@ -100,7 +100,7 @@ updated: 2026-10-13
 | [[协程原理与unitask]] | Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析 |
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
-| [[YooAssets 热更新流程 — HybridCLR 实战]] | **学习项目实战**（`E:\unityproject\HybirdCLR`）：YooAssets 多包设计 + 三档运行模式（EditorSimulate/OfflinePlay/HostPlay）+ 八步链路（Initialize → CreatePackage → 文件系统与下载参数 → 请求版本 → 加载清单 → 差异下载 → LoadAssetAsync<TextAsset> → Assembly.Load + 反射调用 → Release）；DLL 为何改名 `.bytes`；自定义 IRemoteService 的多 CDN 容灾；**YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证**：产物三份（CDN/OutputCache/Simulate）+ `.report` 配置项语义（EnableSharePackRule / SingleReferencedPackAlone / FileNameStyle / CompressOption）+ ErrorCode201·601 警告 + buildlogtep 耗时拆解 + 补丁 FSM 八节点 + 四档 PlayMode 初始化参数 + 包版本号 vs URL 版本目录（2026-10-13 补强） |
+| [[YooAssets 热更新流程 — HybridCLR 实战]] | **学习项目实战**（`E:\unityproject\HybirdCLR`）：YooAssets 多包设计 + 三档运行模式（EditorSimulate/OfflinePlay/HostPlay）+ 八步链路（Initialize → CreatePackage → 文件系统与下载参数 → 请求版本 → 加载清单 → 差异下载 → LoadAssetAsync<TextAsset> → Assembly.Load + 反射调用 → Release）；DLL 为何改名 `.bytes`；自定义 IRemoteService 的多 CDN 容灾；**YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证**：产物三份（CDN/OutputCache/Simulate）+ `.report` 配置项语义（EnableSharePackRule / SingleReferencedPackAlone / FileNameStyle / CompressOption）+ ErrorCode201·601 警告 + buildlogtep 耗时拆解 + 补丁 FSM 八节点 + 四档 PlayMode 初始化参数 + 包版本号 vs URL 版本目录；**补丁 FSM 各节点实现细节**（ResourceDownloaderOptions(10,3) 参数语义 / `yield return downloader` = Operation 实现 IEnumerator / ClearCacheMethods 两枚举与清理时机）（2026-10-13 · 2026-10-14 补强） |
 
 ### ui（11）
 

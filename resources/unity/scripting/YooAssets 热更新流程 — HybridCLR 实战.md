@@ -3,9 +3,9 @@ title: "YooAssets 热更新流程 — HybridCLR 实战"
 type: resource
 tags: [unity, 热更新, HybridCLR, YooAssets, AssetBundle, 学习项目]
 created: "2026-10-09"
-updated: "2026-10-13"
+updated: "2026-10-14"
 status: active
-summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类；附 YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证与打包配置项语义、补丁 FSM 八节点"
+summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类；附 YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证与打包配置项语义、补丁 FSM 八节点及各节点实现细节"
 related:
   - "[[热更新 HybridCLR — AOT 泛型元数据补全]]"
   - "[[AssetBundle 生命周期与卸载语义]]"
@@ -387,6 +387,43 @@ FsmInitializePackage → FsmRequestPackageVersion → FsmUpdatePackageManifest
 - `FsmInitializePackage.GetHostServerURL()` 拼的是 `http://127.0.0.1/CDN/PC/v1.0` —— 这个 `v1.0` 是**代码里硬编码的 URL 一级目录**，与包版本无关。
 
 → 上传 CDN 时必须让 **URL 目录组织** 与 **`RemoteService` 拼出的路径** 对齐，否则 `RequestPackageVersionAsync` 取不到 `.version` 文件。**这是热更「首跑失败」的高频原因。**
+
+## 八、2026-10-14 实战推进：补丁 FSM 各节点实现细节
+
+第七节只记了八节点的**顺序**，这里补上各节点源码里的实现细节（`PatchLogic/FsmNode/`）。
+
+| 文件 | 关键实现 |
+| --- | --- |
+| `FsmCreateDownloader.cs` | `int downloadingMaxNum = 10; int failedTryAgain = 3;` → `new ResourceDownloaderOptions(10, 3)` → `package.CreateResourceDownloader(options)`；`TotalDownloadCount == 0` 直接 `ChangeState<FsmStartGame>()`，否则发 `PatchFoundUpdateFilesEvent(count, bytes)` **暂停流程、让玩家确认是否更新** |
+| `FsmDownloadPackageFiles.cs` | 先挂 `downloader.DownloadError += …` / `DownloadProgressChanged += …`，再 `downloader.StartDownload(); yield return downloader;` → 恢复后判 `Status != EOperationStatus.Succeeded` 才决定是否推进 |
+| `FsmDownloadPackageOver.cs` | 纯日志节点，直接 `ChangeState<FsmClearCacheBundle>()` |
+| `FsmClearCacheBundle.cs` | `new ClearCacheOptions(ClearCacheMethods.ClearUnusedBundleFiles)` → `package.ClearCacheAsync(options)`；**排在下载完成之后**执行 |
+| `PatchManager.cs` | `EventGroup` 监听 5 个 User 事件（InitializePackage / BeginDownloadWebFiles / RequestPackageVersion / UpdatePackageManifest / DownloadWebFiles）；`StateMachine(null)` + `AddNode<…>()` × 8；`IsValidPlayMode` 白名单含 `WebPlayMode`（四档全支持） |
+
+### 8.1 `ResourceDownloaderOptions(10, 3)` 两个参数
+
+`downloadingMaxNum`（最大并发下载数）= 10、`failedTryAgain`（单文件失败重试次数）= 3。**重试次数不是重试间隔** —— 间隔由下载器内部按次数退避，别把第二个参数当"秒数"。
+
+### 8.2 `yield return downloader;` 为什么合法
+
+YooAsset 的 `Operation` **直接实现了 `IEnumerator`**（`MoveNext` 里返回 `IsDone`、`Current` 返回自身），所以协程可以 `yield return` 一个异步操作对象，语义 = 「等到操作完成再恢复」。
+
+```csharp
+downloader.StartDownload();
+yield return downloader;                      // 等价于 while(!op.IsDone) yield return null;
+if (downloader.Status != EOperationStatus.Succeeded) { /* 处理失败 */ }
+```
+
+这就是 YooAsset 全异步 API 能**无缝塞进协程**（也能 `await`、也能传回调）的原因 —— 一套 Operation 三处复用。对照 📎 [[协程原理与unitask]]：原生协程只认 `YieldInstruction` / `IEnumerator` / `null`，YooAsset 走的正是「自定义 `IEnumerator`」这条路。
+
+### 8.3 `ClearCacheMethods` 的两个枚举与执行时机
+
+| 枚举 | 清什么 |
+| --- | --- |
+| `ClearUnusedBundleFiles` | **只清未被任何清单引用**的缓存文件（官方示例用这个） |
+| `ClearAllBundleFiles` | 清掉全部缓存文件（连当前清单引用的也清） |
+
+**为什么排在 `FsmDownloadPackageOver` 之后**：下载过程中缓存目录里既有旧版本文件、也有正在写入的新文件，此时清缓存有误删风险；等下载全部结束、清单已生效，再清「没被引用的」才是安全的。
 
 ## 相关
 
