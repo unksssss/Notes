@@ -59,11 +59,12 @@ updated: 2026-10-15
 | [[Unity Input System 使用指南]] | Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。 |
 | [[unity-inputsystem详解]] | 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用 |
 
-### network（1）
+### network（2）
 
 | File | Summary |
 | --- | --- |
-| [[TCP 与 UDP 的区别与游戏选型]] | TCP vs UDP 十维度对比表；**队头阻塞**是实时游戏弃用 TCP 的核心原因（位置数据有时效性，宁可丢包也不等重传）；Nagle 算法坑与 `NoDelay`；业界方案 UDP + 自研可靠（KCP/ENet/UTP，关键消息可靠、状态同步允许丢包）；**粘包是 TCP 独有问题**（字节流无边界 vs 数据报有边界） |
+| [[TCP 与 UDP 的区别与游戏选型]] | TCP vs UDP 十维度对比表；**字节流 vs 数据报**的边界差异（收发次数不对应 / 读不完时续读 vs 截断 / 粘包归属与三种划界方案）；**队头阻塞**是实时游戏弃用 TCP 的核心原因（位置数据有时效性，宁可丢包也不等重传）；Nagle 算法坑与 `NoDelay`；业界方案 UDP + 自研可靠（KCP/ENet/UTP） |
+| [[可靠 UDP 与 KCP 原理]] | **可靠 UDP = 把序列号 / ACK / 重传 / 滑动窗口搬到用户态重做**（TCP 那套在内核里改不动）；KCP 比 TCP 快在哪（RTO ×1.5 vs ×2 / 快速重传阈值 / 可关拥塞控制）= 用带宽换延迟；**选择性可靠**是核心设计——指令类走可靠通道、状态类走不可靠通道（UTP pipeline / ENet channel）；冗余发送抗丢包 |
 
 ### performance（1）
 
@@ -204,4 +205,4 @@ updated: 2026-10-15
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 83 篇资源笔记（unity 48 / csharp 8 / algorithm 16 / archive 9 / meta 2）。算法区 16 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 84 篇资源笔记（unity 49 / csharp 8 / algorithm 16 / archive 9 / meta 2）。算法区 16 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
