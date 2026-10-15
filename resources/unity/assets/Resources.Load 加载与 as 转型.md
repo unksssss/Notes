@@ -58,7 +58,5 @@ if (go == null)
 > 泛型类型安全推荐用；`as` 是引用类型 downcast 不是装箱；加载失败返回 null 不抛异常；**用之前判空**。
 
 ## 相关
-
-- [[UnityEngine.Object 判空与销毁机制]]
-- [[struct 装箱陷阱与值类型原理]]
-- [[Addressables资源生命周期]]
+- [[UnityEngine.Object 判空与销毁机制]] — 加载失败返回 null（伪 null 陷阱）
+- [[Addressables资源生命周期]] — Resources 体系的正统替代

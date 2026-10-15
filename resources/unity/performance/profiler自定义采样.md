@@ -61,5 +61,5 @@ Profiler.EndSample();
 
 ## 相关笔记
 
-- [[DOTS详解]] — 对比 MonoBehaviour 和 DOTS 的性能差异
+- [[dots详解]] — 对比 MonoBehaviour 和 DOTS 的性能差异
 - [[对象池实现]] — 测量有无对象池的 GC 差异

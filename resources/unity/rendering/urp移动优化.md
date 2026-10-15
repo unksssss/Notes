@@ -71,6 +71,6 @@ public class MobileOptimizer : MonoBehaviour
 ## 相关笔记
 
 - [[对象池实现]] — 结合对象池减少实例化开销
-- [[Profiler自定义采样]] — 用 Profiler 检查渲染瓶颈
+- [[profiler自定义采样]] — 用 Profiler 检查渲染瓶颈
 - [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing 等批处理手段
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染快照与数据竞争（线程侧约束）

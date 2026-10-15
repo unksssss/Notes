@@ -80,5 +80,5 @@ public partial struct MoveSystem : ISystem
 
 ## 相关笔记
 
-- [[Profiler自定义采样]] — 用 Profiler 对比 DOTS 和传统方式的性能差异
+- [[profiler自定义采样]] — 用 Profiler 对比 DOTS 和传统方式的性能差异
 - [[对象池实现]] — 另一种性能优化手段

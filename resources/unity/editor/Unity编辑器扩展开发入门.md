@@ -133,7 +133,6 @@ public class SetGoInteractable
 - 学完绘制层后做 EditorWindow 带界面工具
 
 ## 相关笔记
-- [[Unity 渲染批处理体系]]
-- [[Obi Rope粒子约束体系]]
-- [[scriptableobject数据驱动设计]]
-- [[profiler自定义采样]]
+- [[Unity创建编辑器窗体EditorWindow]] — 自定义窗口开发
+- [[Unity编辑器相关特性]] — MenuItem / CustomEditor / PropertyDrawer 等特性速查
+- [[scriptableobject数据驱动设计]] — 编辑器工具常用于生成与管理 SO 配置

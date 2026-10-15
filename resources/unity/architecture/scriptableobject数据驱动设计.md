@@ -278,4 +278,4 @@ public class Weapon : MonoBehaviour
 ## 相关笔记
 
 - [[对象池实现]] — 对象池管理也可以结合 ScriptableObject 做配置
-- [[Profiler自定义采样]] — 用 Profiler 检查 ScriptableObject 的内存占用
+- [[profiler自定义采样]] — 用 Profiler 检查 ScriptableObject 的内存占用

@@ -63,6 +63,6 @@ public class HoverDetector : MonoBehaviour, IPointerEnterHandler, IPointerMoveHa
 3. 查目标物体 Inspector 的 **Raycast Target** 勾选状态
 
 ## 相关
-
-- [[XR射线交互与World Space Canvas]]
-- [[ToggleGroup底层机制]]
+- [[UGUI 事件系统与射线检测链路]] — 接口在整套射线检测链路中的位置
+- [[UGUI 拖拽实现与拖放检测]] — IDragHandler 等拖拽接口的完整用法
+- [[UGUI Canvas 渲染模式与屏幕适配]] — Event Camera 没设会导致事件全失效

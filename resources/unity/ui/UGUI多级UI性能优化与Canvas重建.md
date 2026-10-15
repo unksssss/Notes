@@ -66,4 +66,3 @@ summary: 多级 UI 性能优化：Canvas Rebuild 根因、动静分离拆 Canvas
 - [[TMP Text 零分配更新]]
 - [[UGUI布局系统与强制刷新]]
 - [[对象池实现]]
-- [[XR射线交互与World Space Canvas]]

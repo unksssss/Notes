@@ -7,7 +7,7 @@ updated: "2026-08-18"
 status: active
 summary: "Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析"
 source: ""
-related: ["[[unity知识点-2026-04-28]]", "[[unity知识点-2026-04-29]]", "[[DOTS详解]]", "[[Profiler自定义采样]]"]
+related: ["[[unity知识点-2026-04-28]]", "[[unity知识点-2026-04-29]]", "[[dots详解]]", "[[profiler自定义采样]]"]
 ---
 
 # 协程原理与 UniTask
@@ -673,7 +673,7 @@ async UniTask<string> FetchChain()
 
 - [[unity知识点-2026-04-28]] — Unity 日常知识点
 - [[unity知识点-2026-04-29]] — 进阶话题
-- [[DOTS详解]] — Jobs System 实现真正的多线程并行
-- [[Profiler自定义采样]] — 检测协程/UniTask 的性能开销
+- [[dots详解]] — Jobs System 实现真正的多线程并行
+- [[profiler自定义采样]] — 检测协程/UniTask 的性能开销
 - Cysharp/UniTask GitHub: https://github.com/Cysharp/UniTask
 - Microsoft Docs: Async state machines — 编译器生成的状态机详细说明

@@ -53,5 +53,4 @@ Obi 把绳索拆成**一串粒子（ObiParticle）**，由**全局唯一的 Obi 
 - MCP execute_code 会冻结游戏循环，无法测试物理模拟
 
 ## 相关
-
-- [[Unity 渲染批处理体系]]
+- [[ParticleSystem详解]] — 同为粒子体系笔记（约束求解 vs 粒子模拟）

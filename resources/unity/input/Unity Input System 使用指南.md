@@ -10,8 +10,7 @@ updated: 2026-06-17
 status: active
 summary: Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。
 source: ""
-related:
-  - "[[XR Interaction Toolkit 配置指南]]"
+related: ["[[unity-inputsystem详解]]"]
 ---
 
 # Unity Input System 使用指南

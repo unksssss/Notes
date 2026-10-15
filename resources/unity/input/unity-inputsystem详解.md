@@ -284,5 +284,5 @@ void StopVibration()
 
 ## 相关笔记
 
-- [[ScriptableObject数据驱动设计]] — Input Actions 配置和 ScriptableObject 都是数据驱动思路
-- [[Profiler自定义采样]] — 用 Profiler 检测输入延迟
+- [[scriptableobject数据驱动设计]] — Input Actions 配置和 ScriptableObject 都是数据驱动思路
+- [[profiler自定义采样]] — 用 Profiler 检测输入延迟
