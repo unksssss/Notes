@@ -49,6 +49,11 @@ updated: 2026-10-15
 | [[二叉搜索树BST]] | [[红黑树]] | related |
 | [[二叉搜索树BST]] | [[DFS与BFS遍历算法]] | related |
 | [[二叉搜索树BST]] | [[递归与迭代转换]] | related |
+| [[二叉搜索树BST]] | [[二叉平衡树AVL]] | related |
+| [[二叉平衡树AVL]] | [[二叉搜索树BST]] | related |
+| [[二叉平衡树AVL]] | [[红黑树]] | related |
+| [[二叉平衡树AVL]] | [[递归与迭代转换]] | related |
+| [[红黑树]] | [[二叉平衡树AVL]] | related |
 | [[红黑树]] | [[二叉搜索树BST]] | related |
 | [[红黑树]] | [[DFS与BFS遍历算法]] | related |
 | [[红黑树]] | [[哈希表冲突解决与Dictionary底层]] | related |

@@ -2,11 +2,12 @@
 title: "二叉搜索树BST"
 type: resource
 tags: [算法, 数据结构, 面试, 二叉树, cpp]
+category: 树与平衡树
 created: "2026-08-21"
 updated: "2026-10-15"
 status: active
 summary: "BST 性质（中序遍历=升序）、递归插入/查找/删除三情况（双子用中序后继值替换）、三个实现踩坑、退化 O(n) 引出 AVL/红黑树"
-related: ["[[红黑树]]", "[[DFS与BFS遍历算法]]", "[[递归与迭代转换]]"]
+related: ["[[二叉平衡树AVL]]", "[[红黑树]]", "[[DFS与BFS遍历算法]]", "[[递归与迭代转换]]"]
 ---
 
 # 二叉搜索树 BST

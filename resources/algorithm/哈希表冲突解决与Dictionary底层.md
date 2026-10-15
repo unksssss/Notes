@@ -2,6 +2,7 @@
 title: "哈希表冲突解决与 C# Dictionary 底层"
 type: resource
 tags: [算法, csharp, 面试, 数据结构]
+category: 数据结构基础
 created: "2026-07-31"
 updated: "2026-08-13"
 status: active

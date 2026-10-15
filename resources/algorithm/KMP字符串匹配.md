@@ -2,6 +2,7 @@
 title: "KMP 字符串匹配"
 type: resource
 tags: [算法, 面试, 数据结构]
+category: 图与字符串
 created: "2026-08-03"
 updated: "2026-08-10"
 status: active

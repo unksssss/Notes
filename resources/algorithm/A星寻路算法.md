@@ -2,6 +2,7 @@
 title: "A* 寻路算法"
 type: resource
 tags: [算法, 寻路, 面试]
+category: 图与字符串
 created: "2026-09-08"
 updated: "2026-09-08"
 status: active

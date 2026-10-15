@@ -2,6 +2,7 @@
 title: "DFS 与 BFS 遍历算法"
 type: resource
 tags: [算法, 面试, 数据结构]
+category: 树与平衡树
 created: "2026-07-31"
 updated: "2026-08-06"
 status: active
