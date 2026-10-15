@@ -7,7 +7,7 @@ updated: "2026-06-17"
 status: active
 summary: "XR Grab Interactable 每个属性的作用、取值范围、使用场景和VR消防项目实际配置。"
 source: ""
-related: [["XR Interaction Toolkit 配置指南"]]
+related: ["[[XR Interaction Toolkit 配置指南]]"]
 ---
 
 # XR Grab Interactable 完整参考手册

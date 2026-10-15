@@ -7,7 +7,7 @@ updated: "2026-06-17"
 status: active
 summary: "用 Hinge Joint 实现VR里真实的开关门交互，结合 XR Grab Interactable 让手抓住门把手推开拉开关门。"
 source: ""
-related: [["XR Interaction Toolkit 配置指南"], ["XR Grab Interactable 完整参考手册"]]
+related: ["[[XR Interaction Toolkit 配置指南]]", "[[XR Grab Interactable 完整参考手册]]"]
 ---
 
 # VR门交互 — Hinge Joint + XR Grab Interactable
