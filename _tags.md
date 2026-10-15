@@ -61,7 +61,7 @@ updated: 2026-10-15
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — System.Object → UnityEngine.Object 四大分支；Component 两条腿（Behaviour vs 直接继承）；12 道面试追问
 - [[TCP 与 UDP 的区别与游戏选型]] — TCP vs UDP 十维度对比、队头阻塞、粘包归属、自研可靠 UDP
-- [[可靠 UDP 与 KCP 原理]] — 序列号 / ACK / 重传 / 滑动窗口四个机制搬到用户态详解；KCP 取舍；选择性可靠
+- [[可靠 UDP 与 KCP 原理]] — 四个机制用户态详解 + RTT/RTO 术语速查与 RTO 自适应计算；KCP 取舍；选择性可靠
 
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
@@ -80,7 +80,7 @@ updated: 2026-10-15
 - [[UGUI 拖拽实现与拖放检测]] — 背包拖拽骨架 + 拖拽中碰撞检测失效八条根因（面试八问 Q6/Q7）
 - [[UGUI DrawCall 与性能优化]] — 合批五条件 + 破批十大元凶 + Overdraw + 诊断工具链（面试八问 Q8）
 - [[TCP 与 UDP 的区别与游戏选型]] — 队头阻塞为何让游戏弃用 TCP；粘包是 TCP 独有问题
-- [[可靠 UDP 与 KCP 原理]] — 「UDP 怎么保证可靠」高频题：四个机制逐个拆解（含 `min(rwnd, cwnd)`）+ KCP 快在哪 + 选择性可靠
+- [[可靠 UDP 与 KCP 原理]] — 「UDP 怎么保证可靠」高频题：四个机制逐个拆解 + RTO 怎么算（Karn / Jacobson 公式 / 退避）+ KCP 快在哪 + 选择性可靠
 
 ### 协程
 - [[协程原理与unitask]] — Unity 协程工作原理、局限性与 UniTask 替代方案
