@@ -117,6 +117,8 @@ updated: 2026-10-14
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
 - [[两个链表的第一个公共结点]] — 单链表相交必 Y 形；长度差对齐 / 双指针走完自己走对方 / 哈希表（剑指 52）
 - [[链表中环的入口结点]] — 快慢指针找相遇点 + 推导 a=(n-1)L+c，fast 回 head 同速再遇即入口（剑指 23）
+- [[二叉搜索树BST]] — 中序=升序；插入/删除三情况（双子用中序后继）；递归每层 return 且调用处接返回值
+- [[红黑树]] — 五性质 + 黑高推导；插入三 case（看叔节点）；2-3-4 树同构；AVL vs RBT 取舍
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -138,6 +140,8 @@ updated: 2026-10-14
 - [[动态规划入门]] — 最优子结构/重叠子问题、三板斧套路
 - [[二分查找]] — 原理、比较次数推导、O(log n)
 - [[贪心算法入门]] — 局部最优、找零钱翻车案例
+- [[二叉搜索树BST]] — 中序=升序；递归插入/查找/删除；顺序插入退化为链 → 需平衡树
+- [[红黑树]] — 自平衡 BST；C++ map/set 底层；Java HashMap 链表 ≥8 树化
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
@@ -235,6 +239,14 @@ updated: 2026-10-14
 - [[协程原理与unitask]] — Unity 协程工作原理、IL 层状态机、yield 指令恢复时机、UniTask 替代
 - [[Unity 序列化机制]] — 序列化器范围与限制、Dictionary 三绕路、6.6 原生 Dictionary
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — 类继承体系全景、BehaviourManager 派发、Component 两条腿
+
+### 二叉树
+- [[二叉搜索树BST]] — 中序=升序；插入/删除三情况；递归每层 return
+- [[红黑树]] — 五性质、插入三 case、2-3-4 树同构、AVL 对比
+
+### cpp
+- [[二叉搜索树BST]] — 递归 insert/search/remove，中序升序验证
+- [[红黑树]] — RBT.cpp 手搓（rotateLeft/Right + fixInsert 待完成）
 
 ## Stats
 
