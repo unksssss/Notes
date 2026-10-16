@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-15
+updated: 2026-10-16
 ---
 
 # Tags Index
@@ -122,6 +122,7 @@ updated: 2026-10-15
 - [[二叉搜索树BST]] — 中序=升序；插入/删除三情况（双子用中序后继）；递归每层 return 且调用处接返回值
 - [[二叉平衡树AVL]] — 严格平衡 |bf| ≤ 1；四型旋转 LL/RR/LR/RL；插入至多 1 次旋 vs 删除最坏 O(log n) 次；树高 ≤ 1.44·log₂n
 - [[红黑树]] — 五性质 + 黑高推导；插入三 case（看叔节点）；2-3-4 树同构；AVL vs RBT 取舍
+- [[二叉搜索树转双向链表]] — 中序 = 升序 → 遍历顺便接指针；`prev` 必须 `TreeNode*&` 引用传参（剑指 36）
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -146,6 +147,7 @@ updated: 2026-10-15
 - [[二叉搜索树BST]] — 中序=升序；递归插入/查找/删除；顺序插入退化为链 → 需平衡树
 - [[二叉平衡树AVL]] — 自平衡 BST：平衡因子 + 旋转维持平衡（BST → AVL → 红黑树 主线中段）
 - [[红黑树]] — 自平衡 BST；C++ map/set 底层；Java HashMap 链表 ≥8 树化
+- [[二叉搜索树转双向链表]] — BST 中序串联成双向链表；left 指前驱 / right 指后继（剑指 36）
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
@@ -249,23 +251,25 @@ updated: 2026-10-15
 - [[二叉搜索树BST]] — 中序=升序；插入/删除三情况；递归每层 return
 - [[二叉平衡树AVL]] — 平衡因子 / 最小失衡子树 / 四型旋转；插入 1 次 vs 删除 O(log n) 次
 - [[红黑树]] — 五性质、插入三 case、2-3-4 树同构、AVL 对比
+- [[二叉搜索树转双向链表]] — 中序遍历顺便接左右指针；prev 引用传参 + 后序位置改 left
 
 ### cpp
 - [[二叉搜索树BST]] — 递归 insert/search/remove，中序升序验证
 - [[二叉平衡树AVL]] — AVL.cpp 手搓（rotateLeft/Right + 四型判定；remove 待重建）
 - [[红黑树]] — RBT.cpp 手搓（rotateLeft/Right + fixInsert 待完成）
+- [[二叉搜索树转双向链表]] — 手搓中序递归串联；`TreeNode*&` 引用传参的核心坑
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
 | unity | 37 |
-| 算法 | 15 |
+| 算法 | 16 |
 | 性能优化 | 10 |
 | unity面试 | 14 |
-| 数据结构 | 15 |
-| 二叉树 | 3 |
-| cpp | 4 |
+| 数据结构 | 16 |
+| 二叉树 | 4 |
+| cpp | 5 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
