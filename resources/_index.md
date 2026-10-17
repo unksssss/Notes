@@ -95,7 +95,7 @@ updated: 2026-10-16
 | [[IL2CPP 编译原理与陷阱]] | IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制、Mono 对比；2026 官方路线 Mono → CoreCLR 四阶段（6.5~6.8） |
 | [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] | System.Object → UnityEngine.Object 四大分支；Component 两条腿（走 Behaviour 的 MonoBehaviour/StateMachineBehaviour/Collider2D/Rigidbody2D vs 直接继承的 Transform/Renderer/Collider3D/Rigidbody）；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别；3D 与 2D 不对称；12 道面试追问 |
 | [[Unity 序列化机制]] | Unity 序列化器范围与限制、Dictionary 三绕路；Unity 6.6 官方新特性：Inspector 原生 Dictionary 序列化（两列 key-value + 编译期校验）（Day 37 官方新特性） |
-| [[MonoBehaviour生命周期与SetActive的坑]] | Awake/OnEnable/Start 生命周期；初始 inactive 对象不触发 Awake（首次激活才触发）；协程与 SetActive 的关系；OnDisable vs OnDestroy 触发时机对比 |
+| [[MonoBehaviour生命周期与SetActive的坑]] | Awake/OnEnable/Start 生命周期；**执行顺序分阶段**（所有 Awake → 所有 OnEnable → 所有 Start，这是 Start 的依赖保证）；**active 与 enabled 两个开关的分界**（Awake 只看 active，enabled 从 OnEnable 起生效）；三种激活情况实测对照表；`Instantiate` 同步执行 Awake；对象池重置必须放 OnEnable 的机制解释；协程与 SetActive；OnDisable vs OnDestroy |
 | [[UnityEngine.Object 判空与销毁机制]] | Unity 对象双层结构：托管壳 + native 芯；Destroy 只销毁 native；== 重载使销毁即空；MissingReferenceException；假空对象；为什么分两侧（历史/性能/生命周期主权） |
 | [[Update-FixedUpdate-LateUpdate执行时机]] | 三 Update 分工：FixedUpdate 固定步长跑物理、Update 帧率相关跑逻辑、LateUpdate 相机跟随；物理与渲染是解耦的两套时钟 |
 | [[协程原理与unitask]] | Unity 协程工作原理、IL 层状态机、yield 指令恢复时机表、WaitForEndOfFrame 帧末时机与截屏用途、局限性、UniTask 零 GC 异步方案深度解析 |

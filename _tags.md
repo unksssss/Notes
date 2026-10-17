@@ -44,7 +44,7 @@ updated: 2026-10-16
 - [[ToggleGroup底层机制]] — ToggleGroup allowSwitchOff 行为与底层调用链
 - [[Addressables资源生命周期]] — Addressables 引用计数机制与资源生命周期
 - [[Obi Rope粒子约束体系]] — Obi Rope 粒子约束架构、Blueprint 局部坐标系与整体平移
-- [[MonoBehaviour生命周期与SetActive的坑]] — 生命周期与初始 inactive 陷阱
+- [[MonoBehaviour生命周期与SetActive的坑]] — 执行顺序分阶段；active 与 enabled 两个开关的分界；三种激活情况实测
 - [[IL2CPP 编译原理与陷阱]] — IL2CPP 编译流水线、泛型处理、代码裁剪、反射限制
 - [[Unity 渲染批处理体系]] — 静态批处理 vs GPU Instancing vs SRP Batcher
 - [[struct 装箱陷阱与值类型原理]] — 值类型装箱拆箱机制与 GC 压力
@@ -196,7 +196,7 @@ updated: 2026-10-16
 - [[DOTween与协程选型]] — 协程管流程、DOTween 管补间，可中断可控是核心差异
 
 ### 生命周期
-- [[MonoBehaviour生命周期与SetActive的坑]] — 初始 inactive 不触发 Awake
+- [[MonoBehaviour生命周期与SetActive的坑]] — 执行顺序分阶段（Start 的依赖保证）；active 与 enabled 两开关分界；首次 vs 再次激活；Instantiate 同步跑 Awake
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — Object→Component→Behaviour/MonoBehaviour 全景；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别
 
