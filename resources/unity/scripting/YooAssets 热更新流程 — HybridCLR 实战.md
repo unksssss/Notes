@@ -3,9 +3,9 @@ title: "YooAssets 热更新流程 — HybridCLR 实战"
 type: resource
 tags: [unity, 热更新, HybridCLR, YooAssets, AssetBundle, 学习项目]
 created: "2026-10-09"
-updated: "2026-10-14"
+updated: "2026-10-17"
 status: active
-summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类；附 YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证与打包配置项语义、补丁 FSM 八节点及各节点实现细节"
+summary: "实战项目 E:\\unityproject\\HybirdCLR 的完整热更链路：YooAssets.Initialize → CreatePackage → 自定义 IRemoteService + HostPlayModeOptions 文件系统 → RequestPackageVersion → LoadPackageManifest → ResourceDownloader 差异下载 → LoadAssetAsync<TextAsset>(dll.bytes) → Assembly.Load → 反射调用热更类；附 YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证与打包配置项语义、补丁 FSM 八节点及各节点实现细节、HostPlayMode 首次跑通的两个独立坑（BundledCopyOption 默认 None 缺 hash/BuiltinCatalog、打包后未同步 CDN 导致版本错位）与「hash → bytes → version 对齐」三层排查法"
 related:
   - "[[热更新 HybridCLR — AOT 泛型元数据补全]]"
   - "[[AssetBundle 生命周期与卸载语义]]"
@@ -425,8 +425,107 @@ if (downloader.Status != EOperationStatus.Succeeded) { /* 处理失败 */ }
 
 **为什么排在 `FsmDownloadPackageOver` 之后**：下载过程中缓存目录里既有旧版本文件、也有正在写入的新文件，此时清缓存有误删风险；等下载全部结束、清单已生效，再清「没被引用的」才是安全的。
 
+## 九、2026-10-17 实战推进：HostPlayMode 全链路首次跑通（两个独立坑）
+
+`YooAssets_HybirdCLR` 项目今日首次跑通 HostPlayMode 完整链路（含真实增量热更）。本节记录**两个独立故障**的根因链与修复，以及排查方法论 —— 这是「官方示例照抄也会挂」的典型样本。
+
+### 9.1 前置事实：这个项目其实没有 HybridCLR
+
+| 项 | 实测 |
+| --- | --- |
+| 引擎 | Unity **2022.3.62f3c1**（中国版），目标 Windows Standalone |
+| 资源框架 | YooAsset **3.0.6**（openupm scopedRegistry `com.tuyoogame.yooasset`） |
+| 代码热更 | ⚠️ **未安装** —— manifest 无 `com.code-philosophy.hybridclr`、`Assets/` 下无 HybridCLR 目录、`Build/*_Data/Managed` 是纯 Mono 输出 |
+| 版本控制 | **无 git 仓库**（连 diff 都看不了） |
+| 场景 | `SampleScene.unity` 只有 Camera + Light，**没有挂启动器**；入口在示例的 `Boot.unity` |
+
+**结论**：目录名叫 `HybirdCLR`（Hybrid 的拼写错误）但能力上**只有资源热更，没有代码热更**。名字骗人，判断能力要看 manifest 与产物。
+
+### 9.2 坑一：`BundledCopyOption` 默认 `None` → 内置包缺三件套
+
+**现象**
+
+```
+file:///.../Assets/StreamingAssets/yoo/DefaultPackage/DefaultPackage_2026-10-13-962.hash → 404
+→ InitializePackageOperation 失败 → FsmInitializePackage.cs:99 只报 warning，流程静默中断
+```
+
+**根因链（逐层挖到源码）**
+
+1. `BuiltinFileSystem` 初始化**必须**读到 `<Package>_<Version>.hash` —— `RequestBuiltinPackageHashOperation.cs:44-63`：`File.Exists` 不满足就发 `file://` 请求，404 直接 `SetError`
+2. HostPlayMode 下 `CopyBuiltinPackageManifest=true`（`FsmInitializePackage.cs:68` 显式打开），`CopyBuiltinPackageManifestOperation.cs:79-105` 会**无条件**拷贝内置 version / manifest / hash —— 源码注释写明「只负责拷贝文件，不负责校验」，缺一个就 fail
+3. **为什么缺**：打包窗口的 `BundledCopyOption` **默认值是 `None`**（`Editor/BundleBuilder/BuildParameters.cs:95`）
+   - `TaskCopyBundledFiles_SBP.cs:19` → `None` 时整段跳过，不往 StreamingAssets 拷 version / manifest / hash
+   - `TaskCreateCatalog_SBP.cs:18` → `None` 时不生成 `BuiltinCatalog.json / .bytes`
+   - StreamingAssets 里现存的 version + bytes 是**当时手动拷的**，正好漏了 hash
+
+**关键：补 hash 只是第一层。** `BuiltinFileSystem.OnCreate`（`BuiltinFileSystem.cs:348-356`）会创建 `BuiltinBundleCache`，其初始化 `BBCInitializeOperation` → `LoadBuiltinCatalogOperation` **强依赖 `BuiltinCatalog.bytes`**，缺文件同样走 `file://` 请求失败 → 只补 hash 能过初始化，**加载资源时还会挂**。
+
+**正解**：AssetBundle Builder 窗口把「内置资源拷贝选项 / Bundled Copy Option」改为 **`ClearAndCopyAll`** 后重新构建 → 自动拷全 `version + <ver>.bytes + <ver>.hash + 43 个 bundle + BuiltinCatalog.json/bytes`。
+
+### 9.3 坑二：打包后没同步 CDN → 版本错位
+
+- 16:34 重打包后：内置包版本 `2026-10-17-994`；CDN（`E:\net\CDN\PC\v1.0\`）仍是 `2026-10-17-988`
+- **表现很怪**：客户端会「降到旧清单」→ 按 988 去找 bundle → 找不到 / 加载失败。看起来像网络问题或资源丢失，实际是**两边版本号不一致**
+- **修复**：994 全套 `cp -f` 到 CDN（只覆盖/新增，没删任何文件；988 的清单文件留在原地成为**孤儿**，无害）
+- **纪律**：**「打包」和「同步 CDN」必须当成一个原子操作**，漏一步必踩。建议后续写 `Tools/` 一键同步脚本（robocopy + 版本号校验）
+
+### 9.4 为什么「三档验证顺序」是排查的前提
+
+本次能快速定位，靠的是**先缩范围**：
+
+```
+EditorSimulateMode  →  绕开所有文件系统，确认示例本身正常
+        ↓
+OfflinePlayMode     →  验证内置包完整（本次先跑通 → 问题被压到 host 侧）
+        ↓
+HostPlayMode        →  只剩「下载链路 + 远端版本」两个变量
+```
+
+Offline 能跑、Host 不能跑 → **内置包没问题，问题一定在 host 侧的文件系统或远端**。这一步省掉了大量瞎猜。
+
+### 9.5 关键路径速查（调试先看这里）
+
+| 用途 | 路径 |
+| --- | --- |
+| 编辑器沙盒缓存 | `Library/yoo/DefaultPackage/`（`ManifestFiles/` 存 `<Pkg>_<ver>.bytes` + `.hash` + `ApplicationFootprint.bytes`；`SimulateCache/` 存模拟缓存） |
+| 打包产物 | `Bundles/StandaloneWindows64/DefaultPackage/<版本号>/` |
+| 内置资源（首包） | `Assets/StreamingAssets/yoo/DefaultPackage/` |
+| 本地 CDN 服务器 | `E:\net\`（`python -m http.server 80`，启动脚本 `开启服务器.bat`）→ URL `http://127.0.0.1/CDN/PC/v1.0` |
+| 播放器沙盒 | `%USERPROFILE%\AppData\LocalLow\DefaultCompany\YooAssets_HybirdCLR\` |
+
+**行为异常时第一招**：清掉 `Library/yoo/DefaultPackage/`（里面常残留多版清单，比如 985 / 988），整目录重来。
+
+### 9.6 排查方法论：初始化失败先分三层
+
+| 层 | 缺什么会挂 | 对应文件 |
+| --- | --- | --- |
+| ① 文件系统 | hash 读不到 | `<Pkg>_<Ver>.hash` |
+| ② 清单 | manifest / catalog 缺失 | `<Pkg>_<Ver>.bytes` + `BuiltinCatalog.bytes` |
+| ③ 远端 | 版本目录 / 版本号对不上 | `DefaultPackage.version` + URL 里的 `<appVersion>` 目录 |
+
+**一句话**：初始化 404 不要先怀疑网络，按「hash → bytes → version 对齐」三层逐个 `curl` / `ls` 一遍，八成当场定位。
+
+### 9.7 顺带的生命周期实验（`Assets/Scripts/`）
+
+同日在项目里写了两个小脚本验证 `Instantiate` 的生命周期：
+
+```csharp
+// CreateGo.cs
+void Start() {
+    var go = Instantiate(prefab);
+    //awake 在实例化时就会调用一次
+    go.enabled = false;
+}
+
+// BeCreatedGo.cs：Awake / Start / OnEnable 各打一条日志 + gameObject.activeSelf
+```
+
+**结论**：`Instantiate` **同步执行 Awake**（`Instantiate` 返回前 Awake 已跑完）；紧接着的 `enabled = false` 只能拦住 `Start`（延后到启用那一刻），**拦不住已经发生的 Awake 与 OnEnable**。完整执行顺序与 `active` / `enabled` 两个开关的分界见 📎 [[MonoBehaviour生命周期与SetActive的坑]]。
+
 ## 相关
 
 - [[热更新 HybridCLR — AOT 泛型元数据补全]]
 - [[AssetBundle 生命周期与卸载语义]]
 - [[Addressables资源生命周期]]
+- [[MonoBehaviour生命周期与SetActive的坑]]
