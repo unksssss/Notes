@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-16
+updated: 2026-10-20
 ---
 
 # Resources
@@ -80,10 +80,11 @@ updated: 2026-10-16
 | [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选） |
 | [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
 
-### rendering（3）
+### rendering（4）
 
 | File | Summary |
 | --- | --- |
+| [[URP 卡通描边 — 法线外扩与 ZOffset]] | 两 Pass 描边法（Cull Front + 沿法线外扩）：屏幕恒定线宽的「视空间 Z × FOV」补偿（FOV 由 `unity_CameraProjection._m11` 反解）、ZOffset 只改 `positionCS.z` 治脸部脏描边（透视走投影矩阵 z 行重算）、顶点采样必须 `tex2Dlod`；五 Pass 分工、描边要写深度、硬边破面等六坑、与屏幕后处理 Sobel 取舍 |
 | [[ParticleSystem详解]] | Unity ParticleSystem 全部模块属性详解，按开发频率排序，附常见参数调优方案。 |
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |

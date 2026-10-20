@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-16
+updated: 2026-10-20
 ---
 
 # Knowledge Graph
@@ -116,6 +116,8 @@ updated: 2026-10-16
 | [[UGUI事件接口与EventTrigger]] | [[UGUI 事件系统与射线检测链路]] | related |
 | [[UGUI事件接口与EventTrigger]] | [[UGUI 拖拽实现与拖放检测]] | related |
 | [[UGUI事件接口与EventTrigger]] | [[UGUI Canvas 渲染模式与屏幕适配]] | related |
+| [[URP 卡通描边 — 法线外扩与 ZOffset]] | [[Unity 渲染批处理体系]] | related |
+| [[URP 卡通描边 — 法线外扩与 ZOffset]] | [[urp移动优化]] | related |
 
 ## Suggested Links
 

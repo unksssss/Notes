@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-16
+updated: 2026-10-20
 ---
 
 # Tags Index
@@ -187,6 +187,7 @@ updated: 2026-10-16
 - [[UGUI 图集原理与合批]] — 图集共享纹理免切换、Mask vs RectMask2D、动静分离
 - [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件、破批十大元凶、Overdraw 与诊断
 - [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing / 静态动态合批
+- [[URP 卡通描边 — 法线外扩与 ZOffset]] — 两 Pass 描边：法线外扩 + Cull Front、屏幕恒定线宽补偿、ZOffset 治脸部脏描边
 
 ### 网络
 - [[TCP 与 UDP 的区别与游戏选型]] — 面向连接/可靠/字节流 vs 无连接/不可靠/数据报；游戏选型与自研可靠 UDP
@@ -326,7 +327,8 @@ updated: 2026-10-16
 | 网络同步 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
-| 渲染 | 4 |
+| 渲染 | 5 |
+| 描边 | 1 |
 | 协程 | 1 |
 | 异步 | 1 |
 | 对象池 | 1 |
