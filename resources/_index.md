@@ -77,7 +77,7 @@ updated: 2026-10-20
 | File | Summary |
 | --- | --- |
 | [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力）vs SimpleMove（速度/秒+自动重力）对比、斜坡 Slope Limit 与法线投影处理、选型建议 |
-| [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选） |
+| [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本 Physics2D**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的四条排查清单、LayerMask 传层索引的坑、射线只该用于遮挡检测的成本判断、ContactFilter2D 与 queriesHitTriggers |
 | [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
 
 ### rendering（4）

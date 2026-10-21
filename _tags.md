@@ -176,7 +176,7 @@ updated: 2026-10-20
 - [[二叉树的右视图]] — DFS「根-右-左」时同深度首现即最右；`depth == res.size()` 的语义是「该深度尚未记录」
 
 ### 物理
-- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测
+- [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
 - [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
 
 ### 数据驱动
