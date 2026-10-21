@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-20
+updated: 2026-10-21
 ---
 
 # Tags Index
@@ -62,6 +62,7 @@ updated: 2026-10-20
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — System.Object → UnityEngine.Object 四大分支；Component 两条腿（Behaviour vs 直接继承）；12 道面试追问
 - [[TCP 与 UDP 的区别与游戏选型]] — TCP vs UDP 十维度对比、队头阻塞、粘包归属、自研可靠 UDP
 - [[可靠 UDP 与 KCP 原理]] — 四个机制用户态详解 + RTT/RTO 术语速查与 RTO 自适应计算；KCP 取舍；选择性可靠
+- [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
 
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
@@ -143,6 +144,16 @@ updated: 2026-10-20
 ### 设计模式
 - [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事
 - [[UI-逻辑-数据分层与事件驱动]] — UI/逻辑/数据三层 + 事件驱动（TaskStateManager 范式）
+- [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
+
+### 状态机
+- [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
+
+### AI
+- [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
+
+### 架构
+- [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
 
 ### 序列化
 - [[Unity 序列化机制]] — Unity 序列化器范围/限制、6.6 原生 Dictionary 序列化

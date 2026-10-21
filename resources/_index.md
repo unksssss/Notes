@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-20
+updated: 2026-10-21
 ---
 
 # Resources
@@ -18,11 +18,12 @@ updated: 2026-10-20
 | [[DOTween与协程选型]] | 协程（状态机/流程控制）vs DOTween（时间轴补间/可中断可控），选择口诀：'动'用 DOTween、'流程'用协程，可混用 |
 | [[dotween详解]] | Unity DOTween 动画补间库完整指南：基本用法、回调系统、Sequence序列、生命週期控制、常用模式与性能注意事项 |
 
-### architecture（6）
+### architecture（7）
 
 | File | Summary |
 | --- | --- |
 | [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
+| [[有限状态机FSM — 手写实现与状态切换边界]] | 手写 FSM 三层骨架（IState / 状态基类持 owner / 状态机 Dictionary 注册 + 幂等切换）；Exit→换ID→Enter 的顺序理由、非 MonoBehaviour 状态机开不了协程、状态切换边界五要素、FSM vs 行为树 vs GOAP；怪物 AI 实战 6 坑（每帧 SetDestination / 冷却只读不写 / 球形判定不判朝向 / int 存距离 / 单例伪 null） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
 | [[对象池 OnEnable OnDisable 最佳实践]] | 利用 OnEnable/OnDisable 配合对象池实现自动重置，避免手动重置状态的耦合问题 |
 | [[对象池实现]] | Unity 对象池原理与 IObjectPool<T> 实现（踩坑修正版），含面试三连问：池空 Get=Instantiate 兜底 / 池满 Release=Destroy 截断 / 初始化放 OnEnable 原因；池化反面判据 + 粒子池同构（maxParticles/Prewarm，Day 36 拔高） |
