@@ -6,7 +6,7 @@ updated: 2026-10-16
 
 # 算法区导航（resources/algorithm）
 
-32 篇算法与数据结构笔记，已按 **6 个子目录物理归档（目录即分类）**。每篇 frontmatter 里另有 `category` 字段，便于属性面板筛选。
+33 篇算法与数据结构笔记，已按 **6 个子目录物理归档（目录即分类）**。每篇 frontmatter 里另有 `category` 字段，便于属性面板筛选。
 总索引见 [[resources/_index]] 的「算法与数据结构」段。
 
 ## 一、数据结构基础（`algorithm/数据结构基础`）（4）
@@ -91,6 +91,12 @@ updated: 2026-10-16
 | --- | --- |
 | [[A星寻路算法]] | A* = Dijkstra + 启发式 `f=g+h`；h 可采纳性保证最优；h=0 退化为 Dijkstra；NavMesh 思想 |
 | [[KMP字符串匹配]] | 主串指针不回退；next 数组（最长相等前后缀）；O(n×m) → O(n+m) |
+
+## 附、工具与模板（根目录）（1）
+
+| File | Summary |
+| --- | --- |
+| [[ACM模式输入输出]] | 工具页（根目录，不属于六类）。**核心认知**：ACM = ① IO 壳 + ② 算法 + ③ 输出格式化，**只有 ② 是核心代码模式里练过的** → 切模式时算法原样搬，只补外壳。**万能结构**：`solve()` 读一组算一组打一组，`main()` 只放 `ios::sync_with_stdio(false)` + `cin.tie(nullptr)` + 多组循环。**五种输入形态**：单组读 n / 先给 T / **不给 T 读到 EOF**（`while (cin >> n)`，牛客最常见）/ 整行含空格（`getline`）/ 逗号分隔（`getline(iss, tok, ',')`）。★ **最大坑**：`cin >> x` 之后直接 `getline` 会读到空串（换行残留在缓冲区）→ 第一组空、**整体错位一行、最后一组丢失**；修法是先 `getline` 吃掉换行或全用 getline + istringstream。输出三坑：行末空格（空格放前面写）、组间空行、`endl` 强制 flush 导致 TLE。本地调试用 `< in.txt` 重定向而非 `freopen`。六种形态已全部 g++ 实测 |
 
 ## 建议刷题顺序
 

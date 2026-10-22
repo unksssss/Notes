@@ -140,7 +140,7 @@ updated: 2026-10-22
 | [[C# IL 中间语言与编译执行模型]] | IL/CIL = .NET 通用中间语言：两段论（csc 编译一次、JIT/AOT 各自翻译）；栈机模型（ldarg 压栈/add 弹栈/ret）；box/newobj/隐藏类指令 ↔ 装箱/闭包/协程状态机；Unity 四条消费路线 Mono/IL2CPP/CoreCLR/HybridCLR |
 | [[委托与事件]] | delegate = 类型安全的函数指针 + target（实例方法隐式持 `this`）→ 多播委托链按序执行、异常截断、`-=` 只移除一个；**event = 编译器对 delegate 字段的封装**（私有字段 + add/remove 访问器，外部只能 `+=`/`-=`，不能赋 null 覆盖、不能 Invoke）→ 为什么需要它；与 UnityEvent 取舍；订阅不取消 = GC 泄漏，静态事件最危险 |
 
-## 算法与数据结构（32）
+## 算法与数据结构（33）
 
 > 分区导航：[[algorithm/_index|算法区导航]] —— 本区已按 **6 个子目录物理分类**（目录即分类），附建议刷题顺序。
 
@@ -206,6 +206,12 @@ updated: 2026-10-22
 | [[KMP字符串匹配]] | KMP 核心思想：主串指针不回退，利用 next 数组（最长相等前后缀）计算模式串滑动距离，复杂度从 O(n×m) 降到 O(n+m) |
 | [[A星寻路算法]] | A* = Dijkstra + 启发式 f(n)=g(n)+h(n)；h 可采纳性保证最优、高估错过最优解；h=0 退化为 Dijkstra；网格启发函数选择；NavMesh 底层思想（Day 37 面经） |
 
+### 工具与模板（1）— `algorithm/`（根目录）
+
+| File | Summary |
+| --- | --- |
+| [[ACM模式输入输出]] | 工具页。**ACM = IO 壳 + 算法 + 输出格式化三层**，只有中间那层与核心代码模式相同 → 切模式时算法原样搬，只补外壳（`solve()` 读一组算一组，`main()` 管多组循环 + IO 提速）。**五种输入形态**：单组读 n / 先给 T / **不给 T 读到 EOF**（`while (cin >> n)`，牛客最常见）/ 整行含空格 / 逗号分隔。★ **最大坑**：`cin >> x` 后直接 `getline` 读到空串 → **整体错位一行、最后一组丢失**（实测）。输出三坑：行末空格 / 组间空行 / `endl` 强制 flush 致 TLE。本地调试用 `< in.txt` 重定向。含 g++ 8.1.0 下 `bits/stdc++.h` 报错的环境提示 |
+
 ## 项目归档（消防仿真 / XR-VR，已停出题）
 
 | File | Summary |
@@ -229,4 +235,4 @@ updated: 2026-10-22
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 101 篇资源笔记（unity 50 / csharp 8 / algorithm 32 / archive 9 / meta 2）。算法区 32 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 102 篇资源笔记（unity 50 / csharp 8 / algorithm 33 / archive 9 / meta 2）。算法区 33 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
