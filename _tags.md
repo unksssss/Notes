@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-21
+updated: 2026-10-22
 ---
 
 # Tags Index
@@ -155,13 +155,16 @@ updated: 2026-10-21
 ### AI
 - [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
 - [[巡逻保安AI — FSM与行为树的机制差异与选型]] — **FSM 与行为树六维差异**；Running 是记忆不是状态、打断来自 Reactive Selector、FSM 病根是状态两两耦合；巡逻保安选 FSM 的完整实现；换 BT 的四个信号 + 混用实践
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 手写 BT 工程三件套：黑板查找链与三态陷阱、Sequence 遇 RUNNING 必须立刻 return、节点依赖注入；实战 11 个 bug 根因与修复
 
 ### 行为树
 - [[巡逻保安AI — FSM与行为树的机制差异与选型]] — Selector / Sequence / Condition 的语义与打断能力；BT 与 FSM 的选型判断（状态数 / 组合需求 / 谁维护 / 框架成本）
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 黑板（GetData 沿父链 / SetData 用索引器 / 三态问题）、Sequence 与 Selector 对 RUNNING 的不对称处理、顺序即优先级、Attach 可见性与 params 构造、节点生命周期与依赖注入
 
 ### 架构
 - [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
 - [[巡逻保安AI — FSM与行为树的机制差异与选型]] — 「按规模选范式」：4 状态用 FSM（零框架代码），行为涨到 8~10 个且有组合需求才换 BT
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 框架基类设计：消息方法必须 virtual（子类重声明会静默隐藏）、运行时程序集不得引用 UnityEditor
 
 ### 序列化
 - [[Unity 序列化机制]] — Unity 序列化器范围/限制、6.6 原生 Dictionary 序列化
@@ -376,9 +379,9 @@ updated: 2026-10-21
 | 寻路 | 1 |
 | 序列化 | 1 |
 | 设计模式 | 2 |
-| 架构 | 3 |
-| AI | 2 |
-| 行为树 | 1 |
+| 架构 | 4 |
+| AI | 3 |
+| 行为树 | 2 |
 | 类层级 | 1 |
 | scripting | 4 |
 | Canvas | 2 |

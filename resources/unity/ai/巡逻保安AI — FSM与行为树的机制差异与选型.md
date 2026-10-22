@@ -364,3 +364,4 @@ Root (Selector)
 
 - [[有限状态机FSM — 手写实现与状态切换边界]] —— FSM 的三层骨架（IState / 状态基类 / 状态机注册表）、Exit→换ID→Enter 的顺序理由、状态切换边界五要素，本篇的选型结论建立在它的实现细节上
 - [[Physics Raycast 与 NonAlloc]] —— 本篇 `CanSeePlayer` 里的遮挡检测，以及 NonAlloc 在多点检测时的用法
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] —— 本篇回答「该不该选 BT」，那篇回答「真写 BT 会踩什么」：黑板查找链与三态陷阱、Sequence 遇 RUNNING 的中断语义、节点依赖注入、`using UnityEditor` 混进运行时程序集

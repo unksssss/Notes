@@ -10,11 +10,12 @@ updated: 2026-10-22
 
 ## Unity / 引擎技术
 
-### ai（1）
+### ai（2）
 
 | File | Summary |
 | --- | --- |
 | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | FSM 与行为树六维差异（心智模型 / 执行方式 / 扩展成本 / 复用 / 打断 / 调试）；三个易错机制——**Running 是记忆不是状态**、**打断来自 Reactive Selector 而非行为树本身**、**FSM 病根是状态间两两耦合而非状态多**；巡逻保安选 FSM 的完整实现（4 状态 + 感知降频 10Hz + Enter/Exit 配对 + 幂等切换 + 追击双退出条件）；换行为树的四个信号与「BT 选、FSM 执行」的混用实践 |
+| [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] | 手写 BT 的工程层三件套：**黑板**（`GetData` 沿父链查找 + `SetData` 用索引器而非 `Add` + 「null 值 vs key 不存在」三态 + 泛型黑板以类型为 key）、**RUNNING 中断语义**（Sequence 遇 RUNNING 必须立刻 return，只 break switch 会让后续 Action 被误执行；记忆式 vs 响应式；顺序即优先级）、**节点依赖注入**（Node 非 MonoBehaviour，Transform/NavMeshAgent 靠构造传入）。含 2026-10-22 实战 11 个 bug 的根因与修复：提前 return 让父链查找成死代码、`parent.parent` 硬编码深度、`static LayerMask` 恒为 0、`using UnityEditor` 混进运行时程序集、`Attach` 私有导致树建不起来、`TaskPatrol` transform 未注入 + 索引不递增 + 绕过 NavMeshAgent、基类消息方法被子类隐藏的静默失效 |
 
 ### animation（3）
 
@@ -235,4 +236,4 @@ updated: 2026-10-22
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 102 篇资源笔记（unity 50 / csharp 8 / algorithm 33 / archive 9 / meta 2）。算法区 33 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 105 篇资源笔记（unity 53 / csharp 8 / algorithm 33 / archive 9 / meta 2）。算法区 33 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
