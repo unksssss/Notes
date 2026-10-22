@@ -3,7 +3,7 @@ title: "有限状态机FSM — 手写实现与状态切换边界"
 type: resource
 tags: [unity, 架构, 状态机, AI, 设计模式]
 created: "2026-10-21"
-updated: "2026-10-21"
+updated: "2026-10-22"
 status: active
 summary: "手写 FSM 三层骨架（IState 接口 / 状态基类持 owner / 状态机 Dictionary 注册 + 幂等切换），Exit→换ID→Enter 的顺序理由、非 MonoBehaviour 状态机开不了协程的后果、状态切换边界五要素，以及怪物 AI 实战里的 6 个工程坑"
 source: "E:\\unityproject\\UnityGroupWorking\\UnityGroupWorking-main\\Assets\\Scripts\\FSM"
@@ -252,6 +252,8 @@ private void Awake()
 | 典型坑 | 状态爆炸、转移遗漏 | 每帧遍历开销、黑板数据竞争 | 规划抖动、代价难调 |
 
 **一句话选型**：状态 ≤10 用 FSM；有「优先级打断 + 可复用子树」用 BT；要「怪物自己想办法」用 GOAP。工业界常见组合是 **FSM 管顶层（Idle/Combat/Dead）+ BT 管 Combat 内部**。
+
+> 行为树的节点语义（Selector / Sequence / Condition、`Running` 是记忆而非状态、打断来自 Reactive Selector）与「巡逻保安该选哪个」的完整推演，见 [[巡逻保安AI — FSM与行为树的机制差异与选型]]。
 
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-20
+updated: 2026-10-22
 ---
 
 # Knowledge Graph
@@ -132,6 +132,9 @@ updated: 2026-10-20
 | [[UGUI事件接口与EventTrigger]] | [[UGUI Canvas 渲染模式与屏幕适配]] | related |
 | [[URP 卡通描边 — 法线外扩与 ZOffset]] | [[Unity 渲染批处理体系]] | related |
 | [[URP 卡通描边 — 法线外扩与 ZOffset]] | [[urp移动优化]] | related |
+| [[巡逻保安AI — FSM与行为树的机制差异与选型]] | [[有限状态机FSM — 手写实现与状态切换边界]] | extends |
+| [[巡逻保安AI — FSM与行为树的机制差异与选型]] | [[Physics Raycast 与 NonAlloc]] | related |
+| [[有限状态机FSM — 手写实现与状态切换边界]] | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | related |
 
 ## Suggested Links
 

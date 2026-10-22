@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-21
+updated: 2026-10-22
 ---
 
 # Resources
@@ -9,6 +9,12 @@ updated: 2026-10-21
 按知识域分目录归档（Unity / C# / 算法 / 归档 / meta），Unity 内再按主题细分。双链按文件名解析，跨目录跳转不受影响。
 
 ## Unity / 引擎技术
+
+### ai（1）
+
+| File | Summary |
+| --- | --- |
+| [[巡逻保安AI — FSM与行为树的机制差异与选型]] | FSM 与行为树六维差异（心智模型 / 执行方式 / 扩展成本 / 复用 / 打断 / 调试）；三个易错机制——**Running 是记忆不是状态**、**打断来自 Reactive Selector 而非行为树本身**、**FSM 病根是状态间两两耦合而非状态多**；巡逻保安选 FSM 的完整实现（4 状态 + 感知降频 10Hz + Enter/Exit 配对 + 幂等切换 + 追击双退出条件）；换行为树的四个信号与「BT 选、FSM 执行」的混用实践 |
 
 ### animation（3）
 
@@ -223,4 +229,4 @@ updated: 2026-10-21
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 100 篇资源笔记（unity 49 / csharp 8 / algorithm 32 / archive 9 / meta 2）。算法区 32 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 101 篇资源笔记（unity 50 / csharp 8 / algorithm 32 / archive 9 / meta 2）。算法区 32 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
