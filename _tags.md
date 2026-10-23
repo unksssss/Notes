@@ -119,6 +119,7 @@ updated: 2026-10-22
 - [[ACM模式输入输出]] — 三层结构（IO 壳/算法/输出）；五种输入形态；cin>> 后接 getline 会读空串导致整组错位
 - [[字符串变形]] — 单词反序 + 大小写反转；★ 初版 `i > 0` 漏 s[0]；最优是整体反转 + 逐词反转 O(1) 空间（BM83）
 - [[最长公共前缀]] — 纵向扫描一列一列比；★ `j >= size() ||` 越界判断必须放 `||` 左边（短路保护）；排序比首尾 O(n·m·log n)（LC 14）
+- [[验证IP地址]] — IPv4 四关 / IPv6 三关；★ 并联验证（isIPv4 不行试 isIPv6）而非先猜类型；split 必须补最后一段（BM85）
 - [[二分查找]] — 原理、比较次数推导、O(log n)、C# BinarySearch
 - [[贪心算法入门]] — 局部最优、找零钱翻车案例、贪心 vs DP 分界
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -342,18 +343,19 @@ updated: 2026-10-22
 - [[ACM模式输入输出]] — 手写 main：ios 提速 / 多组 T / while(cin>>n) 读到 EOF / getline + istringstream 解析；endl 会 flush 致 TLE
 - [[字符串变形]] — 原地 `reverse(begin, begin+n)` + 逐词 `reverse`；`toupper((unsigned char)c)` 防 UTF-8 负值 UB
 - [[最长公共前缀]] — 手写纵向扫描；`strs[0].substr(0, j)` 的第二参是长度；`size()` 与 `int` 比较要强转
+- [[验证IP地址]] — 手写 split + 逐段校验；`v = v*10 + (c-'0')` 不是 `+=`；`isdigit((unsigned char)c)`
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
 | unity | 38 |
-| 算法 | 34 |
+| 算法 | 35 |
 | 性能优化 | 10 |
 | unity面试 | 15 |
 | 数据结构 | 31 |
 | 二叉树 | 17 |
-| cpp | 23 |
+| cpp | 24 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
