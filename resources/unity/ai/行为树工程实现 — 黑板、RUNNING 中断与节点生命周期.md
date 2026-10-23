@@ -3,11 +3,11 @@ title: "行为树工程实现 — 黑板、RUNNING 中断与节点生命周期"
 type: resource
 tags: [unity, AI, 行为树, 架构, unity面试]
 created: "2026-10-22"
-updated: "2026-10-22"
+updated: "2026-10-23"
 status: active
-summary: "手写行为树的工程层三个核心：黑板（共享上下文）的查找链与三态陷阱、Sequence/Selector 对 RUNNING 的中断语义、节点与宿主（Transform / NavMeshAgent）的依赖注入。附 2026-10-22 UnityGroupWorking 实战 10 个 bug 的逐个根因与修复代码：GetData 提前 return 导致父链查找成死代码、SetData 用 Add 抛重复键、parent.parent 硬编码层级、LayerMask 恒为 0、Sequence 遇 RUNNING 继续遍历、using UnityEditor 混进运行时程序集、Attach 私有导致树建不起来、TaskPatrol transform 未注入 + 索引不递增 + 绕过 NavMeshAgent。"
-source: "2026-10-22 UnityGroupWorking 行为树实战代码 review"
-related: ["[[巡逻保安AI — FSM与行为树的机制差异与选型]]", "[[有限状态机FSM — 手写实现与状态切换边界]]", "[[Physics Raycast 与 NonAlloc]]", "[[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]]"]
+summary: "手写行为树的工程层三个核心：黑板（共享上下文）的查找链与三态陷阱、Sequence/Selector 对 RUNNING 的中断语义、节点与宿主（Transform / NavMeshAgent）的依赖注入。附 2026-10-22 UnityGroupWorking 实战 11 个 bug 的逐个根因与修复代码：GetData 提前 return 导致父链查找成死代码、SetData 用 Add 抛重复键、parent.parent 硬编码层级、LayerMask 恒为 0、Sequence 遇 RUNNING 继续遍历、using UnityEditor 混进运行时程序集、Attach 私有导致树建不起来、TaskPatrol transform 未注入 + 索引不递增 + 绕过 NavMeshAgent。2026-10-23 补组装期三坑：字符串 key 编译期零保护（写 player 读 Target）、持续型动作缺让位条件导致 Selector 兄弟分支饿死、Node 缺 OnEnter/OnExit 使内部计时器跨切换残留。"
+source: "2026-10-22 ~ 2026-10-23 UnityGroupWorking 行为树实战代码 review"
+related: ["[[巡逻保安AI — FSM与行为树的机制差异与选型]]", "[[有限状态机FSM — 手写实现与状态切换边界]]", "[[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]]", "[[Physics Raycast 与 NonAlloc]]", "[[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]]"]
 ---
 
 # 行为树工程实现 — 黑板、RUNNING 中断与节点生命周期
@@ -168,6 +168,41 @@ public CheckPlayerInFOVRange(Transform owner, Blackboard bb) { ... }
 
 **判据：凡是出现 `parent.parent`、`GetComponentInParent` 之类的「按深度取祖先」，都是在赌树的结构不变。树是会变的。**
 
+### 2.6 字符串 key 是编译期零保护（2026-10-23 复发）
+
+`Dictionary<string, object>` 的 key 是**纯字符串**，C# 编译器对它的唯一要求是「两个字符串相等」——拼错、大小写不一致、写了一半，全部合法。
+
+```cs
+// 写端：Assets/Scripts/BT/CheckPlayerInFOVRange.cs:26
+parent.parent.SetData("player", colliders[0].transform);
+
+// 读端：Assets/Scripts/BT/TaskAttack.cs / TaskGoToTarget.cs（2026-10-23 新代码）
+Transform target = (Transform)GetData("Target");   // ★ 大写 T，而且名字也不一样
+```
+
+**后果链条**：`GetData` 沿父链找不到 `"Target"` → 返回 `null` → `(Transform)null` 仍是 `null` → 下一行 `target.position` **NRE**。两个动作节点都是第一帧就崩，且报错位置在「用 target 的那一行」，**离真正的错误（key 拼错）隔了一层**。
+
+> 这正是 2.4 ③「值为 null / key 不存在 / 类型不对」三态问题的现实版本：**三态全被压成同一个 `null`，所以「key 写错」和「目标还没找到」在代码里长得一模一样。**
+
+**两层修法：**
+
+```cs
+// ✅ 第一层（最小改动）：常量类收口，写错就编译不过
+public static class BBKeys
+{
+    public const string Player = "player";
+    public const string PatrolIndex = "patrolIndex";
+}
+
+SetData(BBKeys.Player, colliders[0].transform);
+var target = GetData(BBKeys.Player) as Transform;
+
+// ✅ 第二层（根治）：泛型黑板，用类型当 key，key 根本不存在拼错的可能
+//    Set<Transform>(t) / TryGet<Transform>(out t) —— 见 2.4 ③
+```
+
+**为什么常量类只能算「第一层」**：它挡住了拼写错误，但挡不住「同一个类型存两份不同语义的数据」（比如 `Transform` 既想存「当前目标」又想存「巡逻锚点」）。泛型黑板同样有这个问题，此时才需要 `Blackboard.Set<T>(string slot, T v)` 这种「类型 + 槽位名」的混合 key。**先常量类，撞到墙了再升级——不要一上来就设计泛型框架。**
+
 ---
 
 ## 三、RUNNING 的中断语义：Sequence 与 Selector 不对称
@@ -253,6 +288,52 @@ case NodeState.RUNNING:
 | **响应式 Sequence** | 每帧从第一个子节点重跑，条件节点放最前面 | 「玩家在范围内 → 追击」，条件一变立刻退出 |
 
 ⚠️ **顺序即优先级**：响应式 Sequence 里，条件节点放**后面**意味着「前面的动作跑完才发现条件不成立了」——已经白跑了一帧（甚至一整个动画）。放**最前**才是真正的守卫。
+
+### 3.6 持续型动作必须自带让位条件（否则兄弟分支饿死）
+
+`Selector` 的语义是「从左到右，第一个不返回 `FAILURE` 的胜出」。所以**任何恒返回 `RUNNING` 的节点，只要排在前面的位置，就会永久占住这条路径**——后面的兄弟节点一次都不会被 tick。
+
+```cs
+// ❌ Assets/Scripts/BT/TaskGoToTarget.cs（2026-10-23）
+public override NodeState Evaluate()
+{
+    Transform target = (Transform)GetData("Target");
+    if (Vector3.Distance(tranform.position, target.position) > 0.01f)
+    {
+        tranform.position = Vector3.MoveTowards(tranform.position, target.position, 3f * Time.deltaTime);
+        tranform.LookAt(target);
+    }
+
+    state = NodeState.RUNNING;      // ★ 无条件，永不 SUCCESS / FAILURE
+    return state;
+}
+```
+
+挂成 `Selector(TaskGoToTarget, TaskAttack)` 的结果：怪物贴到玩家身上一直推，**但一刀不砍**——`TaskAttack` 永远轮不到。
+
+**这是同一个坑第二次踩**：10-22 的 `TaskPatrol` 也是恒 `RUNNING`，饿死的是追击分支；今天换成 `TaskGoToTarget`，饿死的是攻击分支。**换了个节点，同一个设计缺口。**
+
+**根因不是「忘了写 SUCCESS」，是「动作节点没定义自己的结束条件」**：
+
+| 节点类型 | 结束条件 | 返回 |
+| --- | --- | --- |
+| 追击（GoToTarget） | 进入攻击距离 / 目标丢失 | `SUCCESS` / `FAILURE` |
+| 攻击（Attack） | 目标离开攻击距离 / 目标死亡 | `FAILURE` |
+| 巡逻（Patrol） | 永远不结束（但**有目标时必须 `FAILURE` 让位**） | 恒 `RUNNING` + 让位 |
+
+```cs
+// ✅ 追击：追到就 SUCCESS，把控制权交回 Selector
+if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.05f)
+{
+    state = NodeState.SUCCESS;
+    return state;
+}
+
+// ✅ 巡逻：平时恒 RUNNING，但一旦黑板里有目标就主动 FAILURE 让位
+if (GetData(BBKeys.Player) != null) return NodeState.FAILURE;
+```
+
+> **自查口诀**：写完一个动作叶，先问「它什么时候返回 `SUCCESS`、什么时候返回 `FAILURE`」。两个都答不出来 → 这个节点一旦被执行就永远不放手。
 
 ---
 
@@ -368,7 +449,88 @@ public class TaskPatrol : Node
 }
 ```
 
-> `agent.remainingDistance` 在 `pathPending == true` 时**返回值无意义**（可能是 0 或无穷大），所以必须先判 `pathPending`。这是 NavMeshAgent 最经典的坑之一。
+> `agent.remainingDistance` 在 `pathPending == true` 时**返回值无意义**（可能是 0 或无穷大），所以必须先判 `pathPending`。这是 NavMeshAgent 最经典的坑之一。NavMeshAgent 与 `transform` 的所有权冲突（`updatePosition` / `updateRotation` / `Warp`）见 📎 [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]]。
+
+### 4.4 缺 `OnEnter` / `OnExit`：带内部状态的节点做不干净「被打断」
+
+```cs
+// Assets/Scripts/BT/TaskAttack.cs（2026-10-23）
+private float attackTime = 1f;
+private float attackCount = 0f;
+
+public override NodeState Evaluate()
+{
+    attackCount += Time.deltaTime;
+    if (attackCount >= attackTime) { attackCount = 0; /* 造成伤害 */ }
+    state = NodeState.RUNNING;
+    return state;
+}
+```
+
+`attackCount` 是**节点实例上的字段**，而节点实例在树的整个生命周期里只 new 一次。于是：
+
+```
+第 1 帧：Selector 选中攻击分支 → attackCount 累加到 0.9
+第 2 帧：玩家跑开 → CheckPlayerInAttackRange 返回 FAILURE → 攻击节点被切走（计数停在 0.9）
+第 30 帧：玩家又走回来 → 攻击节点重新被选中 → 下一帧立刻 0.9 + 0.02 > 1 → 瞬发一刀
+```
+
+**根因**：`Node` 基类只有 `Evaluate()`，没有「进入 / 离开」钩子。任何带计时器、动画状态、目标锁定的节点，都无法在「被抢占」时清理自己。
+
+```cs
+// ✅ 基类补两个空实现
+public class Node
+{
+    public virtual void OnEnter() { }
+    public virtual void OnExit()  { }
+}
+
+// ✅ 组合节点负责在「选中变化」时调用（记忆式遍历的最小实现）
+public override NodeState Evaluate()
+{
+    foreach (var child in children)
+    {
+        var s = child.Evaluate();
+        if (s == NodeState.RUNNING)
+        {
+            if (runningChild != child)          // ★ 换人了
+            {
+                runningChild?.OnExit();
+                child.OnEnter();
+                runningChild = child;
+            }
+            state = NodeState.RUNNING;
+            return state;
+        }
+        if (s == NodeState.SUCCESS) { state = NodeState.SUCCESS; return state; }
+    }
+    state = NodeState.FAILURE;
+    return state;
+}
+```
+
+```cs
+// ✅ 节点侧：被打断就清零
+public override void OnExit() => timer = 0f;
+```
+
+### 4.5 动作叶该依赖接口，不是具体类
+
+```cs
+// ❌ 绑死具体类型
+var playerHealth = target.GetComponent<PlayerHealth>();
+playerHealth.TakeDamage(10);
+```
+
+同一个项目里，`MonsterController` 已经实现了 `TakeDamage(in DamageInfo)`（配合 `IDamageable`），文档里也把「伤害契约」写成了 `IDamageable + DamageInfo`。但行为树这边绕回去绑 `PlayerHealth`，结果是：**这套 AI 只能打玩家**，打不了可破坏物、木箱、其他怪物。
+
+```cs
+// ✅ 面向契约
+if (target.TryGetComponent(out IDamageable dmg))
+    dmg.TakeDamage(new DamageInfo { damage = damage });
+```
+
+> 顺带两个小问题：`GetComponent` 每次攻击都调一次（应缓存）；`private PlayerHealth playerHealth;` 字段声明了却从未使用（被局部变量遮蔽，CS0169 警告）。
 
 ---
 
@@ -524,7 +686,7 @@ int count = Physics.OverlapSphereNonAlloc(owner.position, radius, hits, mask);
 
 ---
 
-## 九、十个 bug 汇总表
+## 九、bug 汇总表（2026-10-22 十一项 + 2026-10-23 五项）
 
 | # | 位置 | 症状 | 根因 | 修复 |
 | --- | --- | --- | --- | --- |
@@ -539,6 +701,13 @@ int count = Physics.OverlapSphereNonAlloc(owner.position, radius, hits, mask);
 | 9 | `Tree` | 树静默不动 | 子类重声明 `Start`/`Update` 隐藏基类版本 | 基类 `virtual`、子类 `override` |
 | 10 | `TaskPatrol` | NRE / 原地打转 / 穿墙 | `transform` 未注入、索引不递增、绕过 NavMeshAgent | 注入 `NavMeshAgent` + 环形索引 + `SetDestination` |
 | 11 | 感知节点 | 永远发现不了玩家 | `static LayerMask` 从未赋值 = 0 | 构造注入 + `[SerializeField]` 配层 |
+| 12 | `MonsterBT.SetUpTree` | **CS0161 编译错误，整个程序集标红** | 方法声明返回 `Node` 却没有 `return` | 补 `return new Selector(...)` |
+| 13 | `TaskAttack` / `TaskGoToTarget` | 第一帧 NRE | 写端 `"player"`、读端 `"Target"`，黑板 key 不一致 | `BBKeys` 常量类 / 泛型黑板 |
+| 14 | `TaskGoToTarget` | 攻击分支被饿死，一刀不砍 | 动作叶恒 `RUNNING`，无结束条件 | 到达返回 `SUCCESS`、目标丢失返回 `FAILURE` |
+| 15 | `TaskGoToTarget` / `TaskPatrol` | 抽搐 / 穿墙 / 朝向抖动 | 直写 `transform.position` + `LookAt` 与 `NavMeshAgent` 双写 | 只 `SetDestination`，转向关 `updateRotation` |
+| 16 | `TaskAttack` | 打断后瞬发一刀 / 只能打玩家 | 无 `OnEnter`/`OnExit` 清理计时器；绑 `PlayerHealth` 具体类而非 `IDamageable` | 基类补钩子 + 面向 `IDamageable` 契约 |
+
+> ⚠️ **#12 是唯一一个编译错误**：它的存在意味着 #13~#16 那些运行时问题**根本没机会暴露**。这四天里「新写的代码没被执行过」比「写错了」更值得警惕——**先让它编译、再让它运行、最后才谈行为对不对**。
 
 ---
 
@@ -556,12 +725,19 @@ int count = Physics.OverlapSphereNonAlloc(owner.position, radius, hits, mask);
 **Q：`RUNNING` 到底是不是状态？**
 是「记忆」不是「状态」。`SUCCESS`/`FAILURE` 当帧结束，只有 `RUNNING` 要求「下次从我这继续」——所以行为树本质是**一次带记忆的深度优先遍历**。
 
+**Q：为什么动作节点一定要定义「结束条件」？**
+因为 `Selector` 只认返回值。恒 `RUNNING` 的节点排在前面的位置，就等于永久占住这条路径，后面的兄弟节点一次都不会被 tick（「饿死」）。所以每个动作叶都要能回答：「我什么时候算成功？什么时候算失败？」——答不出来，它就不该出现在 `Selector` 里。
+
+**Q：黑板的 key 用字符串有什么问题？**
+编译器完全不管，拼错/大小写不一致全部合法，运行时才表现为 `null` → NRE，而且报错位置在「用值的地方」，离真正的错误隔一层。最小修法是常量类，根治是泛型黑板（类型当 key）。
+
 ---
 
 ## 相关
 
 - 📎 [[巡逻保安AI — FSM与行为树的机制差异与选型]] —— 理论层：FSM 与 BT 六维差异、Reactive Selector 为何能打断、什么时候该换
 - 📎 [[有限状态机FSM — 手写实现与状态切换边界]] —— 对照实现：FSM 三层骨架 + 切换边界五要素
+- 📎 [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] —— 动作叶为什么不许碰 `transform.position`：`updatePosition`/`updateRotation` 双写、`pathPending` 与到达判定、`Warp` 合法瞬移
 - 📎 [[Physics Raycast 与 NonAlloc]] —— `OverlapSphere` 分配问题、LayerMask 传参坑、`ContactFilter2D`
 - 📎 [[MonoBehaviour生命周期与SetActive的坑]] —— MonoBehaviour 消息方法的反射调用规则（方法隐藏为何静默失效）
 - 📎 [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] —— 为什么 `Node` 拿不到 `transform`

@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # Resources
@@ -15,7 +15,7 @@ updated: 2026-10-22
 | File | Summary |
 | --- | --- |
 | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | FSM 与行为树六维差异（心智模型 / 执行方式 / 扩展成本 / 复用 / 打断 / 调试）；三个易错机制——**Running 是记忆不是状态**、**打断来自 Reactive Selector 而非行为树本身**、**FSM 病根是状态间两两耦合而非状态多**；巡逻保安选 FSM 的完整实现（4 状态 + 感知降频 10Hz + Enter/Exit 配对 + 幂等切换 + 追击双退出条件）；换行为树的四个信号与「BT 选、FSM 执行」的混用实践 |
-| [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] | 手写 BT 的工程层三件套：**黑板**（`GetData` 沿父链查找 + `SetData` 用索引器而非 `Add` + 「null 值 vs key 不存在」三态 + 泛型黑板以类型为 key）、**RUNNING 中断语义**（Sequence 遇 RUNNING 必须立刻 return，只 break switch 会让后续 Action 被误执行；记忆式 vs 响应式；顺序即优先级）、**节点依赖注入**（Node 非 MonoBehaviour，Transform/NavMeshAgent 靠构造传入）。含 2026-10-22 实战 11 个 bug 的根因与修复：提前 return 让父链查找成死代码、`parent.parent` 硬编码深度、`static LayerMask` 恒为 0、`using UnityEditor` 混进运行时程序集、`Attach` 私有导致树建不起来、`TaskPatrol` transform 未注入 + 索引不递增 + 绕过 NavMeshAgent、基类消息方法被子类隐藏的静默失效 |
+| [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] | 手写 BT 的工程层三件套：**黑板**（`GetData` 沿父链查找 + `SetData` 用索引器而非 `Add` + 「null 值 vs key 不存在」三态 + 泛型黑板以类型为 key + **字符串 key 是编译期零保护**，写 `player` 读 `Target` 的实证）、**RUNNING 中断语义**（Sequence 遇 RUNNING 必须立刻 return，只 break switch 会让后续 Action 被误执行；记忆式 vs 响应式；顺序即优先级；**持续型动作必须自带让位条件否则兄弟分支饿死**）、**节点依赖注入**（Node 非 MonoBehaviour，Transform/NavMeshAgent 靠构造传入；**缺 OnEnter/OnExit 导致计时器跨切换残留**；动作叶依赖 `IDamageable` 而非具体类）。含 2026-10-22~23 实战 16 个 bug 的根因与修复：提前 return 让父链查找成死代码、`parent.parent` 硬编码深度、`static LayerMask` 恒为 0、`using UnityEditor` 混进运行时程序集、`Attach` 私有导致树建不起来、`SetUpTree` 缺 return 的 CS0161、`TaskPatrol`/`TaskGoToTarget` 绕过 NavMeshAgent、基类消息方法被子类隐藏的静默失效 |
 
 ### animation（3）
 
@@ -80,11 +80,12 @@ updated: 2026-10-22
 | --- | --- |
 | [[profiler自定义采样]] | Unity Profiler 自定义采样标记定位性能瓶颈 |
 
-### physics（3）
+### physics（4）
 
 | File | Summary |
 | --- | --- |
 | [[CharacterController移动 — Move vs SimpleMove]] | Move（位移/帧+手动重力）vs SimpleMove（速度/秒+自动重力）对比、斜坡 Slope Limit 与法线投影处理、选型建议 |
+| [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] | **agent 是位置的唯一所有者**：`updatePosition`/`updateRotation` 默认 true，每帧把内部位置与朝向写回 transform，任何 `transform.position = ...` 都在和它抢所有权（抽搐/回弹/穿墙/`remainingDistance` 与实际位置脱节）。正确姿势 `SetDestination` + `isStopped` + `speed`/`stoppingDistance`；**到达判定必须先判 `pathPending`**（否则 remainingDistance 无意义）+ `pathStatus == PathPartial` 失败分支；`LookAt` 与 `updateRotation` 只能活一个；合法瞬移用 `agent.Warp`；不用寻路（死亡/击飞）先 `enabled = false`。附行为树 `TaskGoToTarget` 双写实战的修复代码与十坑清单 |
 | [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本 Physics2D**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的四条排查清单、LayerMask 传层索引的坑、射线只该用于遮挡检测的成本判断、ContactFilter2D 与 queriesHitTriggers |
 | [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
 
@@ -241,4 +242,4 @@ updated: 2026-10-22
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 110 篇资源笔记（unity 53 / csharp 8 / algorithm 38 / archive 9 / meta 2）。算法区 38 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 111 篇资源笔记（unity 54 / csharp 8 / algorithm 38 / archive 9 / meta 2）。算法区 38 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。

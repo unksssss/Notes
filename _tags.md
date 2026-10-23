@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # Tags Index
@@ -147,6 +147,7 @@ updated: 2026-10-22
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
+- [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — agent 是位置的唯一所有者；只 SetDestination 不写 transform；pathPending 与到达判定；LookAt 与 updateRotation 只能活一个；Warp 合法瞬移
 
 ### 设计模式
 - [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事
@@ -159,11 +160,11 @@ updated: 2026-10-22
 ### AI
 - [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
 - [[巡逻保安AI — FSM与行为树的机制差异与选型]] — **FSM 与行为树六维差异**；Running 是记忆不是状态、打断来自 Reactive Selector、FSM 病根是状态两两耦合；巡逻保安选 FSM 的完整实现；换 BT 的四个信号 + 混用实践
-- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 手写 BT 工程三件套：黑板查找链与三态陷阱、Sequence 遇 RUNNING 必须立刻 return、节点依赖注入；实战 11 个 bug 根因与修复
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 手写 BT 工程三件套：黑板查找链与三态陷阱（含字符串 key 零保护）、Sequence 遇 RUNNING 必须立刻 return、持续型动作的让位条件、节点依赖注入与 OnEnter/OnExit；实战 16 个 bug 根因与修复
 
 ### 行为树
 - [[巡逻保安AI — FSM与行为树的机制差异与选型]] — Selector / Sequence / Condition 的语义与打断能力；BT 与 FSM 的选型判断（状态数 / 组合需求 / 谁维护 / 框架成本）
-- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 黑板（GetData 沿父链 / SetData 用索引器 / 三态问题）、Sequence 与 Selector 对 RUNNING 的不对称处理、顺序即优先级、Attach 可见性与 params 构造、节点生命周期与依赖注入
+- [[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]] — 黑板（GetData 沿父链 / SetData 用索引器 / 三态问题 / 常量类收口）、Sequence 与 Selector 对 RUNNING 的不对称处理、顺序即优先级、恒 RUNNING 饿死兄弟分支、Attach 可见性与 params 构造、节点生命周期与依赖注入
 
 ### 架构
 - [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
@@ -207,6 +208,7 @@ updated: 2026-10-22
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
 - [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
+- [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — updatePosition/updateRotation 双写冲突、pathPending 与 remainingDistance、stoppingDistance 到达判定、enabled=false vs isStopped、Warp 瞬移、十坑清单
 
 ### 数据驱动
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用
