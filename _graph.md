@@ -87,6 +87,9 @@ updated: 2026-10-22
 | [[完全二叉树]] | [[二叉平衡树AVL]] | related |
 | [[完全二叉树]] | [[DFS与BFS遍历算法]] | related |
 | [[用vector实现栈]] | [[栈与队列的相互实现]] | related |
+| [[栈的输出序列种数]] | [[栈与队列的相互实现]] | related |
+| [[栈的输出序列种数]] | [[动态规划入门]] | related |
+| [[栈的输出序列种数]] | [[完全二叉树]] | related |
 | [[用vector实现栈]] | [[哈希表冲突解决与Dictionary底层]] | related |
 | [[用vector实现栈]] | [[完全二叉树]] | related |
 | [[判断完全二叉树]] | [[完全二叉树]] | related |
