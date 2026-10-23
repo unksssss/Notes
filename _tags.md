@@ -117,6 +117,7 @@ updated: 2026-10-22
 - [[动态规划入门]] — 最优子结构/重叠子问题、三板斧套路、爬楼梯变体
 - [[滑动窗口的最大值]] — 双端单调队列存下标；队尾弹掉 <= 新元素的、队首弹掉过期的；O(n)/O(k)（剑指 59-I）
 - [[ACM模式输入输出]] — 三层结构（IO 壳/算法/输出）；五种输入形态；cin>> 后接 getline 会读空串导致整组错位
+- [[字符串变形]] — 单词反序 + 大小写反转；★ 初版 `i > 0` 漏 s[0]；最优是整体反转 + 逐词反转 O(1) 空间（BM83）
 - [[二分查找]] — 原理、比较次数推导、O(log n)、C# BinarySearch
 - [[贪心算法入门]] — 局部最优、找零钱翻车案例、贪心 vs DP 分界
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -338,18 +339,19 @@ updated: 2026-10-22
 - [[重建二叉树]] — 手搓四参区间递归 `build(pre,pl,pr,vin,il,ir)`；`pl > pr` 判空
 - [[滑动窗口的最大值]] — 手搓 `deque<int>` 存下标；三行核心：弹尾 / push_back / 弹头；下标比较代替值比较
 - [[ACM模式输入输出]] — 手写 main：ios 提速 / 多组 T / while(cin>>n) 读到 EOF / getline + istringstream 解析；endl 会 flush 致 TLE
+- [[字符串变形]] — 原地 `reverse(begin, begin+n)` + 逐词 `reverse`；`toupper((unsigned char)c)` 防 UTF-8 负值 UB
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
 | unity | 38 |
-| 算法 | 32 |
+| 算法 | 33 |
 | 性能优化 | 10 |
 | unity面试 | 15 |
 | 数据结构 | 31 |
 | 二叉树 | 17 |
-| cpp | 21 |
+| cpp | 22 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
