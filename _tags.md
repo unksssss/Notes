@@ -344,6 +344,7 @@ updated: 2026-10-22
 - [[字符串变形]] — 原地 `reverse(begin, begin+n)` + 逐词 `reverse`；`toupper((unsigned char)c)` 防 UTF-8 负值 UB
 - [[最长公共前缀]] — 手写纵向扫描；`strs[0].substr(0, j)` 的第二参是长度；`size()` 与 `int` 比较要强转
 - [[验证IP地址]] — 手写 split + 逐段校验；`v = v*10 + (c-'0')` 不是 `+=`；`isdigit((unsigned char)c)`
+- [[进制转换]] — `v = v*base + digit(c)`；`0x` 前缀先剥掉不要循环跳过；`stoi(…,16)` 认前缀但 FFFFFFFF 会 out_of_range；`cout << hex` 粘性要 `dec` 关
 
 ## Stats
 
@@ -355,7 +356,7 @@ updated: 2026-10-22
 | unity面试 | 15 |
 | 数据结构 | 31 |
 | 二叉树 | 17 |
-| cpp | 24 |
+| cpp | 25 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |

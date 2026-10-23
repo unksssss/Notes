@@ -127,6 +127,9 @@ updated: 2026-10-22
 | [[字符串变形]] | [[KMP字符串匹配]] | related |
 | [[最长公共前缀]] | [[字符串变形]] | related |
 | [[验证IP地址]] | [[字符串变形]] | related |
+| [[进制转换]] | [[验证IP地址]] | related |
+| [[进制转换]] | [[ACM模式输入输出]] | related |
+| [[进制转换]] | [[哈希表冲突解决与Dictionary底层]] | related |
 | [[验证IP地址]] | [[最长公共前缀]] | related |
 | [[验证IP地址]] | [[ACM模式输入输出]] | related |
 | [[最长公共前缀]] | [[KMP字符串匹配]] | related |
