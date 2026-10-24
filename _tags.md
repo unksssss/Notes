@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # Tags Index
@@ -29,6 +29,7 @@ updated: 2026-10-23
 
 ### unity
 - [[dots详解]] — Unity DOTS (ECS + Jobs + Burst) 完整讲解
+- [[平面反射 — 镜像相机、斜投影裁剪与反射贴图采样]] — Built-in 平面反射五步链路与十坑
 - [[Unity 序列化机制]] — Unity 序列化器范围/限制、6.6 原生 Dictionary 序列化
 - [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事
 - [[UI-逻辑-数据分层与事件驱动]] — UI/逻辑/数据三层 + 事件驱动（TaskStateManager 范式）
@@ -223,6 +224,10 @@ updated: 2026-10-23
 - [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件、破批十大元凶、Overdraw 与诊断
 - [[Unity 渲染批处理体系]] — SRP Batcher / GPU Instancing / 静态动态合批
 - [[URP 卡通描边 — 法线外扩与 ZOffset]] — 两 Pass 描边：法线外扩 + Cull Front、屏幕恒定线宽补偿、ZOffset 治脸部脏描边
+- [[平面反射 — 镜像相机、斜投影裁剪与反射贴图采样]] — 镜像相机 + 斜投影裁剪 + GL.invertCulling + 屏幕空间采样；三方案边界与十坑
+
+### 平面反射
+- [[平面反射 — 镜像相机、斜投影裁剪与反射贴图采样]] — 镜像矩阵、`CalculateObliqueMatrix`、绕序翻转、RT/镜像相机生命周期
 
 ### 网络
 - [[TCP 与 UDP 的区别与游戏选型]] — 面向连接/可靠/字节流 vs 无连接/不可靠/数据报；游戏选型与自研可靠 UDP
@@ -355,7 +360,7 @@ updated: 2026-10-23
 
 | Tag | Count |
 |-----|-------|
-| unity | 38 |
+| unity | 39 |
 | 算法 | 36 |
 | 性能优化 | 10 |
 | unity面试 | 15 |
@@ -374,8 +379,9 @@ updated: 2026-10-23
 | 网络同步 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
-| 渲染 | 5 |
+| 渲染 | 6 |
 | 描边 | 1 |
+| 平面反射 | 1 |
 | 协程 | 1 |
 | 异步 | 1 |
 | 对象池 | 1 |

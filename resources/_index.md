@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # Resources
@@ -89,10 +89,11 @@ updated: 2026-10-23
 | [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本 Physics2D**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的四条排查清单、LayerMask 传层索引的坑、射线只该用于遮挡检测的成本判断、ContactFilter2D 与 queriesHitTriggers |
 | [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
 
-### rendering（4）
+### rendering（5）
 
 | File | Summary |
 | --- | --- |
+| [[平面反射 — 镜像相机、斜投影裁剪与反射贴图采样]] | Built-in 管线平面反射五步链路：镜像相机 + **镜像矩阵**（`I - 2nnᵀ`，乘在 view 矩阵左）× **斜投影裁剪**（`CalculateObliqueMatrix` 把近裁剪面扭到镜面，否则倒影里出现地板背面；`clipPlaneOffset` 防镜面自反射递归；正交投影下必退化）→ **`GL.invertCulling` 翻绕序**（镜像行列式为负，必须 try/finally 复位，否则主画面也里外翻）→ **屏幕空间采样**（`ComputeScreenPos` 必须除 w）。含三方案边界（Probe 照不出角色 / SSR 反射不到屏幕外 / Planar DrawCall 翻倍）、RT 与镜像相机生命周期（`[ExecuteAlways]` 下 `Destroy` vs `DestroyImmediate`）、`Screen position out of view frustum` 根因（SceneView 正交相机触发 `OnWillRenderObject`）、10 条坑清单、移植 URP 的 CommandBuffer 对照 |
 | [[URP 卡通描边 — 法线外扩与 ZOffset]] | 两 Pass 描边法（Cull Front + 沿法线外扩）：屏幕恒定线宽的「视空间 Z × FOV」补偿（FOV 由 `unity_CameraProjection._m11` 反解）、ZOffset 只改 `positionCS.z` 治脸部脏描边（透视走投影矩阵 z 行重算）、顶点采样必须 `tex2Dlod`；五 Pass 分工、描边要写深度、硬边破面等六坑、与屏幕后处理 Sobel 取舍 |
 | [[ParticleSystem详解]] | Unity ParticleSystem 全部模块属性详解，按开发频率排序，附常见参数调优方案。 |
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
@@ -242,4 +243,4 @@ updated: 2026-10-23
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 111 篇资源笔记（unity 54 / csharp 8 / algorithm 38 / archive 9 / meta 2）。算法区 38 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 112 篇资源笔记（unity 55 / csharp 8 / algorithm 38 / archive 9 / meta 2）。算法区 38 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
