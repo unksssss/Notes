@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-22
+updated: 2026-10-26
 ---
 
 # Knowledge Graph
@@ -151,6 +151,8 @@ updated: 2026-10-22
 | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | [[有限状态机FSM — 手写实现与状态切换边界]] | extends |
 | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | [[Physics Raycast 与 NonAlloc]] | related |
 | [[有限状态机FSM — 手写实现与状态切换边界]] | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | related |
+| [[Socket 通讯与心跳重连机制]] | [[TCP 与 UDP 的区别与游戏选型]] | related |
+| [[Socket 通讯与心跳重连机制]] | [[可靠 UDP 与 KCP 原理]] | related |
 
 ## Suggested Links
 

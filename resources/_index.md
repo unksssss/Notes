@@ -67,12 +67,13 @@ updated: 2026-10-26
 | [[Unity Input System 使用指南]] | Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。 |
 | [[unity-inputsystem详解]] | 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用 |
 
-### network（2）
+### network（3）
 
 | File | Summary |
 | --- | --- |
 | [[TCP 与 UDP 的区别与游戏选型]] | TCP vs UDP 十维度对比表；**字节流 vs 数据报**的边界差异（收发次数不对应 / 读不完时续读 vs 截断 / 粘包归属与三种划界方案）；**队头阻塞**是实时游戏弃用 TCP 的核心原因（位置数据有时效性，宁可丢包也不等重传）；Nagle 算法坑与 `NoDelay`；业界方案 UDP + 自研可靠（KCP/ENet/UTP） |
 | [[可靠 UDP 与 KCP 原理]] | **可靠 UDP = 把序列号 / ACK / 重传 / 滑动窗口搬到用户态重做**（TCP 那套在内核里改不动）；附 **RTT / RTO / SRTT / RTTVAR / MSS / MTU / BDP 术语速查**；**四个机制逐个拆解**：一次丢包完整走查、TCP 字节序号 vs 包序号、累积确认 vs 位图确认、超时重传 vs 快速重传（阈值为何是 3）、`min(rwnd, cwnd)` 与流量控制·拥塞控制分工；**RTO 是算出来的**（Karn 算法 + Jacobson 公式 + 退避 ×2 vs ×1.5）、BDP 与吞吐上限公式、`MSS = MTU − 首部`；KCP 比 TCP 快在哪 = 用带宽换延迟；**选择性可靠**——指令类走可靠通道、状态类走不可靠通道；附自测六问 |
+| [[Socket 通讯与心跳重连机制]] | Socket 两端 API 顺序（**`Accept` 返回新 socket**，监听 socket 是前台、新 socket 是服务员）；三次握手与 API 对应 + `backlog` 溢出；**半开连接**与 TCP KeepAlive 四个不够用的理由（默认 2 小时 / 只在空闲发 / 应用层不可见 / NAT 可能先回收）；心跳 Ping-Pong 设计与参数（间隔 3~10s、超时 2~3 倍、**间隔必须小于 NAT 表项超时**）；重连 = 指数退避 + 抖动 + 上限，且重连后要重新鉴权/恢复会话/拉全量快照；Unity 三坑（切后台停心跳、`System.Threading.Timer` 线程、心跳包零分配）；附「自己项目没做心跳」的面试话术 |
 
 ### performance（1）
 
@@ -244,4 +245,4 @@ updated: 2026-10-26
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 113 篇资源笔记（unity 55 / csharp 8 / algorithm 39 / archive 9 / meta 2）。算法区 39 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 114 篇资源笔记（unity 56 / csharp 8 / algorithm 39 / archive 9 / meta 2）。算法区 39 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
