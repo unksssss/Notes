@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-26
+updated: 2026-10-27
 ---
 
 # Resources
@@ -144,6 +144,14 @@ updated: 2026-10-26
 | [[C# IL 中间语言与编译执行模型]] | IL/CIL = .NET 通用中间语言：两段论（csc 编译一次、JIT/AOT 各自翻译）；栈机模型（ldarg 压栈/add 弹栈/ret）；box/newobj/隐藏类指令 ↔ 装箱/闭包/协程状态机；Unity 四条消费路线 Mono/IL2CPP/CoreCLR/HybridCLR |
 | [[委托与事件]] | delegate = 类型安全的函数指针 + target（实例方法隐式持 `this`）→ 多播委托链按序执行、异常截断、`-=` 只移除一个；**event = 编译器对 delegate 字段的封装**（私有字段 + add/remove 访问器，外部只能 `+=`/`-=`，不能赋 null 覆盖、不能 Invoke）→ 为什么需要它；与 UnityEvent 取舍；订阅不取消 = GC 泄漏，静态事件最危险 |
 
+## 操作系统（1）
+
+> 面向客户端面试的最小集：只覆盖「会被问到的那几个点」，不做教材式铺开。
+
+| File | Summary |
+| --- | --- |
+| [[进程与线程 — 基本概念与关系]] | 进程 = 资源分配单位（独立地址空间）、线程 = CPU 调度单位（共享地址空间）；**共享代码段/数据段/堆、独享栈/寄存器/TID**（「栈是私有的，堆是大家的」）；四个关系要点——线程是轻量级进程、一个线程崩会带走整个进程（Chrome 多进程 vs Unity 单进程）、共享内存=通信免费但要锁（`count++` 非原子）、切换开销差在换页表与 TLB；IPC vs 线程通信；进程/线程/协程三层对比；Unity 主线程-子线程-回主线程映射；线程池与线程数经验值 |
+
 ## 算法与数据结构（39）
 
 > 分区导航：[[algorithm/_index|算法区导航]] —— 本区已按 **6 个子目录物理分类**（目录即分类），附建议刷题顺序。
@@ -245,4 +253,4 @@ updated: 2026-10-26
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 114 篇资源笔记（unity 56 / csharp 8 / algorithm 39 / archive 9 / meta 2）。算法区 39 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 115 篇资源笔记（unity 56 / os 1 / csharp 8 / algorithm 39 / archive 9 / meta 2）。算法区 39 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
