@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-27
+updated: 2026-10-28
 ---
 
 # Tags Index
@@ -293,6 +293,9 @@ updated: 2026-10-27
 - [[UGUI 拖拽实现与拖放检测]] — UI 拖拽无 Collider、Kinematic vs Static 不触发、手动 Query 兜底
 - [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
 
+### 命中判定
+- [[魂类命中判定 — 动画窗口与多段去重]] — 动画驱动的判定窗口、HashSet 去重与连段重置、部位倍率与削韧、i-frame 曲线驱动、顿帧必须 Realtime
+
 ### DrawCall
 - [[UGUI DrawCall 与性能优化]] — UGUI 合批五条件与破批十大元凶
 - [[字体与文本合批]] — 字体/文本侧的合批条件与 fallback 拆 submesh
@@ -393,6 +396,7 @@ updated: 2026-10-27
 | 心跳与重连 | 1 |
 | 操作系统 | 1 |
 | 进程与线程 | 1 |
+| 命中判定 | 1 |
 | 工业仿真 | 1 |
 | URP | 1 |
 | 渲染 | 6 |

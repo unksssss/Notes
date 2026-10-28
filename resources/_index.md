@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-27
+updated: 2026-10-28
 ---
 
 # Resources
@@ -82,7 +82,7 @@ updated: 2026-10-27
 | --- | --- |
 | [[profiler自定义采样]] | Unity Profiler 自定义采样标记定位性能瓶颈 |
 
-### physics（4）
+### physics（5）
 
 | File | Summary |
 | --- | --- |
@@ -90,6 +90,7 @@ updated: 2026-10-27
 | [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] | **agent 是位置的唯一所有者**：`updatePosition`/`updateRotation` 默认 true，每帧把内部位置与朝向写回 transform，任何 `transform.position = ...` 都在和它抢所有权（抽搐/回弹/穿墙/`remainingDistance` 与实际位置脱节）。正确姿势 `SetDestination` + `isStopped` + `speed`/`stoppingDistance`；**到达判定必须先判 `pathPending`**（否则 remainingDistance 无意义）+ `pathStatus == PathPartial` 失败分支；`LookAt` 与 `updateRotation` 只能活一个；合法瞬移用 `agent.Warp`；不用寻路（死亡/击飞）先 `enabled = false`。附行为树 `TaskGoToTarget` 双写实战的修复代码与十坑清单 |
 | [[Physics Raycast 与 NonAlloc]] | Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本 Physics2D**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的四条排查清单、LayerMask 传层索引的坑、射线只该用于遮挡检测的成本判断、ContactFilter2D 与 queriesHitTriggers |
 | [[Rigidbody 睡眠与 Trigger Collider]] | 睡眠机制（低于 SleepThreshold + 无外力 → 停模拟省 CPU；传送不自动唤醒用 MovePosition/WakeUp）；Trigger 只重叠检测走 OnTrigger、开销低，触发同样需至少一方有刚体（Day 36 面经） |
+| [[魂类命中判定 — 动画窗口与多段去重]] | 魂类判定 = **动画驱动的时间窗口 + 逐帧碰撞 + 一次攻击只结算一次**；前摇/窗口/后摇三段的设计意图（读招与攻击代价）；三种判定形状取舍（骨骼挂 collider / Overlap 快照 / 扫掠）；`HashSet.Add` 返回 false 即已命中、**连段必须按段重置**；部位倍率与削韧（poise）驱动战斗节奏；i-frame 用 AnimationCurve 而非硬编码；**顿帧必须用 `WaitForSecondsRealtime`**；联机刻意不做延迟补偿 |
 
 ### rendering（5）
 
@@ -255,4 +256,4 @@ updated: 2026-10-27
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 116 篇资源笔记（unity 56 / os 1 / csharp 8 / algorithm 40 / archive 9 / meta 2）。算法区 40 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 117 篇资源笔记（unity 57 / os 1 / csharp 8 / algorithm 40 / archive 9 / meta 2）。算法区 40 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
