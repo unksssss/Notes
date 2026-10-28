@@ -65,7 +65,7 @@ updated: 2026-10-28
 
 | File | Summary |
 | --- | --- |
-| [[Unity Input System 使用指南]] | Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。 |
+| [[Unity Input System 使用指南]] | Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入；**Value action 的 performed/canceled 触发语义**（performed 只在「default → 非 default」时触发一次，非零区间内换向不再触发）与「Button 用回调 / Value 用轮询」取舍，含「只订 performed → 松手不归零」实战故障与多输入源 `isJoyStickControl` 死锁（2026-10-28 补强） |
 | [[unity-inputsystem详解]] | 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用 |
 
 ### network（3）

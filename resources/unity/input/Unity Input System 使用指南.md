@@ -6,11 +6,11 @@ tags:
   - 输入
   - XR
 created: 2026-06-17
-updated: 2026-06-17
+updated: 2026-10-28
 status: active
-summary: Unity 新版 Input System 完整使用指南，从安装、创建Action、绑定按键到代码读取输入。
+summary: Unity 新版 Input System 完整使用指南：安装、创建 Action、绑定按键、三种读取方式；含 Value action 的 performed/canceled 触发语义与「回调 vs 轮询」取舍（实战踩坑：键盘松手不归零）。
 source: ""
-related: ["[[unity-inputsystem详解]]"]
+related: ["[[unity-inputsystem详解]]", "[[UGUI 事件系统与射线检测链路]]"]
 ---
 
 # Unity Input System 使用指南
@@ -162,6 +162,76 @@ GameObject 挂 PlayerInput 组件:
 | **Value** | 持续读取值 | 摇杆 XY、鼠标位置 |
 | **Button** | 按键按下/松开 | pressed、wasPressed、wasReleased |
 | **Pass Through** | 原样穿透 | 不处理，直接传给下一级 |
+
+---
+
+## Value Action 的回调语义（最容易踩的坑）
+
+上面「方式二：事件回调」的相位表是按 **Button** 写的。同一个 `performed`，落在 **Value** action 上语义完全不同：
+
+| Action Type | `performed` 何时触发 | `canceled` 何时触发 |
+| --- | --- | --- |
+| **Button** | 按下（越过 press point） | 松开 |
+| **Value** | 值**从 `default` 变为非 default** 时，**只触发一次** | 值**回到 default** 时触发一次 |
+| **PassThrough** | 值每帧变化都触发 | 值回到 default |
+
+关键在第二行：Value action 在**非零区间内改值不会再触发 `performed`**。WASD 从 A 换到 D、从 W 加按 A（斜向），都只是「非零 → 另一个非零」，回调不会再来一次。
+
+### 典型故障：只订 performed，松手后值不归零
+
+```cs
+// ❌ 只订一半相位
+input.Player.Move.performed += OnKeyboardMove;
+
+void OnKeyboardMove(InputAction.CallbackContext ctx)
+{
+    moveDirection = ctx.ReadValue<Vector2>();   // 松手后再也没人来改这个字段
+}
+```
+
+表现：按下能走、换向失灵、**松手后角色继续朝最后方向滑**。`moveDirection` 永远停在最后一次非零值上。
+
+```cs
+// ✅ 补上 canceled
+input.Player.Move.performed += OnKeyboardMove;
+input.Player.Move.canceled  += OnKeyboardMove;
+
+void OnKeyboardMove(InputAction.CallbackContext ctx)
+{
+    // canceled 相位下 ReadValue 会返回 default，但显式写更不容易被后人改坏
+    moveDirection = ctx.canceled ? Vector2.zero : ctx.ReadValue<Vector2>();
+}
+```
+
+### 更推荐：Value action 直接轮询
+
+```cs
+void Update()
+{
+    Vector2 move = input.Player.Move.ReadValue<Vector2>();   // 每帧现读，天然归零
+    ...
+}
+```
+
+轮询不需要关心相位语义：松手那一帧读到的就是 `(0,0)`，换向那一帧读到新值，不存在「漏触发」。**心智模型：Button 用回调（关心边沿），Value 用轮询（关心当前状态）。**
+
+> 补充：`initialStateCheck: true` 的 Value action 在 action 被 Enable 时就会立刻发一次 `performed`（如果当前已有非零值），这也是为什么「只订 performed」在编辑器里偶尔看起来是对的——按住键再进 Play，第一次能对上。
+
+### 相关坑：多输入源共用一个方向字段
+
+键盘和虚拟摇杆同时写 `moveDirection` 时，常见写法是加一个 `isJoyStickControl` 标志。标志的**置位条件**必须是「值是否为零」，而不是「谁调用了回调」：
+
+```cs
+// ❌ 摇杆松手（value 为零）也会进摇杆模式，之后键盘分支全被跳过
+void OnJoyStick(Vector2 value) { isJoyStickControl = true; ... }
+
+// ✅ 松手即退出摇杆模式
+void OnJoyStick(Vector2 value) { isJoyStickControl = value != Vector2.zero; ... }
+```
+
+否则会形成死锁：置 `true` 在前、复位在后，而复位所在的分支本身又被 `true` 挡住 → 第一次按键无效。
+
+📎 相关：[[UGUI 事件系统与射线检测链路]]
 
 ---
 
