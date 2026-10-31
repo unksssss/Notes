@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-28
+updated: 2026-10-31
 ---
 
 # Resources
@@ -145,6 +145,7 @@ updated: 2026-10-28
 | [[内存管理方案对比]] | 各大语言内存管理策略对比：完全手动 → 编译期静态分析 → ARC → 追踪式 GC → 引用计数+GC |
 | [[C# IL 中间语言与编译执行模型]] | IL/CIL = .NET 通用中间语言：两段论（csc 编译一次、JIT/AOT 各自翻译）；栈机模型（ldarg 压栈/add 弹栈/ret）；box/newobj/隐藏类指令 ↔ 装箱/闭包/协程状态机；Unity 四条消费路线 Mono/IL2CPP/CoreCLR/HybridCLR |
 | [[委托与事件]] | delegate = 类型安全的函数指针 + target（实例方法隐式持 `this`）→ 多播委托链按序执行、异常截断、`-=` 只移除一个；**event = 编译器对 delegate 字段的封装**（私有字段 + add/remove 访问器，外部只能 `+=`/`-=`，不能赋 null 覆盖、不能 Invoke）→ 为什么需要它；与 UnityEvent 取舍；订阅不取消 = GC 泄漏，静态事件最危险 |
+| [[事件总线实现 — 订阅令牌与发布期快照]] | 手写事件总线：Subscribe 返回 token / Unsubscribe 返回 bool / Publish 同步广播。四个关键决策——**发布前锁定 count** 使新增订阅下次生效（省掉 ToArray 分配）、**取消只标记 IsActive 不 RemoveAt**（否则索引错位）、墓碑只在非发布期压缩、订阅者异常隔离并上抛 OnSubscriberException。含嵌套发布的深度计数、token 用 struct 避免分配、重复取消返回 false |
 
 ## 操作系统（1）
 
@@ -256,4 +257,4 @@ updated: 2026-10-28
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 117 篇资源笔记（unity 57 / os 1 / csharp 8 / algorithm 40 / archive 9 / meta 2）。算法区 40 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 118 篇资源笔记（unity 57 / os 1 / csharp 9 / algorithm 40 / archive 9 / meta 2）。算法区 40 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。

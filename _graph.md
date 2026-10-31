@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-28
+updated: 2026-10-31
 ---
 
 # Knowledge Graph
@@ -159,6 +159,9 @@ updated: 2026-10-28
 | [[魂类命中判定 — 动画窗口与多段去重]] | [[Physics Raycast 与 NonAlloc]] | related |
 | [[魂类命中判定 — 动画窗口与多段去重]] | [[Rigidbody 睡眠与 Trigger Collider]] | related |
 | [[魂类命中判定 — 动画窗口与多段去重]] | [[巡逻保安AI — FSM与行为树的机制差异与选型]] | related |
+| [[事件总线实现 — 订阅令牌与发布期快照]] | [[委托与事件]] | related |
+| [[事件总线实现 — 订阅令牌与发布期快照]] | [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | related |
+| [[事件总线实现 — 订阅令牌与发布期快照]] | [[UI-逻辑-数据分层与事件驱动]] | related |
 
 ## Suggested Links
 
