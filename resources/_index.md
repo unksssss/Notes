@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-10-31
+updated: 2026-11-01
 ---
 
 # Resources
@@ -259,4 +259,4 @@ updated: 2026-10-31
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 120 篇资源笔记（unity 57 / os 1 / csharp 9 / algorithm 42 / archive 9 / meta 2）。算法区 42 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 121 篇资源笔记（unity 58 / os 1 / csharp 9 / algorithm 42 / archive 9 / meta 2）。算法区 42 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
