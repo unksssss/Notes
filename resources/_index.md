@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: 2026-11-01
+updated: 2026-11-02
 ---
 
 # Resources
@@ -21,7 +21,7 @@ updated: 2026-11-01
 
 | File | Summary |
 | --- | --- |
-| [[Animator参数与性能优化]] | Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效；状态机过渡期间状态归属 + Has Exit Time（Day 36 面经） |
+| [[Animator参数与性能优化]] | Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效；状态机过渡期间状态归属 + Has Exit Time（Day 36 面经）；**参数名与 Controller 逐字核对法**（`.controller` 抽参脚本 + `m_Type` 编号表 1=Float/3=Int/4=Bool/9=Trigger）、**互斥布尔用 `!` 取反造出非法状态**（Run/Crouch/Idle 是三态，两布尔只有 4 组合必有 1 个非法）、**动画 Float 量纲不要与移动速度耦合**（BlendTree 阈值 -1~1，塞 6.0 永远饱和）（2026-11-02 补强） |
 | [[DOTween与协程选型]] | 协程（状态机/流程控制）vs DOTween（时间轴补间/可中断可控），选择口诀：'动'用 DOTween、'流程'用协程，可混用 |
 | [[dotween详解]] | Unity DOTween 动画补间库完整指南：基本用法、回调系统、Sequence序列、生命週期控制、常用模式与性能注意事项 |
 
@@ -102,7 +102,7 @@ updated: 2026-11-01
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（10）
+### scripting（11）
 
 | File | Summary |
 | --- | --- |
@@ -116,6 +116,7 @@ updated: 2026-11-01
 | [[Unity线程模型 — 子线程为什么不能碰Transform]] | Unity API 线程不安全的底层真相：渲染帧首快照 Transform 给 GPU、子线程写入=数据竞争→偶发错位；帧内数据静止；Job 算数据主线程提交（真实面经） |
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 | [[YooAssets 热更新流程 — HybridCLR 实战]] | **学习项目实战**（`E:\unityproject\HybirdCLR`）：YooAssets 多包设计 + 三档运行模式（EditorSimulate/OfflinePlay/HostPlay）+ 八步链路（Initialize → CreatePackage → 文件系统与下载参数 → 请求版本 → 加载清单 → 差异下载 → LoadAssetAsync<TextAsset> → Assembly.Load + 反射调用 → Release）；DLL 为何改名 `.bytes`；自定义 IRemoteService 的多 CDN 容灾；**YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证**：产物三份（CDN/OutputCache/Simulate）+ `.report` 配置项语义（EnableSharePackRule / SingleReferencedPackAlone / FileNameStyle / CompressOption）+ ErrorCode201·601 警告 + buildlogtep 耗时拆解 + 补丁 FSM 八节点 + 四档 PlayMode 初始化参数 + 包版本号 vs URL 版本目录；**补丁 FSM 各节点实现细节**（ResourceDownloaderOptions(10,3) 参数语义 / `yield return downloader` = Operation 实现 IEnumerator / ClearCacheMethods 两枚举与清理时机）；**HostPlayMode 首次跑通的两个独立坑**（`BundledCopyOption` 默认 `None` → 缺 hash/BuiltinCatalog 导致初始化 404；打包后未同步 CDN → 内置 994 vs 远端 988 版本错位）+「hash → bytes → version 对齐」三层排查法（2026-10-13 · 2026-10-14 · 2026-10-17 补强） |
+| [[配置表读取 — Excel 导表、三行表头与反射映射]] | 配表三段链路（策划 Excel → 中间格式 → 运行时解析）；**三行表头**（字段名 / 类型 / 中文注释）必须跳过，且同一字段在前两行是 string、数据行才是 int；**Excel 的 SpreadsheetML 不是通用 XML**（字段名在 `<Data>` 文本里而非元素名、根下挂元数据、表格在 `Worksheet/Table/Row` 四层深）；**XmlDocument 五坑**——`FirstChild` 是 XmlDeclaration 导致静默返回空 List（该用 `DocumentElement`）、`GetFields()` 拿不到 `{get;set;}` 属性（该用 `GetProperties`）、`SetValue` 不做类型转换需 `Convert.ChangeType`（enum 单独 `Enum.Parse`）、`List.Add` 放内层导致数据 ×N、`Load(path)` 只在 Editor 成立（Android 是 jar 内路径，必须 `UnityWebRequest` + `LoadXml`）；**JsonUtility 五条硬限制**（顶层须对象 / 无 Dictionary / 类型严格 / 字段名逐字 / 只序列化 public 字段）；**反射按名逐字匹配**，`Bulletname` vs `BulletName` 静默失败 → 正解是导表时生成 C# 常量或二进制 Reader，运行时零反射；附九项校验清单（2026-11-02 `Empty` 项目实战） |
 
 ### ui（11）
 
@@ -259,4 +260,4 @@ updated: 2026-11-01
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 121 篇资源笔记（unity 58 / os 1 / csharp 9 / algorithm 42 / archive 9 / meta 2）。算法区 42 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 122 篇资源笔记（unity 59 / os 1 / csharp 9 / algorithm 42 / archive 9 / meta 2）。算法区 42 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。

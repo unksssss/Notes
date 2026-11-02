@@ -51,7 +51,7 @@ updated: 2026-10-31
 - [[struct 装箱陷阱与值类型原理]] — 值类型装箱拆箱机制与 GC 压力
 - [[Boehm GC 保守式垃圾回收原理]] — 保守式 GC 标记-清除、增量 GC
 - [[对象池 OnEnable OnDisable 最佳实践]] — 对象池激活/回收钩子最佳实践
-- [[Animator参数与性能优化]] — 参数四类型、Trigger vs Bool、StringToHash
+- [[Animator参数与性能优化]] — 参数四类型、Trigger vs Bool、StringToHash；参数名与 Controller 逐字核对、互斥布尔 ! 取反的非法状态、动画 Float 量纲
 - [[XR射线交互与World Space Canvas]] — 三件套配置与射线命中 UGUI
 - [[UGUI事件接口与EventTrigger]] — IPointerMoveHandler 不生效四大原因
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
@@ -215,9 +215,11 @@ updated: 2026-10-31
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
 - [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
 - [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — updatePosition/updateRotation 双写冲突、pathPending 与 remainingDistance、stoppingDistance 到达判定、enabled=false vs isStopped、Warp 瞬移、十坑清单
+- [[配置表读取 — Excel 导表、三行表头与反射映射]] — 三行表头跳过、SpreadsheetML 结构、XmlDocument 五坑、JsonUtility 五限制、反射逐字匹配
 
 ### 数据驱动
 - [[scriptableobject数据驱动设计]] — 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用
+- [[配置表读取 — Excel 导表、三行表头与反射映射]] — Excel → 中间格式 → 运行时反射映射的完整链路与九项校验清单
 
 ### 每日学习
 - [[unity知识点-2026-04-28]] — 今日学习：DOTS + 协程/UniTask + 对象池 + URP优化 + Profiler采样
