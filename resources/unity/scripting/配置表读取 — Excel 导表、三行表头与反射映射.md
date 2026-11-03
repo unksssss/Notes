@@ -3,9 +3,9 @@ title: "配置表读取 — Excel 导表、三行表头与反射映射"
 type: resource
 tags: [unity, 配置表, 反射, 数据驱动, 项目实战]
 created: "2026-11-02"
-updated: "2026-11-02"
+updated: "2026-11-03"
 status: active
-summary: "策划表 → 中间格式 → 运行时的完整链路；三行表头（类型/注释/数据）必须跳过；Excel 存的 SpreadsheetML 不是通用 XML；XmlDocument 五个必踩坑（FirstChild 是声明节点、GetFields 拿不到属性、SetValue 不做类型转换、Add 位置错、Load 路径只在 Editor 成立）；JsonUtility 三条硬限制；反射按名字逐字匹配，Bulletname vs BulletName 静默失败"
+summary: "策划表 → 中间格式 → 运行时的完整链路；三行表头（类型/注释/数据）必须跳过；Excel 存的 SpreadsheetML 不是通用 XML；XmlDocument 五个必踩坑（FirstChild 是声明节点、GetFields 拿不到属性、SetValue 不做类型转换、Add 位置错、Load 路径只在 Editor 成立）；JsonUtility 三条硬限制；JSON 路线 JsonParser<T>+JsonManager<T> 两层实现与 8 条边界；反射按名字逐字匹配，Bulletname vs BulletName 静默失败"
 ---
 
 # 配置表读取 — Excel 导表、三行表头与反射映射
@@ -254,6 +254,128 @@ public static class WeaponTable
 ```
 
 或者生成二进制 + 生成的 Reader 代码。**运行时零反射**——反射慢、裁剪（IL2CPP/AOT）下还可能被裁掉、字段改名编译期抓不到。反射只适合做**调试期工具**，不适合做正式数据管线。
+
+---
+
+## JSON 路线：`JsonParser<T>` + `JsonManager<T>` 索引层
+
+XML 走不通（五个坑见上）之后改的路线，实测一天跑通到 UI。分两层：**解析层**（JSON → `List<T>`）和**索引层**（`List<T>` → 按 ID 查）。
+
+### 解析层
+
+```cs
+public interface IJsonData { int GetID(); }
+
+public class JsonParser<T> where T : IJsonData, new()
+{
+    public static List<T> ParseTabel(string jsonPath)
+    {
+        string jsonText;
+        using (var sr = new System.IO.StreamReader(jsonPath))
+            jsonText = sr.ReadToEnd();
+
+        JObject root = JObject.Parse(jsonText);
+        JArray rows = root["Sheet1"] as JArray;
+        if (rows == null || rows.Count < 3)
+        {
+            Debug.LogError("[JsonPath]表结构异常,需要填充数据");
+            return null;                     // ← 报错必须中断
+        }
+
+        Type t = typeof(T);
+        var tLst = new List<T>();
+
+        for (int i = 2; i < rows.Count; i++)  // 跳过 2 行表头
+        {
+            T item = new T();
+            foreach (var cell in (JObject)rows[i])
+            {
+                PropertyInfo prop = t.GetProperty(cell.Key,
+                    BindingFlags.Public | BindingFlags.Instance);
+                if (prop == null || !prop.CanWrite)
+                {
+                    Debug.LogWarning($"[JsonPath]{t.Name}找不到属性{cell.Key}");
+                    continue;
+                }
+
+                object raw = ((JValue)cell.Value).Value;
+                object v = prop.PropertyType == typeof(string)
+                    ? raw?.ToString()
+                    : Convert.ChangeType(raw, prop.PropertyType);
+                prop.SetValue(item, v);
+            }
+            tLst.Add(item);                      // ← Add 在外层，一个对象一次
+        }
+        return tLst;
+    }
+}
+```
+
+### 为什么 JSON 路线只跳 2 行（不是 3 行）
+
+| xlsx 位置 | 内容 | 导出 JSON 后 |
+|---|---|---|
+| 第 1 行 | 字段名 `ID / WeaponName / …` | **变成对象 key**，不再占数组元素 |
+| 第 2 行 | 类型 `int / string / …` | `Sheet1[0]` |
+| 第 3 行 | 中文注释 `武器ID / …` | `Sheet1[1]` |
+| 第 4 行起 | 数据 `1001 / AK47 / …` | `Sheet1[2]` 起 |
+
+**「三行表头」跳 3 行、「两行表头」跳 2 行，取决于中间格式保不保留字段名行。** 这个数字跟导表格式绑死，别硬编码在循环头里 —— 提成常量或导表配置，换工具时只改一处。
+
+### 索引层（泛型基类）
+
+```cs
+public class JsonManager<T> where T : class, IJsonData, new()
+{
+    private readonly Dictionary<int, T> dict = new Dictionary<int, T>();
+
+    public JsonManager(string jsonPath)
+    {
+        foreach (var item in JsonParser<T>.ParseTabel(jsonPath))
+        {
+            if (dict.ContainsKey(item.GetID()))
+                Debug.LogError($"[JsonPath]重复 ID {item.GetID()}");   // 别静默覆盖
+            dict[item.GetID()] = item;
+        }
+    }
+
+    public T GetConfig(int id) => dict.TryGetValue(id, out var t) ? t : null;
+    public List<T> GetAllConfig() => new List<T>(dict.Values);
+}
+
+// 加一张新表 = 一行
+public class WeaponGunManager : JsonManager<WeaponConfig>
+{
+    public WeaponGunManager(string jsonPath) : base(jsonPath) { }
+}
+```
+
+泛型约束 `class, IJsonData, new()` 保证「有 ID、能 new」，读表逻辑与「表是哪张」彻底解耦。
+
+### JSON 路线的边界
+
+| 边界 | 说明 |
+|---|---|
+| **`Convert.ChangeType` 只吃 `IConvertible`** | `enum` / `Nullable<T>` / `List<T>` 全不支持，得单独分支 |
+| **`(JValue)value` 强转** | 值是数组或对象时抛 `InvalidCastException`，先判 `value.Type == JTokenType.Object` |
+| **`JObject.Parse` 要求根是对象** | 根是数组得用 `JArray.Parse` / `JToken.Parse` |
+| **JSON 有、类没有 → 只 LogWarning** | 静默跳过，加字段忘了加属性不崩，只是数据缺失 |
+| **类有、JSON 没有 → 保持 default** | `int` 静默变 0，比异常更难查 |
+| **`Dictionary` 遍历序不是契约** | 配表顺序有语义时另存 `List<T>` 保序 |
+| **`GetAllConfig()` 每次 new List** | 高频调用会成 GC 源，缓存成 `IReadOnlyList<T>` |
+| **报错后不 `return`** | `rows == null` 时 `LogError` 完继续跑，下一行 `rows.Count` 直接 NRE，把真正的错误信息盖掉 |
+
+### 路径：`StreamingAssets` 的唯一正确写法
+
+```cs
+// ✗ 绝对路径，换机器 / 打包必炸
+private string jsonPath = @"E:\unityproject\Empty\Assets\StreamingAssets\WeaponGun.json";
+
+// ✓
+string path = Path.Combine(Application.streamingAssetsPath, "WeaponGun.json");
+```
+
+**Android 例外**：`StreamingAssets` 被打进 apk（未压缩），是 `jar:file://` 路径，`StreamReader` / `File.ReadAllText` **读不到**，必须 `UnityWebRequest`（或用 Addressables 把配表打成 TextAsset）。桌面平台 `StreamReader` 可用。
 
 ---
 

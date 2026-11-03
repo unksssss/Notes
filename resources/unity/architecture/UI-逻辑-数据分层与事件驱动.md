@@ -3,9 +3,9 @@ title: "UI-逻辑-数据分层与事件驱动"
 type: resource
 tags: [架构, 设计模式, unity, 面试]
 created: "2026-09-08"
-updated: "2026-09-08"
+updated: "2026-11-03"
 status: active
-summary: "UI/逻辑/数据三层职责划分；状态变更走事件、UI 订阅刷新（TaskStateManager 实战范式）；对比脚本直接互相调用；优点（高内聚低耦合/谁改状态不知谁在听/纯逻辑可单测）+ 缺点（事件流难追踪/简单面板过度设计）（真实面经：零跑『了解 MVC 吗』）"
+summary: "UI/逻辑/数据三层职责划分；状态变更走事件、UI 订阅刷新（TaskStateManager 实战范式）；对比脚本直接互相调用；优点（高内聚低耦合/谁改状态不知谁在听/纯逻辑可单测）+ 缺点（事件流难追踪/简单面板过度设计）；实战两个静默失效点：out 标志位在循环里被覆盖导致事件不发、订阅不退订（真实面经：零跑『了解 MVC 吗』）"
 ---
 
 # UI-逻辑-数据分层与事件驱动
@@ -46,6 +46,69 @@ taskPanel.OnStateChanged += RefreshUI;
 1. **事件流难追踪**：断点地狱——不知道谁触发了状态、谁在响应（隐式控制流）
 2. **过度设计风险**：简单面板强上三层 + 事件总线 = 杀鸡用牛刀（YAGNI）
 3. **数据/逻辑合层后**职责边界要靠自律，容易悄悄长胖
+
+## 实战：事件「不发」的两个静默失效点
+
+分层本身不难，难的是**事件该发的时候没发**——不报错、不崩，只是 UI 不刷新。两个真实案例（`Empty` 武器拾取系统，2026-11-03）。
+
+### 坑 1：`out` 标志位在循环里被互相覆盖 ★最隐蔽
+
+需求：玩家周围 2 米内的武器列表变化时，发一次事件通知 UI。
+
+```cs
+// ✗ 错
+bool isAddChanged = false;
+for (int i = 0; i < AllWeaponItems.Count; i++)
+{
+    if (Vector3.Distance(...) < 2f)
+        AddAreaWeaponItems(AllWeaponItems[i], out isAddChanged);   // 每轮覆盖
+}
+if (isAddChanged) OnAreaWeaponChanged?.Invoke(AreaWeaponItems);
+```
+
+```cs
+private void AddAreaWeaponItems(WeaponItem item, out bool isChanged)
+{
+    if (!AreaWeaponItems.Contains(item)) { isChanged = true; AreaWeaponItems.Add(item); return; }
+    isChanged = false;
+}
+```
+
+**根因**：`out` 的语义是「每次调用都必须写一个值」，不是「只在变化时赋值」。循环 N 次，最终值 = **最后一次调用**的结果。
+
+- 第 1 把枪进范围（`true`）→ 第 2 把本来就在列表里（`false`）→ 最终 `false` → 事件不发
+- 只有「遍历顺序里最后一把恰好是新进入的」才碰巧正确 → **时序相关 bug**，本地测不出来，线上偶发
+
+**改法**：
+
+```cs
+// ✓ 返回 bool，调用方聚合
+private bool AddAreaWeaponItems(WeaponItem item)
+{
+    if (AreaWeaponItems.Contains(item)) return false;
+    AreaWeaponItems.Add(item);
+    return true;
+}
+
+isAddChanged |= AddAreaWeaponItems(AllAreaWeaponItems[i]);
+```
+
+或者干脆**去掉标志位**，变化了就直接发（列表量级小的时候，多发几次比藏 bug 划算）。
+
+> 通用规律：**「有没有变化」是聚合量，不能用 `out` 在循环里传递。** 同样的形状会出现在伤害飘字、buff 列表、任务追踪里。
+
+### 坑 2：订阅了不退订
+
+```cs
+private void Start() => FightingManager.Instance.OnAreaWeaponChanged += OnNewChange;
+// 没有 OnDestroy / OnDisable 里的 -=
+```
+
+场景重载后 `Instance` 换人、旧 UI 对象已被销毁，但委托链还挂着 → 下次事件触发时访问已销毁的 `Transform`，`MissingReferenceException`；同时旧对象被静态事件「钉住」，GC 收不掉。
+
+**规矩**：`+=` 和 `-=` 必须成对出现在同一屏代码里，写订阅的同时就把退订写上。更稳的做法是 📎 [[事件总线实现 — 订阅令牌与发布期快照]] 里的令牌（`IDisposable`）模式，让生命周期自己管。
+
+---
 
 ## 经验法则
 
