@@ -3,9 +3,9 @@ title: "Animator 参数类型与性能优化"
 type: resource
 tags: [unity, 动画, 性能, 项目实战]
 created: "2026-08-03"
-updated: "2026-11-02"
+updated: "2026-11-05"
 status: active
-summary: "Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效；参数名与 Controller 逐字核对法（.controller 抽参 + m_Type 编号表）、互斥布尔用 ! 取反的非法状态、动画 Float 量纲不要与移动速度耦合"
+summary: "Animator 参数四类型、Trigger vs Bool 区别、字符串参数哈希查找的性能坑、StringToHash 预计算 int 优化、HasParameter 防静默失效；参数名与 Controller 逐字核对法（.controller 抽参 + m_Type 编号表）、互斥布尔用 ! 取反的非法状态、动画 Float 量纲不要与移动速度耦合；动画曲线在 Update 之后 LateUpdate 之前写回 transform（代码控制要写 LateUpdate）、Write Defaults=true 时无曲线的属性也被重置"
 ---
 
 # Animator 参数类型与性能优化
@@ -140,8 +140,42 @@ animator.SetFloat(vertical, animBlend);
 
 另外多个输入源（键盘 / 摇杆）要**统一到同一个量纲**再喂动画：键盘用 `speed`（6）、摇杆用 `×4/×6`，两边对不上 → 换输入方式动画立刻跳变。
 
+## 动画曲线每帧写回 transform —— 运行时手拖无效的根因（2026-11-05 实证）
+
+**现象**：运行时在 Scene 视图拖 Animator 层级下的子物体（实测 `ik_hand_r` 骨骼），松手立刻弹回原位；代码在 `Update` 里改它的 `transform` 同样「看起来没生效」。
+
+**根因**：Animator 的求值时机是 **`Update` 之后、`LateUpdate` 之前**，每帧把动画曲线（位置/旋转/缩放）写回 `transform`：
+
+```text
+Update（手拖 / 你的代码改 transform）
+  → Animator 求值（曲线值覆盖 transform）   ← 你的改动在这里被抹掉
+  → LateUpdate
+```
+
+所以**代码想控制被动画驱动的属性，必须写 `LateUpdate`**（或 `OnAnimatorIK`，IK Pass 打开时在动画之后回调），写在 `Update` 里等于没写。
+
+| 场景 | 做法 |
+| --- | --- |
+| 只是编辑期调姿势 | 关掉 Animator；或用 Animation 窗口的 Preview 把姿势录进 clip |
+| 运行时要代码控制 | `LateUpdate` 里改；或 `OnAnimatorIK` |
+| 要自由摆姿势（举枪/换弹手部定位） | **Animation Rigging**：建独立 Target 物体（不挂动画曲线），用 IK 约束追它 —— 改 Target 而不是改骨骼 |
+
+**排查顺序**（别一上来就怀疑拾取）：
+
+1. 有没有 `Rigidbody` 且 `isKinematic = false`？→ 物理每帧覆盖 `transform`，这是第一嫌疑人（`AddComponent<Rigidbody>()` 默认就是非 kinematic）；
+2. 没有刚体，就看是不是 Animator 驱动的骨骼：`grep -r "骨骼名" Art/Animations/`，`.anim` 里带该路径即命中；
+3. 射线打不中，再看 `Collider` —— 运行时 `AddComponent<BoxCollider>()` 拿的是**组件默认值**（`size = 1×1×1`、中心在原点），长枪模型根本包不住。
+
+### 隐蔽坑：clip 里没有这条曲线，属性照样被重置
+
+那是 Layer 的 **Write Defaults = true**：没被任何曲线驱动的属性也会在求值结束时被**写回默认值**。表现为「我明明没做这条动画，骨骼却被拉回原位」，很容易误判成「动画里有曲线」。
+
+> 想保留某属性不被重置：把该 Layer 的 Write Defaults 设为 false（注意：false 时未被驱动的属性保持上一次的值，可能残留上一个状态的姿势，需要自己权衡）。
+
 ## 相关
 
 - [[协程原理与unitask]]
 - [[MonoBehaviour生命周期与SetActive的坑]]
 - [[Unity Input System 使用指南]]
+- [[Update-FixedUpdate-LateUpdate执行时机]]
+- [[Rigidbody 睡眠与 Trigger Collider]]
