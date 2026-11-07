@@ -148,6 +148,7 @@ updated: 2026-11-02
 | [[委托与事件]] | delegate = 类型安全的函数指针 + target（实例方法隐式持 `this`）→ 多播委托链按序执行、异常截断、`-=` 只移除一个；**event = 编译器对 delegate 字段的封装**（私有字段 + add/remove 访问器，外部只能 `+=`/`-=`，不能赋 null 覆盖、不能 Invoke）→ 为什么需要它；与 UnityEvent 取舍；订阅不取消 = GC 泄漏，静态事件最危险 |
 | [[事件总线实现 — 订阅令牌与发布期快照]] | 手写事件总线：Subscribe 返回 token / Unsubscribe 返回 bool / Publish 同步广播。四个关键决策——**发布前锁定 count** 使新增订阅下次生效（省掉 ToArray 分配）、**取消只标记 IsActive 不 RemoveAt**（否则索引错位）、墓碑只在非发布期压缩、订阅者异常隔离并上抛 OnSubscriberException。含嵌套发布的深度计数、token 用 struct 避免分配、重复取消返回 false |
 | [[C++ 调用 C 语言 DLL — extern C 与符号名]] | C++ 调 C DLL 的核心是 **name mangling**：C 生成 `Add`、C++ 生成 `?Add@@YAHHH@Z`，DLL 导出表只有前者 → 必须 `extern "C"`（**管名字、不管调用约定**）。三种写法（有头文件 / 头文件自带 `__cplusplus` 守卫 / 无头文件手声明）；`__declspec(dllimport)` 对函数非必需、**对全局变量必需**；32 位 `__stdcall` 的 `@8` 后缀与 64 位无约定差异；隐式链接 vs `LoadLibrary`；`dumpbin /exports` 排查；**C ABI 跨编译器兼容、C++ ABI 不可行**；Unity `DllImport` 同源要求 |
+| [[C++ 虚函数机制与空指针调用 — vptr与成员偏移]] | 有虚函数的对象首字段是 **vptr**，使成员偏移整体后移 → 非虚函数访问成员也崩在地址 8；**非虚静态绑定 vs 虚函数 vptr→vtable**，这是 null this 两者结局不同的根因；三类崩点（取 vptr / 取成员偏移 / 解引用成员指针）的时机差异；**未初始化 POD 成员导致的不确定崩溃比确定崩溃更难查**；对成员读/写/释放后果不同；UB 在 `-O0`/`-O2`/UBSan 下表现不同；虚析构、构造期 vptr 改写、去虚化 |
 
 ## 操作系统（1）
 
@@ -264,4 +265,4 @@ updated: 2026-11-02
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 126 篇资源笔记（unity 59 / os 1 / csharp 10 / algorithm 45 / archive 9 / meta 2）。算法区 45 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 127 篇资源笔记（unity 59 / os 1 / csharp 11 / algorithm 45 / archive 9 / meta 2）。算法区 45 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
