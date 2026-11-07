@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-10-31
+updated: 2026-11-07
 ---
 
 # Knowledge Graph
@@ -171,6 +171,8 @@ updated: 2026-10-31
 | [[事件总线实现 — 订阅令牌与发布期快照]] | [[委托与事件]] | related |
 | [[事件总线实现 — 订阅令牌与发布期快照]] | [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | related |
 | [[事件总线实现 — 订阅令牌与发布期快照]] | [[UI-逻辑-数据分层与事件驱动]] | related |
+| [[C++ 调用 C 语言 DLL — extern C 与符号名]] | [[C# IL 中间语言与编译执行模型]] | related |
+| [[C++ 调用 C 语言 DLL — extern C 与符号名]] | [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | related |
 
 ## Suggested Links
 

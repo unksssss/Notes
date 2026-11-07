@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: 2026-10-31
+updated: 2026-11-07
 ---
 
 # Tags Index
@@ -385,6 +385,7 @@ updated: 2026-10-31
 - [[最长公共子串]] — 1-based DP 配 0-based 字符串必须写 `s1[i-1]`；`str1[str1.size()]` 返回 `\0` 不崩但读到假数据
 - [[二十四点游戏]] — `int / int` 向零截断（12/8=1）；`num.size()-1` 在 size()==0 时下溢致死循环
 - [[三角形的最大相邻连通块]] — `vector<int>` 并集判断连通会丢"顶点来源"信息，拼出假共享；判连通必须两两比原始三角形
+- [[C++ 调用 C 语言 DLL — extern C 与符号名]] — name mangling 导致符号名不一致、extern "C" 只管名字不管调用约定、dllimport 对全局变量必需
 
 ## Stats
 
@@ -396,7 +397,7 @@ updated: 2026-10-31
 | unity面试 | 16 |
 | 数据结构 | 35 |
 | 二叉树 | 17 |
-| cpp | 30 |
+| cpp | 31 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
