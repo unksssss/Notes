@@ -352,6 +352,60 @@ public class WeaponGunManager : JsonManager<WeaponConfig>
 
 泛型约束 `class, IJsonData, new()` 保证「有 ID、能 new」，读表逻辑与「表是哪张」彻底解耦。
 
+### 进阶：自引用泛型 + 懒加载单例（`JsonManager<T,U>`）
+
+路径不通过构造参数传，而是抽成抽象属性，让每个表一个子类：
+
+```cs
+public abstract class JsonManager<T, U>
+    where T : class, IJsonData, new()
+    where U : JsonManager<T, U>, new()          // ← 自引用泛型（CRTP）
+{
+    private static JsonManager<T, U> instance;
+
+    public static JsonManager<T, U> Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new U();             // 用 U 造自己，才能调到子类覆盖的 JsonPath
+                instance.LoadConfig();
+            }
+            return instance;
+        }
+        set => instance = value;
+    }
+
+    protected abstract string JsonPath { get; }
+
+    private void LoadConfig()
+    {
+        var tList = JsonParser<T>.ParseTabel(JsonPath);
+        foreach (var item in tList) TConfigDict[item.GetID()] = item;
+    }
+}
+
+// 加一张新表 = 一个 5 行子类
+public class WeaponConfigManager : JsonManager<WeaponConfig, WeaponConfigManager>
+{
+    protected override string JsonPath
+        => Path.Combine(Application.streamingAssetsPath, "WeaponGun.json");
+}
+```
+
+**为什么要两个泛型参数**：C# 的静态字段属于**闭合泛型类型**，`JsonManager<WeaponConfig>` 与 `JsonManager<SkillConfig>` 天然各有一份 `instance`（这正好是我们要的「每表一单例」）。但如果只写一个参数 `JsonManager<T>`，`new()` 造出来的是**基类自己**，`JsonPath` 是抽象的、没法实例化。把 `this` 类型也当泛型参数传进来，才能做到「单例是子类实例 + 路径由子类覆盖 + 读表逻辑只写一遍」。
+
+三处坑：
+
+| 坑 | 说明 |
+|---|---|
+| **`Instance` 返回的是基类类型** | 签名写的是 `JsonManager<T,U>`，子类想加 `Reload()` / `GetByWeaponType()` 就调不到 → 返回类型改成 `U` |
+| **懒加载把异常吞成空表** | `instance = new U();` 先赋值、`LoadConfig()` 后执行，后者抛异常时 `instance` 已非 null → 下次访问直接返回**空字典**，且不再报第二次错。改成 `var tmp = new U(); tmp.LoadConfig(); instance = tmp;` |
+| **`set` 对外开放** | `set => instance = value;` 让任何代码都能替换单例，测试注入的便利与「被意外覆盖」的风险同时存在，要写注释说明 |
+
+**再记一条**：抽象属性把路径「抽出来」了，**不等于**路径就对了。`protected override string JsonPath => @"E:\unityproject\...\WeaponGun.json";` 一样是绝对路径 —— 配置化的收益是「改一处」，不是「自动正确」。而且同步 `string` 属性这个签名在 Android 上根本站不住（见下节）。
+
 ### JSON 路线的边界
 
 | 边界 | 说明 |
