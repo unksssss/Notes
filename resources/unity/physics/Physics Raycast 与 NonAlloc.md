@@ -3,9 +3,9 @@ title: "Physics Raycast 与 NonAlloc"
 type: resource
 tags: [物理, 性能优化, 项目实战]
 created: "2026-08-06"
-updated: "2026-10-21"
+updated: "2026-11-12"
 status: active
-summary: "Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本（Physics2D）**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的最小实现与四条排查清单、LayerMask 传层索引的坑、射线的成本判断（只有遮挡才需要）、ContactFilter2D 与 queriesHitTriggers"
+summary: "Physics.Raycast 性能要点：LayerMask 过滤减少检测数量、同步立即返回；RaycastAll 每次返回新数组有 GC，RaycastNonAlloc 写入预分配数组零分配（VR 首选）；**2D 版本（Physics2D）**：3D 返回 bool vs 2D 直接返回 RaycastHit2D、AI 检测玩家的最小实现与四条排查清单、LayerMask 传层索引的坑、射线的成本判断（只有遮挡才需要）、ContactFilter2D 与 queriesHitTriggers；**弹道射线起点**：ScreenPointToRay 的 origin 是相机，直接拿来当子弹起点会「子弹从镜头飞出 + 射线先命中角色自己」，起点必须换枪口、方向用 GetPoint 反解，以及 `~(1 << NameToLayer(x))` 层名拼错时静默退化为「几乎不过滤」"
 ---
 
 # Physics Raycast 与 NonAlloc
@@ -144,6 +144,52 @@ int count2 = Physics2D.Raycast(origin, direction, filter, results, detectDistanc
 ```
 
 ⚠️ **`Physics2D.queriesHitTriggers` 全局默认是 `true`**——目标挂的是 Trigger 碰撞体时默认也会被检测到。如果不希望这样，用 `ContactFilter2D` 单独关掉，比改全局设置安全。
+
+## 弹道射线：起点该用相机还是枪口
+
+`Camera.main.ScreenPointToRay(center)` 返回的 `Ray`，**origin 是相机的近裁剪面中心**，不是角色、也不是枪口。直接拿它当子弹起点，会同时踩两个坑：
+
+```cs
+// ❌ 典型写法（Empty 项目 Bullet.MainPlayerShoot）
+ray = Camera.main.ScreenPointToRay(center);
+transform.position = ray.origin;                                  // ① 子弹从镜头位置出发
+transform.rotation = Quaternion.LookRotation(ray.direction);
+
+// 后续 Move() 里
+if (Physics.Raycast(ray, out var hit, distance, mask)) { ... }     // ② 射线起点也在相机
+```
+
+**① 子弹位置被二次覆盖。** 调用方通常已经摆好了枪口位姿：
+
+```cs
+bulletGo.transform.position = muzzle.position;
+bulletGo.transform.rotation = muzzle.rotation;
+bullet.StartMove(...);   // StartMove 内部又执行 transform.position = ray.origin → 前面的赋值白做
+```
+
+第三人称下相机在角色背后，子弹就变成「从脑后飞出、朝屏幕中心飞」，视觉上与枪口完全错位，而且近距离射击的弹孔位置系统性偏移。
+
+**② 射线会先命中角色自己。** 射线从相机出发指向屏幕中心，角色（`CharacterController` / 武器模型）正好挡在中间；掩码只排除 `Projectile` 层时，角色所在的 `Default` 层照旧命中 → 子弹出手即「击中自己」，在角色身上放命中特效并立刻回池。
+
+### 正解：起点换枪口，方向用远平面点反解
+
+```cs
+Vector3 target = Camera.main.ScreenPointToRay(center).GetPoint(100f);   // 屏幕中心射线上的远点
+Vector3 dir = (target - muzzle.position).normalized;
+
+transform.position = muzzle.position;
+transform.rotation = Quaternion.LookRotation(dir);
+
+// 射线自己建，别复用相机那条
+if (Physics.Raycast(muzzle.position, dir, out var hit, range, mask)) { ... }
+```
+
+要点：
+- `GetPoint(t)` 取屏幕中心射线上的**远点**再与枪口连线，视线与弹道才能收敛到同一个准星位置；直接抄 `ray.direction` 只在相机与枪口重合（第一人称）时成立。
+- 射线起点与子弹起点必须同一个点，否则 `maxDistance = 已飞行距离` 这种「边走边检」的写法会漏检（射线覆盖的线段与子弹实际走过的线段不重合）。
+- 弹道要忽略自身层：`int mask = ~(1 << LayerMask.NameToLayer("Projectile"));`
+
+⚠️ **`LayerMask.NameToLayer` 找不到层名时返回 `-1`，不报错。** `1 << -1` 在 C# 里按移位量取模 31 → 等于 `1 << 31`（`int.MinValue`），取反后是 `0x7FFFFFFF`：看起来「排除了一个层」，实际是**除第 31 层外全开**，等于没有过滤。层名拼错（`Projectile` vs `Projectiles`）会静默退化成「谁都能打中」，这类问题只能靠 Debug.DrawLine 或打印 mask 值来抓。
 
 ## 相关
 
