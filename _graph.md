@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: 2026-11-07
+updated: "2026-11-14"
 ---
 
 # Knowledge Graph
@@ -178,6 +178,9 @@ updated: 2026-11-07
 | [[C++ 调用 C 语言 DLL — extern C 与符号名]] | [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | related |
 | [[C++ 虚函数机制与空指针调用 — vptr与成员偏移]] | [[C++ 调用 C 语言 DLL — extern C 与符号名]] | related |
 | [[C++ 虚函数机制与空指针调用 — vptr与成员偏移]] | [[struct 装箱陷阱与值类型原理]] | related |
+| [[大数加法]] | [[进制转换]] | related |
+| [[大数加法]] | [[字符串变形]] | related |
+| [[大数加法]] | [[验证IP地址]] | related |
 
 ## Suggested Links
 
