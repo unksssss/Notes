@@ -141,6 +141,7 @@ updated: "2026-11-16"
 | [[Boehm GC 保守式垃圾回收原理]] | Unity Mono 使用的 Boehm GC 是保守式(Conservative)GC，不精确追踪引用，而是扫描堆栈内存判断指针；内存碎片危害与缓解（分代/对象池/LOH） |
 | [[C# foreach 与枚举器零分配]] | foreach 的 GC 真相：数组 for 展开零分配、List<T> struct 枚举器不走接口零分配、接口接收枚举器即装箱、yield 状态机分配 |
 | [[C# 闭包与委托 — 隐藏类与 GC 陷阱]] | 闭包=编译器为捕获变量的匿名方法生成隐藏类（c__DisplayClassX），捕获变量搬字段、存活期=委托引用存活期 → 静态/事件订阅拴住 this=泄漏；每帧 new 捕获型 lambda=持续 GC Alloc（Day 36 面经） |
+| [[List Capacity 与 Count — 环形索引的经典误用]] | `List<T>.Capacity` 是内部数组长度、`Count` 才是元素个数，只在「刚好填满」时相等；环形索引 `(i + dir + n) % n` 的 n 必须是 `Count` —— 用 `Capacity` 当模数时 `Count < Capacity` 会算出越界下标（`Empty` 项目「捡一把枪按滚轮切枪必崩」实况）；附 `new List<T>(2)` 不建元素、`RemoveAt(0)` 是 O(n) 搬移（尾部交换 + 弹尾才是 O(1)）、循环里 `Contains` 退化 O(n²)；面试延伸：扩容为什么 2 倍、Capacity 能不能设 0 |
 | [[UniTask 异步编程指南]] | UniTask 零 GC 异步编程指南：以 struct 替代 class 实现零分配，Unity 官方 Task 与协程的最佳替代方案，配套异步模式与生命周期管理 |
 | [[struct 装箱陷阱与值类型原理]] | 值类型装箱/拆箱机制、性能影响、GC 压力来源、避免装箱的三种方法、栈/堆内存布局与生命周期、继承与内存布局分离、装箱内存布局；参数传递 ref/out 与值拷贝（Day 36） |
 | [[内存管理方案对比]] | 各大语言内存管理策略对比：完全手动 → 编译期静态分析 → ARC → 追踪式 GC → 引用计数+GC |
@@ -270,4 +271,4 @@ updated: "2026-11-16"
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 132 篇资源笔记（unity 59 / os 1 / csharp 11 / algorithm 50 / archive 9 / meta 2）。算法区 50 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 133 篇资源笔记（unity 59 / os 1 / csharp 12 / algorithm 50 / archive 9 / meta 2）。算法区 50 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
