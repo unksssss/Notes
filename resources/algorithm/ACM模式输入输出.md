@@ -4,9 +4,9 @@ type: resource
 tags: [算法, cpp, 面试]
 category: 工具与模板
 created: "2026-10-22"
-updated: "2026-10-22"
+updated: "2026-11-17"
 status: active
-summary: "ACM 模式 = IO 壳 + 算法 + 输出格式化三层，只有中间那层与核心代码模式相同。五种输入形态：单组读 n、先给 T 组、不给 T 读到 EOF（while (cin >> n)）、整行含空格（必须 getline，且先 getline 吃掉 cin>> 残留的换行）、逗号分隔（getline(iss, tok, ',')）。★ 最坑：cin >> x 之后直接 getline 会读到空串，导致整组数据错位一行、最后一组丢失（已实测）。输出三条：末尾别多空格、组间空行看题面、大数据量用 '\\n' 不用 endl。IO 提速 ios::sync_with_stdio(false) + cin.tie(nullptr)。本地用 < in.txt 重定向调试，别把 freopen 交上去"
+summary: "ACM 模式 = IO 壳 + 算法 + 输出格式化三层，只有中间那层与核心代码模式相同。五种输入形态：单组读 n、先给 T 组、不给 T 读到 EOF（while (cin >> n)）、整行含空格（必须 getline，且先 getline 吃掉 cin>> 残留的换行）、逗号分隔（getline(iss, tok, ',')）。★ 最坑：cin >> x 之后直接 getline 会读到空串，导致整组数据错位一行、最后一组丢失（已实测）。输出三条：末尾别多空格、组间空行看题面、大数据量用 '\\n' 不用 endl。IO 提速 ios::sync_with_stdio(false) + cin.tie(nullptr)。本地用 < in.txt 重定向调试，别把 freopen 交上去。★ 加速实测（1e6 个 int）：默认 473 ms → 只关 sync 87 ms（5.4×）→ 两个都关 85 ms；只关 tie 468 ms（几乎无差别），因为 tie 省的是「读前 flush cout」，无真实输出等待时没用；关同步后的 cin 比 scanf（240 ms）还快一倍多。代价：不能与 scanf/printf 混用、交互题必须手动 flush。真正更常见的 TLE 元凶是 endl（每次强制 flush）"
 source: "牛客 ACM 模式刷题（灯皇 2026-10-22 提问）"
 related:
   - "[[滑动窗口的最大值]]"
@@ -247,6 +247,98 @@ g++ -std=c++17 -o a.exe a.cpp
 | `getline` 正确版 | 两行含空格 | `[hello 1 2] sum=0` / `[  10 20 30  ] sum=60` ✅ |
 | `getline` 忘 ignore | 同上 | `[] sum=0` / `[hello 1 2] sum=0` ❌（错位 + 丢组） |
 | 逗号分隔 `[1,2,3,4]` | 一行 | `sum=10` ✅ |
+
+## 九、读加速：`sync_with_stdio(false)` 和 `tie(nullptr)` 到底在干嘛
+
+到处能见到这段，写在 `main` 外面（全局作用域）：
+
+```cpp
+static const auto io_sync_off = []() {
+    std::ios::sync_with_stdio(false);   // ① 断开与 C 标准库的同步
+    std::cin.tie(nullptr);              // ② 解开 cin 对 cout 的绑定
+    return nullptr;
+}();
+```
+
+### 为什么要写成「赋给一个全局变量」
+
+它本质是**想在 `main` 之前执行一次**。C++ 里"在 `main` 之前跑一段代码"最省事的办法就是**全局变量初始化** —— 于是用「立即调用的 lambda」把两条语句塞进一个初始化表达式里。
+
+拆开看：
+
+| 部件 | 作用 |
+|---|---|
+| `[](){...}()` | 立即调用（IIFE），执行完就丢 |
+| `return nullptr` | lambda 必须有个返回值才能被赋给变量；返回 `void` 的话 `auto` 推不出类型，`auto x = void` 非法 |
+| `static` | 内部链接，多个 `.cpp` 各有一份互不冲突；且只初始化一次 |
+| `const` | 只是防止后续误改 |
+
+它和下面这句**完全等价**，后者更容易看懂：
+
+```cpp
+static const int io_sync_off = (std::ios::sync_with_stdio(false), std::cin.tie(nullptr), 0);
+```
+
+### ① `sync_with_stdio(false)`：断开 C/C++ 两套缓冲的同步
+
+默认情况下，`cin`/`cout` 和 `scanf`/`printf` **共享同一个底层缓冲区**，这样 `cout << 1; printf("2");` 的输出顺序才有保证。代价是**每次 IO 都要过一层同步检查**。
+
+关掉后 `cin` 用自己的缓冲一次读一大块，速度差一个量级。
+
+**代价：不能混用。** 关掉之后 `cin` 和 `scanf` 各读各的缓冲，`cout` 和 `printf` 各写各的，**输出顺序会乱、输入可能重复消费**。要么全用 C++ 流，要么全用 C 函数。
+
+### ② `tie(nullptr)`：解开 `cin` 对 `cout` 的绑定
+
+默认 `cin` 绑着 `cout`，**每次 `cin >>` 之前都会先 flush 一次 `cout`** —— 这是为了交互式程序里"先打出提示语、再等输入"能正常工作。
+
+解除绑定后这个"读前先写"的动作没了。
+
+**代价：交互题必须自己 flush**（`cout << ... << endl;` 或 `cout.flush()`），否则程序可能卡在等输入、而提示语还在缓冲里没发出去。
+
+### 实测（本机 g++ 8.1.0 `-O2`，1e6 个整数）
+
+| 配置 | 纯读 1e6 个 int | 边读边写 20 万轮（输出重定向） |
+|---|---|---|
+| 默认 | 473 ms | 527 ms |
+| 只 `tie(nullptr)` | 468 ms | 535 ms |
+| 只 `sync_with_stdio(false)` | **87 ms** | — |
+| 两个都关 | 85 ms | **24.7 ms** |
+| `scanf`（对照） | 240 ms | — |
+
+**结论很反直觉**：
+
+1. **收益几乎全部来自 `sync_with_stdio(false)`**（5.4 倍）。`tie(nullptr)` 在纯读、输出重定向到文件时**测不出差别**（473 vs 468），因为它省的是"flush cout"——没有真实输出等待时 flush 本来就便宜。
+2. **`cin` 关同步后比 `scanf` 还快一倍多**（87 vs 240）。「`scanf` 比 `cin` 快」这句话在关掉同步后不成立。
+3. `tie(nullptr)` 真正值钱的是**交互题**和**输出到终端**的场景，不是"读得慢"的解法。
+
+所以这两行是"一起写没坏处"的习惯，但**别以为写了 `tie` 就能救 TLE**。
+
+### 什么时候别写这段
+
+- **数据量小**（几千个）—— 没意义，还多一层心智负担
+- **交互题** —— `tie(nullptr)` 要还回来，或者每步手动 `flush`
+- **要混用 `printf` / `scanf`** —— 关同步后会错序，只能二选一
+- **多线程里** —— `ios_base::sync_with_stdio` 不是线程安全的
+
+### 比它更快的
+
+数据到 1e7 级别时，`cin` 关同步也顶不住，此时要**自己搞缓冲**：
+
+```cpp
+static char buf[1 << 25];
+int n = fread(buf, 1, sizeof(buf), stdin);   // 一次读进来，再手写解析
+```
+
+或者 Linux 上的 `getchar_unlocked()`（无锁版 `getchar`，比 `getchar` 快 2~3 倍，但**不可重入、非标准**，Windows 上没有）。
+
+### 还有个比它更常见的 TLE 元凶
+
+```cpp
+cout << ans << endl;    // ❌ endl = '\n' + flush()，1e5 行就是 1e5 次 flush
+cout << ans << '\n';    // ✅
+```
+
+**`endl` 会强制刷缓冲**，这才是刷题 TLE 的头号原因。`tie` 和它比是小巫见大巫。
 
 ## 相关
 
