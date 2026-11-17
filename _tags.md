@@ -158,7 +158,7 @@ updated: "2026-11-17"
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
-- [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — agent 是位置的唯一所有者；只 SetDestination 不写 transform；pathPending 与到达判定；LookAt 与 updateRotation 只能活一个；Warp 合法瞬移
+- [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — agent 是位置的唯一所有者；只 SetDestination 不写 transform；pathPending 与到达判定；LookAt 与 updateRotation 只能活一个；Warp 合法瞬移；从手写巡逻迁移的判断链（四类卡住只有一类需要寻路）+ 方案 A/B + Bake 参数对齐 CC
 
 ### 设计模式
 - [[单例模式与静态类选型]] — 要对象用单例、只要函数用静态类；静态类做不到的四件事

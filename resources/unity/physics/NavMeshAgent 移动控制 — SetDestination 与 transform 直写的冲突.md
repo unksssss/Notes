@@ -3,9 +3,9 @@ title: "NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲�
 type: resource
 tags: [unity, NavMesh, AI, 移动控制, unity面试]
 created: "2026-10-23"
-updated: "2026-10-23"
+updated: "2026-11-17"
 status: active
-summary: "NavMeshAgent 是位置的唯一所有者：updatePosition/updateRotation 默认 true，每帧把内部位置与朝向写回 transform，任何直接写 transform.position 的代码都在和它抢所有权，表现为抽搐、回弹、穿墙、remainingDistance 与实际位置不一致。正确姿势是 SetDestination + isStopped + speed/stoppingDistance；到达判定必须先判 pathPending（否则 remainingDistance 无意义）；转向要么交给 updateRotation，要么自己写 rotation 但必须先把 updateRotation 关掉；合法瞬移用 agent.Warp 而不是赋 transform.position；不用寻路的场景（死亡/击飞）先 agent.enabled = false。附 2026-10-23 UnityGroupWorking 行为树里 TaskGoToTarget / TaskPatrol 双写实战的修复代码。"
+summary: "NavMeshAgent 是位置的唯一所有者：updatePosition/updateRotation 默认 true，每帧把内部位置与朝向写回 transform，任何直接写 transform.position 的代码都在和它抢所有权，表现为抽搐、回弹、穿墙、remainingDistance 与实际位置不一致。正确姿势是 SetDestination + isStopped + speed/stoppingDistance；到达判定必须先判 pathPending（否则 remainingDistance 无意义）；转向要么交给 updateRotation，要么自己写 rotation 但必须先把 updateRotation 关掉；合法瞬移用 agent.Warp 而不是赋 transform.position；不用寻路的场景（死亡/击飞）先 agent.enabled = false。附 2026-10-23 UnityGroupWorking 行为树里 TaskGoToTarget / TaskPatrol 双写实战的修复代码。第九节给出手写巡逻迁到 NavMeshAgent 的完整判断链：四类「卡住」只有一类真需要寻路、方案 A（只留 Agent）与方案 B（Agent 当寻路器 + desiredVelocity 驱动 CC）的取舍与三行关键代码、Bake 参数必须与 CC 尺寸对齐、spawn 与巡逻点的 SamplePosition 吸附、remainingDistance 判定，以及方案 B 里必须回写 nextPosition 的原因。"
 source: "2026-10-23 UnityGroupWorking 行为树 TaskGoToTarget 实战"
 related: ["[[行为树工程实现 — 黑板、RUNNING 中断与节点生命周期]]", "[[巡逻保安AI — FSM与行为树的机制差异与选型]]", "[[CharacterController移动 — Move vs SimpleMove]]", "[[Rigidbody 睡眠与 Trigger Collider]]"]
 ---
@@ -264,6 +264,112 @@ NavMeshAgent 内部对相同目标有节流，但仍会做一次「目标是否�
 
 **Q：什么时候该放弃 NavMeshAgent，自己写移动？**
 需要飞行、攀爬、跳跃、非平面移动（墙面上走）、或对位移精度要求极高（格斗游戏、平台跳跃）时。NavMesh 本质是「2.5D 平面图」，处理不了这些。
+
+---
+
+## 九、从手写巡逻迁到 NavMeshAgent：一份可照抄的迁移清单
+
+> 出处：2026-11-17 `Empty` 项目里 8 个敌人用 `CharacterController` + 固定 `targetDir` 巡逻，被建筑卡死。以下是「该不该换、怎么换」的完整判断链。
+
+### 9.1 先判断：卡住是不是真的因为「没有寻路」
+
+手写巡逻常见的四个结构性缺失，缺任何一个都会表现为「敌人卡住」，但只有最后一个需要 NavMesh：
+
+| # | 缺失 | 表现 | 需要 NavMesh 吗 |
+| --- | --- | --- | --- |
+| ① | 巡逻点 `position + dir * R` 没做可达性检查，点落在建筑内部 | 走到墙边顶住不动 | ❌ 加一次 `NavMesh.SamplePosition` 或射线检测即可 |
+| ② | 固定 `targetDir` + `Move` 只会**沿墙滑**，凹角/窄缝顶死 | 在凹角里原地抖动 | ✅ 是 |
+| ③ | 多个 `CharacterController` 互相碰撞 | 挤成一堆 | ❌ 分层碰撞矩阵 / `Physics.IgnoreCollision` |
+| ④ | 没有超时兜底，状态机卡死后永远不重选点 | 一直朝一个方向直走 | ❌ 加 `patrolTimer` |
+
+**结论：①③④ 先补，② 才轮到 NavMesh。** 直接上 Agent 而不补 ①④，会变成「寻路正常但目标点本来就在墙里」→ `SetDestination` 返回 `PathPartial`，敌人走到最近可达点后原地发呆。
+
+### 9.2 环境前提（Unity 2022.3）
+
+- `com.unity.ai.navigation` **未安装时**，`com.unity.modules.ai` 自带的 **legacy Navigation** 依然可用：`NavMeshAgent` / `NavMesh` / `NavMeshObstacle` 全在，`Window > AI > Navigation` 可直接 Bake。
+- 装了 `com.unity.ai.navigation` 之后才变成 `NavMeshSurface` 组件式烘焙（Bake 面板从窗口搬到组件上）。
+- 先确认项目里**有没有烘焙产物**（`Assets/**/*.asset` 里的 NavMeshData），没有的话 `isOnNavMesh` 恒 `false`，所有 `SetDestination` 都报错。
+
+### 9.3 两个方案：Agent 独占 vs Agent 当寻路器
+
+`NavMeshAgent` 和 `CharacterController` **不能同时控 transform** —— 这是迁移的第一原则。
+
+| | 方案 A：只留 Agent | 方案 B：Agent + CC |
+| --- | --- | --- |
+| 位移来源 | `agent.Move` / 内部 | `characterController.Move(agent.desiredVelocity * dt)` |
+| 设置 | 删掉 CC，`updatePosition/updateRotation` 保持 `true` | `updatePosition = false`、`updateRotation = false` |
+| 优点 | 简单，碰撞与寻路都是 Agent 负责 | 保留 CC 的斜坡/台阶/`isGrounded`，跳跃与击飞好写 |
+| 缺点 | 丢失 CC 的精细地面检测，跳跃要另写 | 两套碰撞体（Agent 的圆柱 + CC 的胶囊）要尺寸对齐，否则「寻路认为能过、CC 过不去」 |
+| 适合 | 纯地面巡逻怪 | 要跳、要被打飞、要和玩家共用一套移动代码 |
+
+方案 B 的关键三行：
+
+```cs
+agent.updatePosition = false;   // 不写 transform.position
+agent.updateRotation = false;   // 不写 transform.rotation
+agent.SetDestination(target);
+characterController.Move(agent.desiredVelocity * Time.deltaTime);
+// 可选：把 CC 的真实位置回写给 Agent，避免长期漂移
+agent.nextPosition = transform.position;
+```
+
+> ⚠️ 方案 B 里**必须**回写 `agent.nextPosition`。否则 Agent 的内部位置和 CC 的实际位置会慢慢分叉（CC 被墙挡住而 Agent 以为走过去了），几十秒后寻路结果就完全错位。
+
+### 9.4 烘焙参数必须对齐 CC
+
+Bake 面板上的 Agent 参数是「寻路时的通行能力假设」，和 CC 的实际尺寸不一致就会「算得出路径但走不过去」：
+
+| Bake 参数 | 对齐到 |
+| --- | --- |
+| Radius | `characterController.radius`（如 0.3） |
+| Height | `characterController.height`（如 1.9） |
+| Step Height | `characterController.stepOffset`（如 0.3） |
+| Max Slope | `characterController.slopeLimit`（如 45） |
+
+### 9.5 三处代码要改
+
+**① 生成点：抬高的 spawn 必须先吸附**
+
+```cs
+// 原来：center + dir * R + Vector3.up * 5f  → 可能落在空中/墙里
+if (NavMesh.SamplePosition(spawnPos, out var hit, 10f, NavMesh.AllAreas))
+    agent.Warp(hit.position);          // 瞬移用 Warp，不要赋 transform.position
+else
+    Debug.LogWarning($"spawn 点不在 NavMesh 上：{spawnPos}");
+```
+
+**② 巡逻点：同样要吸附，且判定用 `remainingDistance`**
+
+```cs
+if (NavMesh.SamplePosition(SelfPos + Random.insideUnitSphere * R, out var hit, R, NavMesh.AllAreas))
+{
+    agent.SetDestination(hit.position);
+}
+// 到达判定
+if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
+    isPatrolling = true;
+```
+
+**③ 动画参数：用 `agent.velocity.magnitude`**
+
+不要再用「本帧位移 / dt」反推速度（会被 CC 的滑动、碰撞修正污染），也不要拿 `speed` 变量同时当移动倍率和 `SetVertical` 的入参：
+
+```cs
+animatorManager.SetVertical(agent.velocity.magnitude / agent.speed);
+```
+
+### 9.6 零成本过渡兜底
+
+不想现在迁，可以先加一行「位移不足就重选点」，把「卡死」降级成「偶尔发呆」：
+
+```cs
+// 预期本帧位移 vs 实际位移
+if (isPatrolling == false && movedThisFrame < expectedMove * 0.1f)
+{
+    stuckTimer += Time.deltaTime;
+    if (stuckTimer > 2f) { isPatrolling = true; stuckTimer = 0f; }  // 强制重选巡逻点
+}
+```
 
 ---
 
