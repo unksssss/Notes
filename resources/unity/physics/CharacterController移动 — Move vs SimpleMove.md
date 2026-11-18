@@ -132,9 +132,65 @@ characterController.Move(Dir * speed * Time.deltaTime);
 characterController.Move(transform.forward * speed * Time.deltaTime);
 ```
 
+### 坑五：速度变量没 clamp → 负速度 = 面朝前方倒着走
+
+这是「朝向明明对、位移却反了」的唯一解释。`transform.rotation` 由 `LookRotation(Dir)` 决定、跟速度无关；真正乘进位移的是那个**标量**：
+
+```cs
+Vector3 motion = Dir * (speed * z * Time.deltaTime);
+```
+
+`z` 一旦为负，`motion` 方向就整体翻转 —— 朝向不动、人往后退，观感是「他背对着我后退，但脸还朝着我」。
+
+反面教材（自定义加减的平滑写法，漏了「当前值在目标另一侧」这一半情况）：
+
+```cs
+// ❌ 看着像平滑，实际只处理了「比目标快」的情况，否则一路减、没有下限
+private void MinusSpeed(float target)
+{
+    if (runSpeed >= target) { runSpeed = target; return; }
+    runSpeed -= Time.deltaTime * 3f;
+}
+
+// ✅ 目标即边界，天然不会越过
+private void SetSpeed(float target)
+    => runSpeed = Mathf.MoveTowards(runSpeed, target, 3f * Time.deltaTime);
+```
+
+复现链（真实案例，按距离分三档调速）：
+
+| 距离 | 调用 | `runSpeed` 变化 |
+| --- | --- | --- |
+| > 30m | `AddSpeed(6)` | 0 → 6 |
+| 10~30m | `MinusSpeed(4)` | 6 → 钳到 4 |
+| < 10m（面对面停下） | `MinusSpeed(0)` | 4 → 0 |
+| 又被拖回 10~30m | `MinusSpeed(4)` | `0 >= 4` 为假 → **每帧 -3/s，一路减到 -30** |
+
+于是 `Move(dir, -30)` 以 30 的速度朝反方向位移，且**越退越快**（每帧还在减）。
+
+连带症状：负值同时喂给 `Animator.SetFloat("Vertical", z)` → Blend Tree 取到最小阈值节点 → 播「前跑」动画。所以腿在往前跑、人在往后退，两个症状同源。
+
+**规则**：任何参与位移乘法的速度变量都要 clamp（`Mathf.Max(0f, speed)`），并且优先用 `MoveTowards` / `SmoothDamp` 这类**自带边界**的 API，别自己写「加一点 / 减一点」。
+
+### 坑六：`Apply Root Motion` 与 `CharacterController` 双驱动位移
+
+当 `Animator` 不在挂 `CharacterController` 的那个节点上（典型：根节点挂逻辑 + CC，模型作为子物体带 Animator），两套系统会同时推位移：
+
+- `Apply Root Motion = true` → 动画把 root motion 写进**模型子节点**的 localPosition；
+- `CharacterController.Move()` → 推**根节点**。
+
+结果：模型相对胶囊前后漂移，观感是「人朝前、位置往后跑」，走久了模型整体飘出胶囊范围。
+
+```yaml
+# 角色 prefab 的 Animator 组件
+m_ApplyRootMotion: 0     # 手写 CC 移动时必须关
+```
+
+**位移只能有一个所有者**：手写 CC 阶段归 CC；上 NavMesh 之后归 `NavMeshAgent`（同时要关 `updatePosition`/`updateRotation` 或干脆不用 CC，见 [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]]）。两个所有者并存时，症状和「坑五」极像，排查顺序建议：**先关 root motion 看是否还在漂 → 再看速度项有没有负数 → 最后才怀疑方向算反**。
+
 ### 附：状态机卡死的通用兜底
 
-上面四个坑任意一个都能让「到达判定」永假。与其逐个排查，不如先加超时兜底，把「永久卡死」降级成「偶尔发呆」：
+上面几个坑任意一个都能让「到达判定」永假。与其逐个排查，不如先加超时兜底，把「永久卡死」降级成「偶尔发呆」：
 
 ```cs
 patrolTimer += Time.deltaTime;

@@ -237,6 +237,7 @@ updated: "2026-11-18"
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
 - [[Rigidbody 睡眠与 Trigger Collider]] — 睡眠机制省模拟、传送不唤醒坑、Trigger vs Collider
+- [[CharacterController移动 — Move vs SimpleMove]] — Move（位移/帧）vs SimpleMove（速度/秒）；手写巡逻六坑：三维 Distance 拍平、重力未乘 dt、LookRotation 未去 y、位移用原始 Dir 侧滑、**速度变量没 clamp（负 runSpeed → 面朝前方倒着走）**、**Apply Root Motion 与 CC 双驱动位移**
 - [[NavMeshAgent 移动控制 — SetDestination 与 transform 直写的冲突]] — updatePosition/updateRotation 双写冲突、pathPending 与 remainingDistance、stoppingDistance 到达判定、enabled=false vs isStopped、Warp 瞬移、十坑清单
 - [[配置表读取 — Excel 导表、三行表头与反射映射]] — 三行表头跳过、SpreadsheetML 结构、XmlDocument 五坑、JsonUtility 五限制、反射逐字匹配
 
