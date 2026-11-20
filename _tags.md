@@ -158,6 +158,7 @@ updated: "2026-11-20"
 - [[螺旋矩阵]] — 转向模拟（visited）vs 四边界剥边（O(1)）；★ `map<int,int>` 存不下访问状态导致死循环；剥边后两条边必须判空（LC 54 / BM98）
 - [[旋转矩阵]] — 四路轮换 `temp` + 每层转 `right-left` 格（不是 `n-1`）；n≥4 才暴露，n≥6 越界崩（BM99 / LC 48）
 - [[序列维护八操作]] — ACM 模式 8 操作模拟；★ 空序列输出空行 / 行末无空格 / 插入下标 `i+1`；vector 全够用
+- [[栈的操作命令分发]] — ★ C++ 的 switch 不能用于 string（编译期报错），改 if/else 链或先映射 enum；空栈输出 EMPTY
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -237,6 +238,7 @@ updated: "2026-11-20"
 - [[螺旋矩阵]] — 二维矩阵按圈访问；`vector<vector<bool>> visited` 与四边界收缩两种状态表示
 - [[旋转矩阵]] — n×n 原地旋转；转置（`j=i+1` 上三角）+ 逐行 reverse 是更稳的等价写法
 - [[序列维护八操作]] — 一题覆盖 `push_back` / `pop_back` / `a[i]` / `insert` / `sort` / `size` 六个接口的映射
+- [[栈的操作命令分发]] — stack 的 push/pop/top/size/empty 四件套；`pop` 只删不返，取栈顶前必须判空
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
@@ -418,18 +420,19 @@ updated: "2026-11-20"
 - [[螺旋矩阵]] — `matrix[0]` 空矩阵越界；四方向数组 `d[4][2]` 取模是 `%4`；循环次数固定 `m*n` 才不会失控
 - [[旋转矩阵]] — 四路轮换必须「先存再覆盖」；`vector` 越界不检查，小规模用例掩盖大 bug
 - [[序列维护八操作]] — `insert(begin()+i+1, x)` 的插入位置；`sort(..., greater<int>())` 降序；`size_t` 与 `int` 比较警告
+- [[栈的操作命令分发]] — `switch (string)` 是非法的（条件须整型、case 须整型常量）；Java/C# 能 switch 字符串，C++ 不行
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
 | unity | 40 |
-| 算法 | 49 |
+| 算法 | 50 |
 | 性能优化 | 10 |
 | unity面试 | 16 |
-| 数据结构 | 44 |
+| 数据结构 | 45 |
 | 二叉树 | 17 |
-| cpp | 41 |
+| cpp | 42 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
