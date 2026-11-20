@@ -159,6 +159,7 @@ updated: "2026-11-20"
 - [[旋转矩阵]] — 四路轮换 `temp` + 每层转 `right-left` 格（不是 `n-1`）；n≥4 才暴露，n≥6 越界崩（BM99 / LC 48）
 - [[序列维护八操作]] — ACM 模式 8 操作模拟；★ 空序列输出空行 / 行末无空格 / 插入下标 `i+1`；vector 全够用
 - [[栈的操作命令分发]] — ★ C++ 的 switch 不能用于 string（编译期报错），改 if/else 链或先映射 enum；空栈输出 EMPTY
+- [[集合操作与前驱后继]] — 前驱 = `lower_bound(x)` 再 `--`（判 begin），后继 = `upper_bound(x)`（判 end）；★ 线性扫描 O(nq) 会 TLE
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -239,6 +240,7 @@ updated: "2026-11-20"
 - [[旋转矩阵]] — n×n 原地旋转；转置（`j=i+1` 上三角）+ 逐行 reverse 是更稳的等价写法
 - [[序列维护八操作]] — 一题覆盖 `push_back` / `pop_back` / `a[i]` / `insert` / `sort` / `size` 六个接口的映射
 - [[栈的操作命令分发]] — stack 的 push/pop/top/size/empty 四件套；`pop` 只删不返，取栈顶前必须判空
+- [[集合操作与前驱后继]] — `set` 是红黑树，增删查 O(log n)、迭代器只能 ++/--；要重复元素用 multiset
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
@@ -421,18 +423,19 @@ updated: "2026-11-20"
 - [[旋转矩阵]] — 四路轮换必须「先存再覆盖」；`vector` 越界不检查，小规模用例掩盖大 bug
 - [[序列维护八操作]] — `insert(begin()+i+1, x)` 的插入位置；`sort(..., greater<int>())` 降序；`size_t` 与 `int` 比较警告
 - [[栈的操作命令分发]] — `switch (string)` 是非法的（条件须整型、case 须整型常量）；Java/C# 能 switch 字符串，C++ 不行
+- [[集合操作与前驱后继]] — `lower_bound` 是「第一个 >=」不是「第一个 >」；`--s.begin()` 是 UB；`it + 1` 编译不过
 
 ## Stats
 
 | Tag | Count |
 |-----|-------|
 | unity | 40 |
-| 算法 | 50 |
+| 算法 | 51 |
 | 性能优化 | 10 |
 | unity面试 | 16 |
-| 数据结构 | 45 |
+| 数据结构 | 46 |
 | 二叉树 | 17 |
-| cpp | 42 |
+| cpp | 43 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
