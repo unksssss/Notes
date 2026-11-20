@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: "2026-11-19"
+updated: "2026-11-20"
 ---
 
 # Knowledge Graph
@@ -199,6 +199,9 @@ updated: "2026-11-19"
 | [[旋转矩阵]] | [[螺旋矩阵]] | related |
 | [[旋转矩阵]] | [[字符串变形]] | related |
 | [[旋转矩阵]] | [[接雨水]] | related |
+| [[序列维护八操作]] | [[用vector实现栈]] | related |
+| [[序列维护八操作]] | [[ACM模式输入输出]] | related |
+| [[序列维护八操作]] | [[排序算法-快排归并堆排]] | related |
 
 ## Suggested Links
 
