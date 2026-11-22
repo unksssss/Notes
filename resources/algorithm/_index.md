@@ -6,10 +6,10 @@ updated: "2026-11-22"
 
 # 算法区导航（resources/algorithm）
 
-59 篇算法与数据结构笔记，已按 **6 个子目录物理归档（目录即分类）**。每篇 frontmatter 里另有 `category` 字段，便于属性面板筛选。
+60 篇算法与数据结构笔记，已按 **6 个子目录物理归档（目录即分类）**。每篇 frontmatter 里另有 `category` 字段，便于属性面板筛选。
 总索引见 [[resources/_index]] 的「算法与数据结构」段。
 
-## 一、数据结构基础（`algorithm/数据结构基础`）（8）
+## 一、数据结构基础（`algorithm/数据结构基础`）（9）
 
 | File | Summary |
 | --- | --- |
@@ -21,6 +21,7 @@ updated: "2026-11-22"
 | [[序列维护八操作]] | ACM 模式模拟题，q ≤ 7×10³。**核心认知：这题是「题面 → 标准库」的翻译题** —— 8 个操作正好对应 `push_back` / `pop_back` / `a[i]` / `insert(begin()+i+1, x)` / `sort` / `sort+greater` / `size` / 遍历加空格。★ 四个坑：① 空序列执行 op8 要输出**一个空行**（写成「非空才输出」会让后续全部错位）；② 行末不能多空格；③ 插入下标是 `i+1`（插在 i 与 i+1 之间），且 `i == size-1` 时插到末尾合法；④ `size()` 是 `size_t`。最坏 `O(q²)` ≈ 2.5×10⁷ 搬移，vector 稳过 |
 | [[栈的操作命令分发]] | 牛客【模板】栈的操作（push/pop/query/size，空栈输出 `Empty`（大写错就 WA））。★ 灯皇的代码**编译不过**：`switch (op)` 而 op 是 `std::string` —— C++ 的 switch 条件只能是整型，`case "push"` 标签也必须是整型常量，g++ 报 `switch quantity not an integer` + 每个 case 一条 `could not convert`。正解：`if (op == "push") ... else if` 链；分支多时可用 enum 先映射再 switch（Java/C# 能 switch 字符串，C++ 不行）。其余：`stack<long long>` 应对 64 位提示、删多余头文件、`query` 取 top 前必须判空 |
 | [[整数优先队列]] | 牛客【模板】整数优先队列（1 插入 / 2 输出**最小** / 3 删一个最小，n ≤ 10⁶）。★ 灯皇用 `priority_queue<int>` —— 那是**大根堆**，`top()` 给最大值，方向正好反了（官方示例实测 5/10/5，正确 3/3/5）。小根堆必须写 `priority_queue<int, vector<int>, greater<int>>`。★ 反直觉：`greater` 才是小根堆 —— 比较器表示「什么算小」，堆顶是「最不小」的；同一个 `greater` 在 sort 里是降序、在优先队列里是小根堆。★ `endl` 在 5×10⁵ 次输出下多耗 2.2s（2.75s vs 0.52s），必须 `'\n'` + IO 加速 |
+| [[大整数哈希]] | 牛客「大整数哈希」。初始 `f(x)=0`，n 次操作每次「先读 `a=f(x)`，再 `f(x)=y`」，求 `Σ(i × a) mod 2^64`，n ≤ 5×10⁶。灯皇五处错，第一处就致命：**「读 f(x)」这一步整个丢了** —— 循环里只 `map[x] = y`，最后遍历 map 算 `x × y` 的和，等于换了一道题；4 步样例他 40、正确 80。另四处：加权系数用成 `x`（`it.first`）而非操作序号 `i`；`% (2 ^ 64)` 里 `^` 是**按位异或**，`2 ^ 64 = 66`；`long long` 装不下 2⁶⁴−1（实测读 `18446744073709551615` 得 LLONG_MAX 且 **failbit 置位、后续全读不进**）；`long long × long long` 溢出的有符号溢出是 **UB**。正解三档：`unordered_map`（801 ms / 5e6）→ 开放地址法（152 ms，5.3×）→ 加 `fread` 快读（200 MB：463 ms vs cin 2723 / scanf 5641，完整解 1.19 s）。★ 两个核心认知：**`mod 2⁶⁴` 不用写，`unsigned long long` 自然溢出就是**；**`x & MASK` 会被卡**（2e4 个 2¹⁶ 倍数实测 131 ms vs splitmix64 1.0 ms）。★ 题面「64 位输出请用 `printf("%lld")`」是陷阱，高位为 1 时输出负数，必须 `%llu` 或 `cout` |
 
 ## 二、链表（`algorithm/链表`）（3）
 

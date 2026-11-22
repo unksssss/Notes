@@ -163,7 +163,7 @@ updated: "2026-11-22"
 
 > 分区导航：[[algorithm/_index|算法区导航]] —— 本区已按 **6 个子目录物理分类**（目录即分类），附建议刷题顺序。
 
-### 数据结构基础（8）— `algorithm/数据结构基础`
+### 数据结构基础（9）— `algorithm/数据结构基础`
 
 | File | Summary |
 | --- | --- |
@@ -175,6 +175,7 @@ updated: "2026-11-22"
 | [[序列维护八操作]] | ACM 模式 8 操作序列维护（追加/删尾/按下标查/按下标插/升序/降序/长度/整行输出），q ≤ 7×10³。**一题练「题面到标准库的映射」**：`push_back`、`pop_back`、`a[i]`、`insert(begin()+i+1,x)`、`sort`、`sort+greater`、`size`、空格分隔遍历。★ 最容易错的是输出格式：空序列要输出空行、行末不能多空格；其次是插入下标 `i+1`。复杂度最坏 O(q²) 但 q 小，vector 够用 |
 | [[栈的操作命令分发]] | 牛客【模板】栈的操作。考两件事：**命令分发**（字符串 → 分支）和**空栈边界**。`std::stack` 接口就是 push/pop/top/size/empty，一题对应。★ 灯皇用 `switch (op)`（op 是 string）→ **编译期就挂**：C++ switch 只接受整型，case 标签也必须是整型常量，字符串字面量 `const char[N]` 都不满足。改用 `if (op == "push") ... else if` 即可；要 switch 就先映射成 enum。另：`pop` 只删除不返回、取栈顶先 `top()` 且要判空、64 位提示建议 `long long` |
 | [[整数优先队列]] | 牛客【模板】整数优先队列。**核心认知**：`priority_queue` 默认是**大根堆**，题目要「最小」必须先掰方向。灯皇三个操作写对了，只是用了默认 `priority_queue<int>` → 输出最大值。正解：`priority_queue<int, vector<int>, greater<int>>`。★ 比较器语义反直觉：`less` → 大根堆、`greater` → 小根堆（堆顶是「按比较器意义下最大」的元素）。另：`endl` 逐行 flush，n=10⁶ 时 2.75s vs 0.52s；空堆 `top()`/`pop()` 是 UB |
+| [[大整数哈希]] | 牛客「大整数哈希」。初始 `f(x)=0`，n 次操作每次「先读 `a=f(x)`，再 `f(x)=y`」，求 `Σ(i × a) mod 2^64`，n ≤ 5×10⁶。灯皇五处错，第一处就致命：**「读 f(x)」这一步整个丢了** —— 循环里只 `map[x] = y`，最后遍历 map 算 `x × y` 的和，等于换了一道题；4 步样例他 40、正确 80。另四处：加权系数用成 `x`（`it.first`）而非操作序号 `i`；`% (2 ^ 64)` 里 `^` 是**按位异或**，`2 ^ 64 = 66`；`long long` 装不下 2⁶⁴−1（实测读 `18446744073709551615` 得 LLONG_MAX 且 **failbit 置位、后续全读不进**）；`long long × long long` 溢出的有符号溢出是 **UB**。正解三档：`unordered_map`（801 ms / 5e6）→ 开放地址法（152 ms，5.3×）→ 加 `fread` 快读（200 MB：463 ms vs cin 2723 / scanf 5641，完整解 1.19 s）。★ 两个核心认知：**`mod 2⁶⁴` 不用写，`unsigned long long` 自然溢出就是**；**`x & MASK` 会被卡**（2e4 个 2¹⁶ 倍数实测 131 ms vs splitmix64 1.0 ms）。★ 题面「64 位输出请用 `printf("%lld")`」是陷阱，高位为 1 时输出负数，必须 `%llu` 或 `cout` |
 
 ### 链表（3）— `algorithm/链表`
 
@@ -280,4 +281,4 @@ updated: "2026-11-22"
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 142 篇资源笔记（unity 59 / os 1 / csharp 12 / algorithm 59 / archive 9 / meta 2）。算法区 59 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 143 篇资源笔记（unity 59 / os 1 / csharp 12 / algorithm 60 / archive 9 / meta 2）。算法区 60 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
