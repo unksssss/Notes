@@ -162,6 +162,7 @@ updated: "2026-11-22"
 - [[集合操作与前驱后继]] — 前驱 = `lower_bound(x)` 再 `--`（判 begin），后继 = `upper_bound(x)`（判 end）；★ 线性扫描 O(nq) 会 TLE
 - [[多重集合操作]] — ★ `multiset::erase(x)` 删全部、删一个要 `erase(find(x))`；op4 漏读 x 会让后续输入整体错位
 - [[整数优先队列]] — ★ `priority_queue` 默认大根堆，要最小得传 `greater<int>`；`endl` 逐行 flush 会 TLE
+- [[字符串哈希]] — 字符串 → 整数 → 桶下标三步；`return` 是退出码不是输出；单模数 1e9+7 在 n=1e4 约 5% 碰撞（实测 3/100 轮），双模数 0 碰撞
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -245,6 +246,7 @@ updated: "2026-11-22"
 - [[集合操作与前驱后继]] — `set` 是红黑树，增删查 O(log n)、迭代器只能 ++/--；要重复元素用 multiset
 - [[多重集合操作]] — `multiset` 接口同 set，差异只在重复语义（erase/count）；每个重复元素是独立的树节点
 - [[整数优先队列]] — 堆 = 完全二叉树 + 数组存储；push 上浮 / pop 末尾搬根再下沉，均 `O(log n)`
+- [[字符串哈希]] — `unordered_set` 自带去重、`reserve(n*2)` 免 14 次 rehash；`std::hash<string>` 是 MurmurHash
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
@@ -436,12 +438,12 @@ updated: "2026-11-22"
 | Tag | Count |
 |-----|-------|
 | unity | 40 |
-| 算法 | 53 |
+| 算法 | 54 |
 | 性能优化 | 10 |
 | unity面试 | 16 |
-| 数据结构 | 48 |
+| 数据结构 | 49 |
 | 二叉树 | 17 |
-| cpp | 45 |
+| cpp | 46 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
