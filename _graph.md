@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: "2026-11-20"
+updated: "2026-11-22"
 ---
 
 # Knowledge Graph
@@ -211,6 +211,9 @@ updated: "2026-11-20"
 | [[多重集合操作]] | [[集合操作与前驱后继]] | related |
 | [[多重集合操作]] | [[红黑树]] | related |
 | [[多重集合操作]] | [[ACM模式输入输出]] | related |
+| [[整数优先队列]] | [[完全二叉树]] | related |
+| [[整数优先队列]] | [[多重集合操作]] | related |
+| [[整数优先队列]] | [[ACM模式输入输出]] | related |
 
 ## Suggested Links
 
