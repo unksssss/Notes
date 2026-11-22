@@ -25,10 +25,11 @@ updated: "2026-11-22"
 | [[DOTween与协程选型]] | 协程（状态机/流程控制）vs DOTween（时间轴补间/可中断可控），选择口诀：'动'用 DOTween、'流程'用协程，可混用 |
 | [[dotween详解]] | Unity DOTween 动画补间库完整指南：基本用法、回调系统、Sequence序列、生命週期控制、常用模式与性能注意事项 |
 
-### architecture（8）
+### architecture（9）
 
 | File | Summary |
 | --- | --- |
+| [[伤害系统设计 — 接口驱动与职责分层]] | `IDamageable` + `readonly struct DamageInfo` + `Health` 三层拆分：子弹只认接口、不知受体身份；struct 消息零堆分配、加字段不动接口；`Health` 纯数值 + `Action<DamageInfo>` 事件外抛表现；六个真实漏洞根因（`TeamID` 私有未赋值致友伤判定恒失效、`Bullet` 硬编码 `teamID=0`、`isDead` 从不置 true 使 `OnDied` 重复触发 → 重复入池、`currentHealth` 默认 0 且 Player 从未 `Init`、`GetComponent` 不查父链、`LogError` 当日志）与死亡幂等要求（2026-11-22 实战） |
 | [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
 | [[有限状态机FSM — 手写实现与状态切换边界]] | 手写 FSM 三层骨架（IState / 状态基类持 owner / 状态机 Dictionary 注册 + 幂等切换）；Exit→换ID→Enter 的顺序理由、非 MonoBehaviour 状态机开不了协程、状态切换边界五要素、FSM vs 行为树 vs GOAP；怪物 AI 实战 6 坑（每帧 SetDestination / 冷却只读不写 / 球形判定不判朝向 / int 存距离 / 单例伪 null） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
@@ -281,4 +282,4 @@ updated: "2026-11-22"
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 143 篇资源笔记（unity 59 / os 1 / csharp 12 / algorithm 60 / archive 9 / meta 2）。算法区 60 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 144 篇资源笔记（unity 60 / os 1 / csharp 12 / algorithm 60 / archive 9 / meta 2）。算法区 60 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。

@@ -231,6 +231,10 @@ TF-IDF weighted (rare tags + content overlap score higher):
 | [[大整数哈希]] | [[字符串哈希]] | related |
 | [[大整数哈希]] | [[位运算]] | related |
 | [[大整数哈希]] | [[ACM模式输入输出]] | related |
+| [[伤害系统设计 — 接口驱动与职责分层]] | [[对象池 OnEnable OnDisable 最佳实践]] | related |
+| [[伤害系统设计 — 接口驱动与职责分层]] | [[UI-逻辑-数据分层与事件驱动]] | related |
+| [[伤害系统设计 — 接口驱动与职责分层]] | [[struct 装箱陷阱与值类型原理]] | related |
+| [[伤害系统设计 — 接口驱动与职责分层]] | [[单例模式与静态类选型]] | related |
 
 ## Clusters
 
