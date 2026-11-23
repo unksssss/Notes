@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: "2026-11-22"
+updated: "2026-11-23"
 ---
 
 # Tags Index
@@ -64,6 +64,10 @@ updated: "2026-11-22"
 - [[TCP 与 UDP 的区别与游戏选型]] — TCP vs UDP 十维度对比、队头阻塞、粘包归属、自研可靠 UDP
 - [[可靠 UDP 与 KCP 原理]] — 四个机制用户态详解 + RTT/RTO 术语速查与 RTO 自适应计算；KCP 取舍；选择性可靠
 - [[有限状态机FSM — 手写实现与状态切换边界]] — 手写 FSM 三层骨架、切换边界五要素、FSM vs 行为树 vs GOAP
+- [[第三人称相机控制 — LateUpdate 跟随与世界空间旋转相乘]] — 父 yaw / 子 pitch 双节点骨架；世界空间相乘致 roll；LateUpdate 跟随 + SmoothDamp + SphereCast 收线
+
+### 相机
+- [[第三人称相机控制 — LateUpdate 跟随与世界空间旋转相乘]] — `rotation *=` 乘的是世界轴、pitch 必须 clamp、枢轴要抬到头部、跟随放 LateUpdate 且要阻尼
 
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
@@ -497,3 +501,4 @@ updated: "2026-11-22"
 | 拖拽 | 1 |
 | 物理检测 | 2 |
 | DrawCall | 3 |
+| 相机 | 1 |

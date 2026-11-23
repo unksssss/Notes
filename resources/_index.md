@@ -1,7 +1,7 @@
 ---
 title: resources index
 type: index
-updated: "2026-11-22"
+updated: "2026-11-23"
 ---
 
 # Resources
@@ -29,7 +29,7 @@ updated: "2026-11-22"
 
 | File | Summary |
 | --- | --- |
-| [[伤害系统设计 — 接口驱动与职责分层]] | `IDamageable` + `readonly struct DamageInfo` + `Health` 三层拆分：子弹只认接口、不知受体身份；struct 消息零堆分配、加字段不动接口；`Health` 纯数值 + `Action<DamageInfo>` 事件外抛表现；六个真实漏洞根因（`TeamID` 私有未赋值致友伤判定恒失效、`Bullet` 硬编码 `teamID=0`、`isDead` 从不置 true 使 `OnDied` 重复触发 → 重复入池、`currentHealth` 默认 0 且 Player 从未 `Init`、`GetComponent` 不查父链、`LogError` 当日志）与死亡幂等要求（2026-11-22 实战） |
+| [[伤害系统设计 — 接口驱动与职责分层]] | `IDamageable` + `readonly struct DamageInfo` + `Health` 三层拆分：子弹只认接口、不知受体身份；struct 消息零堆分配、加字段不动接口；`Health` 纯数值 + `Action<DamageInfo>` 事件外抛表现；六个真实漏洞根因（`TeamID` 私有未赋值致友伤判定恒失效、`Bullet` 硬编码 `teamID=0`、`isDead` 从不置 true 使 `OnDied` 重复触发 → 重复入池、`currentHealth` 默认 0 且 Player 从未 `Init`、`GetComponent` 不查父链、`LogError` 当日志）与死亡幂等要求（2026-11-22 实战）；**2026-11-23 补记三坑**——物体上挂了两个 `Health`（`GetOrAddComponent` + 外部 `AddComponent` 共存）使 `GetComponent<IDamageable>` 命中没 `Init` 的那个 → 敌人一枪死；`healthSubscribed` 从未置 `true` → 重复订阅且永不退订；`Init` 散落在装配方导致玩家血量恒 0 |
 | [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
 | [[有限状态机FSM — 手写实现与状态切换边界]] | 手写 FSM 三层骨架（IState / 状态基类持 owner / 状态机 Dictionary 注册 + 幂等切换）；Exit→换ID→Enter 的顺序理由、非 MonoBehaviour 状态机开不了协程、状态切换边界五要素、FSM vs 行为树 vs GOAP；怪物 AI 实战 6 坑（每帧 SetDestination / 冷却只读不写 / 球形判定不判朝向 / int 存距离 / 单例伪 null） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
@@ -103,7 +103,7 @@ updated: "2026-11-22"
 | [[Unity 渲染批处理体系]] | 静态批处理 vs GPU Instancing vs SRP Batcher 对比、条件、陷阱、MPB 易混口诀；SRP Batcher 底层 CBUFFER 常量缓冲复用、破坏三条件、与 Instancing 路径二选一（Day 36 拔高） |
 | [[urp移动优化]] | URP 渲染管线在移动端的优化配置与技巧；含 2026 官方战略（BIRP 弃用、URP 唯一管线、HDRP 维护模式） |
 
-### scripting（11）
+### scripting（12）
 
 | File | Summary |
 | --- | --- |
@@ -118,6 +118,7 @@ updated: "2026-11-22"
 | [[热更新 HybridCLR — AOT 泛型元数据补全]] | 热更四步流程：程序集剥离 → AB+清单 MD5 下发 → 启动差异更新 → AOT 泛型元数据补全（DHE）；泛型=按需实例化、主包没见过的组合机器码没有；AOT vs JIT 精讲（Day 36 面经） |
 | [[YooAssets 热更新流程 — HybridCLR 实战]] | **学习项目实战**（`E:\unityproject\HybirdCLR`）：YooAssets 多包设计 + 三档运行模式（EditorSimulate/OfflinePlay/HostPlay）+ 八步链路（Initialize → CreatePackage → 文件系统与下载参数 → 请求版本 → 加载清单 → 差异下载 → LoadAssetAsync<TextAsset> → Assembly.Load + 反射调用 → Release）；DLL 为何改名 `.bytes`；自定义 IRemoteService 的多 CDN 容灾；**YooAsset 3.0.6 官方示例（YooAssets_HybirdCLR）首次打包实证**：产物三份（CDN/OutputCache/Simulate）+ `.report` 配置项语义（EnableSharePackRule / SingleReferencedPackAlone / FileNameStyle / CompressOption）+ ErrorCode201·601 警告 + buildlogtep 耗时拆解 + 补丁 FSM 八节点 + 四档 PlayMode 初始化参数 + 包版本号 vs URL 版本目录；**补丁 FSM 各节点实现细节**（ResourceDownloaderOptions(10,3) 参数语义 / `yield return downloader` = Operation 实现 IEnumerator / ClearCacheMethods 两枚举与清理时机）；**HostPlayMode 首次跑通的两个独立坑**（`BundledCopyOption` 默认 `None` → 缺 hash/BuiltinCatalog 导致初始化 404；打包后未同步 CDN → 内置 994 vs 远端 988 版本错位）+「hash → bytes → version 对齐」三层排查法（2026-10-13 · 2026-10-14 · 2026-10-17 补强） |
 | [[配置表读取 — Excel 导表、三行表头与反射映射]] | 配表三段链路（策划 Excel → 中间格式 → 运行时解析）；**三行表头**（字段名 / 类型 / 中文注释）必须跳过，且同一字段在前两行是 string、数据行才是 int；**Excel 的 SpreadsheetML 不是通用 XML**（字段名在 `<Data>` 文本里而非元素名、根下挂元数据、表格在 `Worksheet/Table/Row` 四层深）；**XmlDocument 五坑**——`FirstChild` 是 XmlDeclaration 导致静默返回空 List（该用 `DocumentElement`）、`GetFields()` 拿不到 `{get;set;}` 属性（该用 `GetProperties`）、`SetValue` 不做类型转换需 `Convert.ChangeType`（enum 单独 `Enum.Parse`）、`List.Add` 放内层导致数据 ×N、`Load(path)` 只在 Editor 成立（Android 是 jar 内路径，必须 `UnityWebRequest` + `LoadXml`）；**JsonUtility 五条硬限制**（顶层须对象 / 无 Dictionary / 类型严格 / 字段名逐字 / 只序列化 public 字段）；**反射按名逐字匹配**，`Bulletname` vs `BulletName` 静默失败 → 正解是导表时生成 C# 常量或二进制 Reader，运行时零反射；附九项校验清单（2026-11-02 `Empty` 项目实战） |
+| [[第三人称相机控制 — LateUpdate 跟随与世界空间旋转相乘]] | 第三人称相机骨架（PlayerCamera 承担 yaw / Main Camera 子节点承担 pitch）+ 四个真实坑：**`cameraTransform.rotation *= Quaternion.Euler(-dy,0,0)` 乘的是世界 X 轴**，玩家转身后上下看变成 roll（正解 `localRotation` 或绕 `transform.right`）；pitch 无 clamp 到 ±90° 画面倒转；枢轴取 `transform.position`（脚底）致视线贴地；跟随必须 `LateUpdate`（读本帧最终位置）+ `SmoothDamp` 阻尼（否则 `CharacterController` 贴地修正传导成抖动）。另含 Input System 鼠标增量不该乘 dt、`CursorLockMode.Locked` 必设、`SphereCast` 相机碰撞收线（2026-11-23 `Empty` 实战） |
 
 ### ui（11）
 
