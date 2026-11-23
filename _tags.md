@@ -164,6 +164,7 @@ updated: "2026-11-22"
 - [[整数优先队列]] — ★ `priority_queue` 默认大根堆，要最小得传 `greater<int>`；`endl` 逐行 flush 会 TLE
 - [[字符串哈希]] — 字符串 → 整数 → 桶下标三步；`return` 是退出码不是输出；单模数 1e9+7 在 n=1e4 约 5% 碰撞（实测 3/100 轮），双模数 0 碰撞
 - [[大整数哈希]] — `mod 2⁶⁴` = 无符号自然溢出；`2 ^ 64` 是异或 = 66；`long long` 读 2⁶⁴−1 会 failbit
+- [[元素方碑能量均衡]] — 操作只动 `i-1`/`i+1`（同奇偶）→ 奇偶两组和各自守恒；BFS 2512 组验证「两组均分且商相等」充要
 
 ### 寻路
 - [[A星寻路算法]] — A* = Dijkstra + 启发式 f=g+h、可采纳性保证最优
@@ -251,6 +252,7 @@ updated: "2026-11-22"
 - [[整数优先队列]] — 堆 = 完全二叉树 + 数组存储；push 上浮 / pop 末尾搬根再下沉，均 `O(log n)`
 - [[字符串哈希]] — `unordered_set` 自带去重、`reserve(n*2)` 免 14 次 rehash；`std::hash<string>` 是 MurmurHash
 - [[大整数哈希]] — 5e6 次操作：开放地址法 152 ms vs `unordered_map` 801 ms；`x & MASK` 需 splitmix64 防退化
+- [[元素方碑能量均衡]] — 只需 `O(1)` 空间：边读边把 x 累加到 sOdd / sEven，连数组都不用存
 
 ### 物理
 - [[Physics Raycast 与 NonAlloc]] — LayerMask 过滤、NonAlloc 零分配射线检测；2D 版（Physics2D）与 3D 的 API 差异、射线的成本判断
@@ -442,12 +444,12 @@ updated: "2026-11-22"
 | Tag | Count |
 |-----|-------|
 | unity | 40 |
-| 算法 | 55 |
+| 算法 | 56 |
 | 性能优化 | 10 |
 | unity面试 | 16 |
-| 数据结构 | 50 |
+| 数据结构 | 51 |
 | 二叉树 | 17 |
-| cpp | 47 |
+| cpp | 48 |
 | 每日学习 | 2 |
 | DOTS | 1 |
 | ECS | 1 |
