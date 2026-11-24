@@ -69,6 +69,9 @@ updated: "2026-11-23"
 ### 相机
 - [[第三人称相机控制 — LateUpdate 跟随与世界空间旋转相乘]] — `rotation *=` 乘的是世界轴、pitch 必须 clamp、枢轴要抬到头部、跟随放 LateUpdate 且要阻尼
 
+### 小地图
+- [[小地图实现 — 图标投影与坐标映射]] — RenderTexture 相机 vs UI 图标投影；`enemy-player` 符号、`z→y`、yaw 抵消、圆形按模长 clamp；Start 顺序竞争致 `Instantiate(null)`、模板 `anchoredPosition` 未归零
+
 ### 线程安全
 - [[Unity线程模型 — 子线程为什么不能碰Transform]] — 渲染帧首快照与数据竞争、帧内数据静止
 

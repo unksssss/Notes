@@ -29,7 +29,7 @@ updated: "2026-11-23"
 
 | File | Summary |
 | --- | --- |
-| [[伤害系统设计 — 接口驱动与职责分层]] | `IDamageable` + `readonly struct DamageInfo` + `Health` 三层拆分：子弹只认接口、不知受体身份；struct 消息零堆分配、加字段不动接口；`Health` 纯数值 + `Action<DamageInfo>` 事件外抛表现；六个真实漏洞根因（`TeamID` 私有未赋值致友伤判定恒失效、`Bullet` 硬编码 `teamID=0`、`isDead` 从不置 true 使 `OnDied` 重复触发 → 重复入池、`currentHealth` 默认 0 且 Player 从未 `Init`、`GetComponent` 不查父链、`LogError` 当日志）与死亡幂等要求（2026-11-22 实战）；**2026-11-23 补记三坑**——物体上挂了两个 `Health`（`GetOrAddComponent` + 外部 `AddComponent` 共存）使 `GetComponent<IDamageable>` 命中没 `Init` 的那个 → 敌人一枪死；`healthSubscribed` 从未置 `true` → 重复订阅且永不退订；`Init` 散落在装配方导致玩家血量恒 0 |
+| [[伤害系统设计 — 接口驱动与职责分层]] | `IDamageable` + `readonly struct DamageInfo` + `Health` 三层拆分：子弹只认接口、不知受体身份；struct 消息零堆分配、加字段不动接口；`Health` 纯数值 + `Action<DamageInfo>` 事件外抛表现；六个真实漏洞根因（`TeamID` 私有未赋值致友伤判定恒失效、`Bullet` 硬编码 `teamID=0`、`isDead` 从不置 true 使 `OnDied` 重复触发 → 重复入池、`currentHealth` 默认 0 且 Player 从未 `Init`、`GetComponent` 不查父链、`LogError` 当日志）与死亡幂等要求（2026-11-22 实战）；**2026-11-23 补记三坑**——物体上挂了两个 `Health`（`GetOrAddComponent` + 外部 `AddComponent` 共存）使 `GetComponent<IDamageable>` 命中没 `Init` 的那个 → 敌人一枪死；`healthSubscribed` 从未置 `true` → 重复订阅且永不退订；`Init` 散落在装配方导致玩家血量恒 0；**2026-11-24 补记第 ⑩ 坑**——`enemyAI.health = health` 只是把字段指向第二个组件，`GetComponent` 仍返回第一个（`currentHealth = 0`）→ 一枪死照旧，且「看起来修好了」比没修更危险 |
 | [[dots详解]] | Unity DOTS (ECS + Jobs + Burst) 完整讲解；含 Burst SIMD 向量化三要素（blittable/连续/对齐/__managed 阻断） |
 | [[有限状态机FSM — 手写实现与状态切换边界]] | 手写 FSM 三层骨架（IState / 状态基类持 owner / 状态机 Dictionary 注册 + 幂等切换）；Exit→换ID→Enter 的顺序理由、非 MonoBehaviour 状态机开不了协程、状态切换边界五要素、FSM vs 行为树 vs GOAP；怪物 AI 实战 6 坑（每帧 SetDestination / 冷却只读不写 / 球形判定不判朝向 / int 存距离 / 单例伪 null） |
 | [[scriptableobject数据驱动设计]] | 从面试题出发，由浅入深讲解 ScriptableObject 的原理与应用；运行时创建必须 CreateInstance（new 只有 C# 壳无原生侧）；CreateInstance 实例不随场景/GC 卸载需手动 Destroy |
@@ -120,10 +120,11 @@ updated: "2026-11-23"
 | [[配置表读取 — Excel 导表、三行表头与反射映射]] | 配表三段链路（策划 Excel → 中间格式 → 运行时解析）；**三行表头**（字段名 / 类型 / 中文注释）必须跳过，且同一字段在前两行是 string、数据行才是 int；**Excel 的 SpreadsheetML 不是通用 XML**（字段名在 `<Data>` 文本里而非元素名、根下挂元数据、表格在 `Worksheet/Table/Row` 四层深）；**XmlDocument 五坑**——`FirstChild` 是 XmlDeclaration 导致静默返回空 List（该用 `DocumentElement`）、`GetFields()` 拿不到 `{get;set;}` 属性（该用 `GetProperties`）、`SetValue` 不做类型转换需 `Convert.ChangeType`（enum 单独 `Enum.Parse`）、`List.Add` 放内层导致数据 ×N、`Load(path)` 只在 Editor 成立（Android 是 jar 内路径，必须 `UnityWebRequest` + `LoadXml`）；**JsonUtility 五条硬限制**（顶层须对象 / 无 Dictionary / 类型严格 / 字段名逐字 / 只序列化 public 字段）；**反射按名逐字匹配**，`Bulletname` vs `BulletName` 静默失败 → 正解是导表时生成 C# 常量或二进制 Reader，运行时零反射；附九项校验清单（2026-11-02 `Empty` 项目实战） |
 | [[第三人称相机控制 — LateUpdate 跟随与世界空间旋转相乘]] | 第三人称相机骨架（PlayerCamera 承担 yaw / Main Camera 子节点承担 pitch）+ 四个真实坑：**`cameraTransform.rotation *= Quaternion.Euler(-dy,0,0)` 乘的是世界 X 轴**，玩家转身后上下看变成 roll（正解 `localRotation` 或绕 `transform.right`）；pitch 无 clamp 到 ±90° 画面倒转；枢轴取 `transform.position`（脚底）致视线贴地；跟随必须 `LateUpdate`（读本帧最终位置）+ `SmoothDamp` 阻尼（否则 `CharacterController` 贴地修正传导成抖动）。另含 Input System 鼠标增量不该乘 dt、`CursorLockMode.Locked` 必设、`SphereCast` 相机碰撞收线（2026-11-23 `Empty` 实战） |
 
-### ui（11）
+### ui（12）
 
 | File | Summary |
 | --- | --- |
+| [[小地图实现 — 图标投影与坐标映射]] | 小地图两条路线（RenderTexture 相机 vs UI 图标投影）的代价对比与选型；世界 XZ → 归一化 → UI 坐标三步映射（`enemy-player` 符号方向、`z→y`、`detectRadius` 必须覆盖全场）；yaw 抵消让「上=玩家前方」；方形逐轴 clamp vs 圆形按模长 clamp + 图标半宽内缩；模板隐藏 → `Instantiate(prefab,parent)` → 字典双向查 → 显式 Remove 的生命周期；2026-11-24 Empty 实战 8 坑（Start 顺序竞争致 `Instantiate(null)`、符号全反 180°、模板 `anchoredPosition` 未归零、clamp 溢出容器、`enemyAIs` 未判 null、`dict[key]` 直接索引、`parent=` 保持世界坐标、`using Unity.VisualScripting` 脏引用） |
 | [[TMP Text 零分配更新]] | TextMeshPro 零 GC 分配更新文本：SetText 格式化重载直接写入内部字符缓冲、SetCharArray；避开 string 拼接与 Format 的堆分配 |
 | [[UGUI 图集原理与合批]] | 图集共享纹理免切换→合批；代价：尺寸上限/整张常驻内存/按界面分组；Mask(模板缓冲打断合批) vs RectMask2D(shader 裁剪)；动静分离三档分层（Day 37 面经） |
 | [[ToggleGroup底层机制]] | ToggleGroup allowSwitchOff 行为与底层调用链：Toggle.Set() 入口早退拦截 + NotifyToggleOn → SetAllTogglesOff |
@@ -284,4 +285,4 @@ updated: "2026-11-23"
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 146 篇资源笔记（unity 61 / os 1 / csharp 12 / algorithm 61 / archive 9 / meta 2）。算法区 61 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 147 篇资源笔记（unity 62 / os 1 / csharp 12 / algorithm 61 / archive 9 / meta 2）。算法区 61 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
