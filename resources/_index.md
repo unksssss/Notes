@@ -284,4 +284,4 @@ updated: "2026-11-23"
 
 > **每日面试题与算法题不在本目录**：每天问答过的题目记录在**日记**里（`journal/YYYY-MM/YYYY-MM-DD.md` 的「每日知识问答」节），那里才是「我每天学了什么」的载体。本目录只沉淀**已消化的知识讲解**。
 
-共 145 篇资源笔记（unity 60 / os 1 / csharp 12 / algorithm 61 / archive 9 / meta 2）。算法区 61 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
+共 146 篇资源笔记（unity 61 / os 1 / csharp 12 / algorithm 61 / archive 9 / meta 2）。算法区 61 篇已按 6 个子目录物理分类；`resources/algorithm/_index.md` 为分区导航（不计入）。
