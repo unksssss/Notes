@@ -1,7 +1,7 @@
 ---
 title: Knowledge Graph
 type: index
-updated: "2026-11-23"
+updated: "2026-11-25"
 ---
 
 # Knowledge Graph
@@ -248,6 +248,11 @@ TF-IDF weighted (rare tags + content overlap score higher):
 | [[多项式输出]] | [[验证IP地址]] | related |
 | [[多项式输出]] | [[判断是否为回文字符串]] | related |
 | [[多项式输出]] | [[一年中的第几天]] | related |
+| [[Unity 消息方法的虚方法隐藏 — override 与 new]] | [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] | related |
+| [[Unity 消息方法的虚方法隐藏 — override 与 new]] | [[MonoBehaviour生命周期与SetActive的坑]] | related |
+| [[Unity 消息方法的虚方法隐藏 — override 与 new]] | [[伤害系统设计 — 接口驱动与职责分层]] | related |
+| [[unity-inputsystem详解]] | [[Unity 消息方法的虚方法隐藏 — override 与 new]] | related |
+| [[伤害系统设计 — 接口驱动与职责分层]] | [[Unity 消息方法的虚方法隐藏 — override 与 new]] | related |
 
 ## Clusters
 

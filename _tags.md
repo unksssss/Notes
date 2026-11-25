@@ -1,7 +1,7 @@
 ---
 title: Tags Index
 type: index
-updated: "2026-11-23"
+updated: "2026-11-25"
 ---
 
 # Tags Index
@@ -312,7 +312,7 @@ updated: "2026-11-23"
 - [[进程与线程 — 基本概念与关系]] — 「栈是私有的，堆是大家的」；`count++` 非原子与三种修法；进程/线程/协程三层对比；Unity 主线程-子线程映射
 
 ### 输入系统
-- [[unity-inputsystem详解]] — 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用
+- [[unity-inputsystem详解]] — 从面试题出发，由浅入深讲解 Unity Input System 的原理与应用；第 8 节补重开局泄漏（`InputSystem_Actions` 非 UnityEngine.Object，`LoadScene` 不销毁 → MissingReferenceException）
 
 ### 动画
 - [[DOTween与协程选型]] — 协程管流程、DOTween 管补间，可中断可控是核心差异
@@ -321,6 +321,10 @@ updated: "2026-11-23"
 - [[MonoBehaviour生命周期与SetActive的坑]] — 执行顺序分阶段（Start 的依赖保证）；active 与 enabled 两开关分界；首次 vs 再次激活；Instantiate 同步跑 Awake
 - [[Update-FixedUpdate-LateUpdate执行时机]] — 三 Update 分工与两套时钟解耦
 - [[Unity 类继承体系 Object-Component-Behaviour-MonoBehaviour]] — Object→Component→Behaviour/MonoBehaviour 全景；BehaviourManager 派发与 enabled/isActiveAndEnabled 区别
+- [[Unity 消息方法的虚方法隐藏 — override 与 new]] — 消息按名字派发到最派生实现；`private void Awake()` 隐藏基类 virtual → 基类逻辑静默不执行（只有 CS0114 警告）
+
+### 继承与重写
+- [[Unity 消息方法的虚方法隐藏 — override 与 new]] — 隐藏 vs 覆盖的派发差异、三个真实现场（Player.Awake / Player.Update）、`protected override` + `base.` 与「非虚消息 + 虚钩子」两种正解
 
 ### UGUI
 - [[UGUI Canvas 渲染模式与屏幕适配]] — Canvas 三渲染模式 + Canvas Scaler 三模式 + 刘海屏 SafeArea
@@ -488,7 +492,7 @@ updated: "2026-11-23"
 | 异步 | 1 |
 | 对象池 | 1 |
 | 动画 | 1 |
-| 生命周期 | 3 |
+| 生命周期 | 4 |
 | UGUI | 9 |
 | 物理 | 2 |
 | daily | 1 |
@@ -515,3 +519,4 @@ updated: "2026-11-23"
 
 | 状态机 | 1 |
 | 集合 | 1 |
+| 继承与重写 | 1 |

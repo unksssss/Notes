@@ -3,11 +3,11 @@ title: "Unity InputSystem详解"
 type: resource
 tags: [unity, InputSystem, 输入系统]
 created: "2026-04-29"
-updated: "2026-04-29"
+updated: "2026-11-25"
 status: active
-summary: "从面试题出发，由浅入深讲解 Unity Input System 的原理与应用"
-source: ""
-related: ["[[unity网络同步方案-状态同步vs帧同步]]"]
+summary: "从面试题出发，由浅入深讲解 Unity Input System 的原理与应用；第 8 节补入重开局泄漏实战：生成的 `InputSystem_Actions` 不是 `UnityEngine.Object`，`LoadScene` 不销毁它 → ActionMap 仍 enabled、委托指向已销毁实例 → `MissingReferenceException`，正解是 `Awake` 只 new、`Bind/UnBind` 在 `OnEnable`/`OnDisable` 配对、`OnDestroy` 里 `Disable + Dispose + 置 null`。"
+source: "2026-11-25 Empty 项目 ReGame 实战补强"
+related: ["[[unity网络同步方案-状态同步vs帧同步]]", "[[Unity 消息方法的虚方法隐藏 — override 与 new]]"]
 ---
 
 # Unity InputSystem 详解
@@ -282,7 +282,93 @@ void StopVibration()
 - **旧版 Input 和 Input System 冲突**：在 Project Settings → Player → Active Input Handling 里选 **Input System Package (New)** 或 **Both**
 - **连点器检测**：`started` 和 `performed` 在快速连按时可能同步触发，如果只需要"按一下"的效果，只用 `performed`
 
+## 8. 重开局泄漏：`InputSystem_Actions` 不是 UnityEngine.Object（2026-11-25 实战）
+
+**现象**：打完一局点「再来一局」，`SceneManager.LoadScene` 重载场景后，**鼠标一动就抛 `MissingReferenceException`**，日志指向旧 `Player` 的 `transform` / `Animator`。
+
+**根因**：`.inputactions` 生成的 C# 类（`InputSystem_Actions`）是**普通 C# 对象，不是 `UnityEngine.Object`**。
+
+| | `MonoBehaviour` / `ScriptableObject` | 生成的 `InputSystem_Actions` |
+| --- | --- | --- |
+| 是否 `UnityEngine.Object` | 是 | **否** |
+| 场景卸载时 | 被 Unity 销毁 | **原封不动**（GC 才管它） |
+| 销毁后判空 | `== null` 成立（重载了 `==`） | 只能靠 `Dispose()` |
+
+于是 `LoadScene` 之后：旧实例还活着 → 它的 `Player` ActionMap 仍然 **enabled** → 委托仍然指向**已销毁的 `Player` 实例方法** → 新场景又 `new` 一份并 `Enable()` → **两份 ActionMap 同时 enabled**，一次鼠标移动两份回调都跑，旧的那份访问已销毁对象就炸。
+
+> 关键认知：**`Enabled` 状态和委托订阅是「活着的托管对象上的状态」，不归场景管**。任何 `Action`/`event`/`InputAction`/`CancellationTokenSource` 字段都是同一个雷区。
+
+**正确骨架**：
+
+```cs
+public class Player : RoleBase
+{
+    private InputSystem_Actions input;
+
+    private void Awake()
+    {
+        input = new InputSystem_Actions();   // 只 new，不 Enable
+    }
+
+    protected override void OnEnable()
+    {
+        base.OnEnable();      // RoleBase 里的 Health 订阅
+        BindInput();
+    }
+
+    protected override void OnDisable()
+    {
+        UnBindInput();
+        base.OnDisable();
+    }
+
+    private void OnDestroy()
+    {
+        if (input == null) return;
+        UnBindInput();
+        input.Dispose();      // 释放非托管资源 + 清空绑定
+        input = null;
+    }
+
+    private void BindInput()
+    {
+        if (input == null) return;
+        // 幂等：先 -= 再 +=，防 OnEnable 多次触发导致重复订阅
+        input.Player.Move.performed   -= OnMove;
+        input.Player.Move.performed   += OnMove;
+        input.Player.Attack.performed -= OnAttack;
+        input.Player.Attack.performed += OnAttack;
+        input.Player.Enable();
+    }
+
+    private void UnBindInput()
+    {
+        if (input == null) return;
+        input.Player.Disable();   // 先停派发，再退订
+        input.Player.Move.performed   -= OnMove;
+        input.Player.Attack.performed -= OnAttack;
+    }
+}
+```
+
+**四个容易写错的点**：
+
+1. **`Dispose()` 之后不能再用** —— `input` 必须置 `null`，下次 `OnEnable` 前要重新 `new`（本项目是「一个场景一个 Player」，所以放 `OnDestroy` 即可）。
+2. **顺序是「先 `Disable` 再 `-=`」** —— 反过来在退订过程中仍可能有回调进来。
+3. **订阅写在 `OnEnable` 而不是 `Start`** —— `Start` 一辈子只跑一次，`OnDisable` 退订后就再也绑不回来了（对象池/`SetActive` 复用场景直接失效）。
+4. **`callback` 里不要做重活** —— `performed` 是输入线程同步进来的，只做「记下意图」，真正逻辑放 `Update`。
+
+**同类隐患清单**（都是「非 UnityEngine.Object + 订阅」）：
+
+- `joyStick.Motion = OnJoyStick`（普通 `Action` 字段）—— 场景卸载不会自动解绑，`OnDisable` 里要 `-=`；
+- `public static event Action OnFire` —— 生命周期跟**程序集**不跟场景，静态事件会持有已销毁实例 → 强引用泄漏 + `MissingReferenceException`；
+- 订阅方自己不退订时，静态事件是最难查的一种（`-=` 忘了写，谁也发现不了）。
+
+**自检**：重开局/切场景后，看 `InputDebugger` 里同一 ActionMap 是不是有**两份以上** enabled 实例；或在回调里打 `GetInstanceID()`，看是否出现旧 ID。
+
 ## 相关笔记
 
 - [[scriptableobject数据驱动设计]] — Input Actions 配置和 ScriptableObject 都是数据驱动思路
 - [[profiler自定义采样]] — 用 Profiler 检测输入延迟
+- [[Unity 消息方法的虚方法隐藏 — override 与 new]] — `Player.Awake` 隐藏基类 `Awake` 导致初始化静默丢失
+- [[UnityEngine.Object 判空与销毁机制]] — 为什么 `InputSystem_Actions` 的 `== null` 永远不成立
